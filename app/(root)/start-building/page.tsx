@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import octopus from '@/public/Octopus.json'
 import pirate from '@/public/Pirateship.json'
 import dynamic from "next/dynamic";
-
 const Lottie = dynamic(() => import('react-lottie'), {ssr: false});
 
 const octopusAnimation = {
