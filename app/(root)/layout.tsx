@@ -4,6 +4,9 @@ import "../globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider"
 import NavBarHomePage from "@/components/navbar/NavBarHomePage";
+import BackToTopButton from "@/components/BackToTopButton";
+import ScrollProgressBar from "@/components/ScrollProgressBar";
+import {SiteFooter} from "@/components/footer/SiteFooter";
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -17,7 +20,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Home Page",
+  title: "Cloudinator",
   description: "Cloudinator Application",
 };
 
@@ -38,7 +41,10 @@ export default function RootLayout({
           disableTransitionOnChange
       >
           <NavBarHomePage/>
+          <ScrollProgressBar />
           {children}
+          <BackToTopButton />
+          <SiteFooter />
       </ThemeProvider>
       </body>
     </html>
