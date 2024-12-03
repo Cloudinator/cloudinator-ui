@@ -26,7 +26,7 @@ const features: Feature[] = [
     {
         title: "Personal Dashboard",
         description:
-            "Customize your workspace with a personal profile that provides at-a-glance insights.",
+            "Customize your workspace with a personal dashboard that provides at-a-glance insights.",
         icon: LayoutDashboardIcon,
     },
     {
