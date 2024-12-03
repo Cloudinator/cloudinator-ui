@@ -1,5 +1,6 @@
 
 import type {Metadata} from "next";
+import Domain from "@/components/profiledashboard/domain/Domain";
 
 export const metadata: Metadata = {
     title: "Domain Profile",
@@ -9,9 +10,7 @@ export const metadata: Metadata = {
 export default function DomainPage() {
     return (
         <>
-            <div className="w-full h-screen grid place-content-center">
-                <h1>This is Domain Profile</h1>
-            </div>
+            <Domain />
         </>
     );
 }
