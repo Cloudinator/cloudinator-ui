@@ -23,7 +23,7 @@ const tutorialSteps = [
     },
     {
         title: "Documentation",
-        content: "A ton of resources for software developer to deep dive with Spring and DevOps",
+        content: "A ton of resources for software developers to deep dive with Spring and DevOps",
         image: "/assets/documentpage.svg"
     },
     {
@@ -79,7 +79,7 @@ const TutorialPopup: React.FC = () => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [currentStep, nextStep, prevStep]);
+    }, [currentStep]);
 
     return (
         <>
@@ -96,7 +96,7 @@ const TutorialPopup: React.FC = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-primary opacity-50 dark:bg-gray-900 dark:bg-opacity-90 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
+                        className="fixed inset-0 dark:bg-opacity-50 bg-opacity-50 dark:bg-gray-900 flex items-center justify-center p-4 z-50 backdrop-blur-sm" // Increased opacity here
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
@@ -104,13 +104,6 @@ const TutorialPopup: React.FC = () => {
                             exit={{ scale: 0.9, opacity: 0 }}
                             className="bg-white dark:bg-gray-800 rounded-lg shadow-xl px-8 pt-4 pb-6 max-w-md w-full relative transition-transform duration-300 ease-in-out"
                         >
-              {/*              <button*/}
-              {/*  onClick={closeTutorial}*/}
-              {/*  className="absolute top-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"*/}
-              {/*  aria-label="Close tutorial"*/}
-              {/*>*/}
-              {/*  <X className="w-6 h-6" />*/}
-              {/*</button> */}
                             <button onClick={closeTutorial} className="text-gray-500 flex justify-end w-full">
                                 Skip Tutorial
                             </button>

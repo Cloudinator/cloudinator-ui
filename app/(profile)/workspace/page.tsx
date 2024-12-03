@@ -1,5 +1,5 @@
-import Workspace from "@/components/profiledashboard/workspace/Workspace";
 import type {Metadata} from "next";
+import Workspace from "@/components/profiledashboard/workspace/Workspace";
 
 export const metadata: Metadata = {
     title: "Workspace Profile",
