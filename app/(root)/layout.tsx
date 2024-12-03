@@ -7,6 +7,7 @@ import NavBarHomePage from "@/components/navbar/NavBarHomePage";
 import BackToTopButton from "@/components/BackToTopButton";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
 import {SiteFooter} from "@/components/footer/SiteFooter";
+import TutorialPopup from "@/components/TutorialPopup";
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -45,6 +46,7 @@ export default function RootLayout({
           {children}
           <BackToTopButton />
           <SiteFooter />
+          <TutorialPopup />
       </ThemeProvider>
       </body>
     </html>

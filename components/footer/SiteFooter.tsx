@@ -10,15 +10,15 @@ export function SiteFooter({ className, ...props }: FooterProps) {
             <div className="container px-4 md:px-6">
                 <div className="grid gap-8 py-8 md:grid-cols-2 lg:grid-cols-5">
                     <div className="lg:col-span-1">
-                        <Link href="/" className="flex items-center space-x-2">
-                            <Image
-                                src="/placeholder.svg"
-                                alt="Cloudinator Logo"
-                                width={40}
-                                height={40}
-                                className="h-10 w-10"
-                            />
+                        <Link href="/" className="items-center space-x-2">
                             <span className="text-xl font-bold">Cloudinator</span>
+                            <Image
+                                src="/logo.png"
+                                alt="Cloudinator Logo"
+                                width={100}
+                                height={100}
+                                className="h-100 w-100"
+                            />
                         </Link>
                     </div>
                     <div className="grid gap-4 lg:col-span-3 lg:grid-cols-3">
@@ -108,7 +108,7 @@ export function SiteFooter({ className, ...props }: FooterProps) {
                                     className="block transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg overflow-hidden"
                                 >
                                     <Image
-                                        src="/placeholder.svg"
+                                        src="/istad.png"
                                         alt={`Sponsor ${sponsor}`}
                                         width={120}
                                         height={60}
@@ -123,7 +123,7 @@ export function SiteFooter({ className, ...props }: FooterProps) {
                     <p>
                         © 2024 Your DevOps Platform by{' '}
                         <Link
-                            href="https://cstad.com"
+                            href="https://istad.edu.kh"
                             className="text-violet-500 hover:text-violet-600 font-medium transition-colors"
                         >
                             ISTAD
