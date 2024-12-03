@@ -22,7 +22,7 @@ const navigation = [
     { name: 'Domain', href: '/domain', icon: Globe },
     { name: 'User', href: '/user', icon: Globe },
     { name: 'Deployment', href: '/deployment', icon: Globe },
-    { name: 'Setting', href: '/setting', icon: Settings },
+    { name: 'Setting', href: '/setting/account', icon: Settings },
 ]
 
 export function SidebarDashboardProfile() {

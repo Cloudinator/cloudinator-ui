@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell, Search, Settings, LogOut } from 'lucide-react';
 import Link from "next/link";
+import Image from "next/image";
 
 const DashboardHeaderProfile = () => {
+    const profileImage = "/profile.png";
     return (
         <div className="border-b px-4 sticky top-0 z-10 bg-white shadow-sm">
             <div className="flex h-14 items-center px-4">
@@ -59,10 +61,12 @@ const DashboardHeaderProfile = () => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button className="relative h-8 w-8 rounded-full bg-gray-500">
-                                <img
-                                    src="/api/placeholder/32/32"
+                                <Image
+                                    src={profileImage}
                                     alt="Profile"
-                                    className="rounded-full"
+                                    width={32}
+                                    height={32}
+                                    className="rounded-full object-cover"
                                 />
                             </Button>
                         </DropdownMenuTrigger>
@@ -74,7 +78,7 @@ const DashboardHeaderProfile = () => {
                             {/*    Profile*/}
                             {/*</DropdownMenuItem>*/}
                             <DropdownMenuItem asChild>
-                                <Link href="/setting">
+                                <Link href="/setting/account">
                                     <Settings className="mr-2 h-4 w-4" />
                                     Setting
                                 </Link>
