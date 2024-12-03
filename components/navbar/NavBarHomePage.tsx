@@ -36,7 +36,7 @@ const NavBarHomePage = () => {
     const navItems = [
         { path: "/", label: "Home" },
         { path: "/service", label: "Service" },
-        { path: "/document", label: "Document" },
+        { path: "https://cloudinator-doc-vercel.vercel.app/", label: "Document" },
         { path: "/start-building", label: "Start Building" },
         { path: "/about", label: "About" },
     ];

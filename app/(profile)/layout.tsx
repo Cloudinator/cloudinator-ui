@@ -5,6 +5,7 @@ import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
 import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
 import {SidebarDashboardProfile} from "@/components/profiledashboard/SidebarDashboardProfile";
+import DashboardHeaderProfile from "@/components/profiledashboard/DashboardHeaderProfile";
 
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -39,8 +40,10 @@ export default function DashboardLayout({
           disableTransitionOnChange
       >
           <SidebarProvider>
+
               <SidebarDashboardProfile />
               <SidebarInset>
+                  <DashboardHeaderProfile />
                   {children}
               </SidebarInset>
           </SidebarProvider>
