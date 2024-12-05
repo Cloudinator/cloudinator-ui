@@ -1,6 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+"use client";
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DashboardSubNavbar from "@/components/navbar/DashboardSubNavbar";
 
 export const metadata = {
@@ -33,10 +35,10 @@ export default function Team() {
         <div>
             <DashboardSubNavbar />
             <div className="px-8 py-4 max-w-4xl">
-                <Card>
+                <Card className="border border-purple-300">
                     <CardHeader>
-                        <CardTitle>Team Management</CardTitle>
-                        <CardDescription>Manage your team members and their roles.</CardDescription>
+                        <CardTitle className="text-purple-600">Team Management</CardTitle>
+                        <CardDescription className="text-gray-700">Manage your team members and their roles.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
@@ -48,16 +50,20 @@ export default function Team() {
                                             <AvatarFallback>{member.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <p className="font-medium">{member.name}</p>
+                                            <p className="font-medium text-purple-600">{member.name}</p>
                                             <p className="text-sm text-gray-500">{member.role}</p>
                                         </div>
                                     </div>
-                                    <Button variant="outline">Manage</Button>
+                                    <Button variant="outline" className="border-purple-500 text-purple-500 hover:bg-purple-100">
+                                        Manage
+                                    </Button>
                                 </div>
                             ))}
                         </div>
                         <div className="mt-6">
-                            <Button>Invite Team Member</Button>
+                            <Button className="bg-purple-600 text-white hover:bg-purple-700">
+                                Invite Team Member
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
