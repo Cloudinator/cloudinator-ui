@@ -103,19 +103,21 @@ jobs:
           name: Deploy to Server
           command: |
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << END_SSH
+              set -e  # Exit immediately if a command exits with a non-zero status
+      
               # Pull the latest Docker image
               docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-            
+      
               # Stop and remove the existing container if it exists
               docker stop cloudinator-ui || true
               docker rm cloudinator-ui || true
-            
+      
               # Run the new container
               docker run -d \
                 --name cloudinator-ui \
                 -p 3000:3000 \
                 vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-            
+      
               # Create Nginx configuration for reverse proxy
               cat << END_NGINX | sudo tee /etc/nginx/sites-available/cloudinator-ui
               server {
@@ -123,7 +125,7 @@ jobs:
                 server_name cloudinator-ui.naktech.pro;
       
                 location / {
-                  proxy_pass http://157.245.153.57:3000;
+                  proxy_pass http://157.245.153.57:3000;  # Use localhost since it's on the same server
                   proxy_http_version 1.1;
                   proxy_set_header Upgrade \$http_upgrade;
                   proxy_set_header Connection 'upgrade';
@@ -132,7 +134,7 @@ jobs:
                 }
               }
               END_NGINX
-            
+      
               # Enable the site and restart Nginx
               sudo ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
               sudo nginx -t && sudo systemctl restart nginx || echo "Nginx restart failed"
