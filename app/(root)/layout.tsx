@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "../globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider"
@@ -9,15 +8,12 @@ import ScrollProgressBar from "@/components/ScrollProgressBar";
 import {SiteFooter} from "@/components/footer/SiteFooter";
 import TutorialPopup from "@/components/TutorialPopup";
 
-const geistSans = localFont({
-  src: "../fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "../fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+import { Poppins } from 'next/font/google';
+
+const poppins = Poppins({
+    subsets: ['latin'],
+    weight: ['400', '500', '600', '700'],
+    variable: '--font-poppins',
 });
 
 export const metadata: Metadata = {
@@ -33,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={poppins.className}
       >
       <ThemeProvider
           attribute="class"
@@ -43,7 +39,7 @@ export default function RootLayout({
       >
           <NavBarHomePage/>
           <ScrollProgressBar />
-          {children}
+            {children}
           <BackToTopButton />
           <SiteFooter />
           <TutorialPopup />
