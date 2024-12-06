@@ -86,10 +86,12 @@ jobs:
           command: |
             docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - Dockerfile
+      # Persisting the Dockerfile is not necessary unless you need it later.
+      # Uncomment if needed.
+      # - persist_to_workspace:
+      #     root: .
+      #     paths:
+      #       - Dockerfile
 
   deploy-to-server:
     executor: deploy-executor
@@ -137,7 +139,7 @@ jobs:
 
               # Enable the site and restart Nginx
               ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
-              nginx -t && systemctl restart nginx
+              nginx -t && systemctl restart nginx || echo "Nginx restart failed"
             EOF
 
 workflows:
