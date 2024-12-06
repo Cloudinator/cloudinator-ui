@@ -16,13 +16,13 @@ if [ $? -eq 0 ]; then
   read commit_message
   git commit -m "$commit_message"
 
-  echo "Enter Branch:"
+  echo "Enter branch:"
   read branch
 
   # Push the changes to the remote repository
   git push origin "$branch"
 
-  echo "Changes pushed successfully."./buil
+  echo "Changes pushed successfully."
 else
   echo "Build failed. Aborting Git operations."
   exit 1
