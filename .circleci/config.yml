@@ -7,55 +7,78 @@ orbs:
 
 jobs:
   build-nextjs:
-    # Build Next.js project
     executor: node/default
     docker:
       - image: cimg/node:20.17.0
     steps:
       - checkout
-      - run:
-          name: Install Dependencies with npm install --force
-          command: npm install --force
+      - node/install-packages:
+          pkg-manager: npm
+          override-ci-command: npm install --force
       - run:
           name: Set Node.js Environment
-          command: echo 'NODE_ENV=production' >> $BASH_ENV  # Ensure production environment
+          command: echo 'NODE_ENV=production' >> $BASH_ENV
+
+      - restore_cache:
+          keys:
+            - npm-deps-{{ checksum "package-lock.json" }}
+      - save_cache:
+          key: npm-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+
       - run:
           name: Build the Next.js project
           command: npm run build
+
+      # Ensure artifacts directory exists and copy build artifacts
       - run:
-          name: Create the ~/artifacts directory
-          command: mkdir -p ~/artifacts
-      - run:
-          name: Copy Next.js output to artifacts
+          name: Prepare Build Artifacts
           command: |
-            cp -R .next ~/artifacts/.next 2>/dev/null || true  # Copy .next directory
-            cp -R public ~/artifacts/public 2>/dev/null || true  # Copy public directory
+            mkdir -p ~/artifacts/.next
+            mkdir -p ~/artifacts/public
+            cp -R .next/* ~/artifacts/.next/ || true
+            cp -R public/* ~/artifacts/public/ || true
+
       - persist_to_workspace:
           root: ~/artifacts
           paths:
-            - .next  # Persist the Next.js build artifacts
-            - public  # Persist public assets
-
+            - .next
+            - public
 
   docker-build-and-push:
-    # Build and push Docker image
     executor: docker/default
     docker:
-      - image: cimg/docker:24.0  # Use a recent Docker image
+      - image: cimg/docker:24.0
     steps:
       - checkout
       - setup_remote_docker:
           version: 20.10.16
+
+      # Attach workspace before Docker build
       - attach_workspace:
-          at: ~/artifacts  # Changed from /workspace to match persist_to_workspace root
+          at: ~/artifacts
+
+      # Add Docker build context preparation step
+      - run:
+          name: Prepare Docker Build Context
+          command: |
+            cp -R ~/artifacts/.next .next
+            cp -R ~/artifacts/public public
+
       - run:
           name: Build Docker Image
           command: |
-            docker build -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
+            docker build \
+              --build-arg NEXT_BUILD_ID=${CIRCLE_SHA1} \
+              -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
+
+      # Use environment variables for Docker credentials
       - run:
           name: Docker Login
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+
       - run:
           name: Push Docker Image
           command: |
