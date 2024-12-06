@@ -36,6 +36,7 @@ jobs:
             - .next  # Persist the Next.js build artifacts
             - public  # Persist public assets
 
+
   docker-build-and-push:
     # Build and push Docker image
     executor: docker/default
@@ -46,7 +47,7 @@ jobs:
       - setup_remote_docker:
           version: 20.10.16
       - attach_workspace:
-          at: /workspace
+          at: ~/artifacts  # Changed from /workspace to match persist_to_workspace root
       - run:
           name: Build Docker Image
           command: |
