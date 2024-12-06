@@ -3,6 +3,7 @@ version: 2.1
 
 orbs:
   node: circleci/node@5
+  docker: circleci/docker@3.2.1
 
 jobs:
   build-nextjs:
@@ -35,8 +36,34 @@ jobs:
           paths:
             - .next  # Persist the Next.js build artifacts
             - public  # Persist public assets
-
+  docker-build-and-push:
+    executor: docker/default
+    steps:
+      - checkout
+      - setup_remote_docker:
+           version: 20.10.16
+      - attach_workspace:
+          at: /workspace
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -t vathanaksol/cloudinator-ui:latest .
+      - run:
+          name: Authenticate with Docker Hub
+          command: |
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - run:
+          name: Tag Docker Image
+          command: |
+            docker tag cloudinator-ui:latest vathanaksol/cloudinator-ui:latest
+      - run:
+          name: Push Docker Image
+          command: |
+            docker push vathanaksol/cloudinator-ui:latest
 workflows:
   build-and-test:
     jobs:
       - build-nextjs
+      - docker-build-and-push:
+          requires:
+            - build-nextjs
