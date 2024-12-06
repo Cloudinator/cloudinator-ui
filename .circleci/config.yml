@@ -76,7 +76,13 @@ jobs:
       - run:
           name: Docker Login
           command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
+
+      - run:
+          name: Verify Docker Login Credentials
+          command: |
+            echo "Username length: ${#DOCKERHUB_USERNAME}"
+            echo "Password length: ${#DOCKERHUB_PASSWORD}"
 
       - run:
           name: Push Docker Image
