@@ -1,4 +1,3 @@
-# CircleCI Configuration for Next.js 15 project with Docker build and deploy
 version: 2.1
 
 orbs:
@@ -13,6 +12,10 @@ executors:
   docker-executor:
     machine:
       image: ubuntu-2004:current
+
+  deploy-executor:
+    docker:
+      - image: cimg/base:stable
 
 jobs:
   build-nextjs:
@@ -95,11 +98,11 @@ jobs:
           at: ~/project
       - add_ssh_keys:
           fingerprints:
-            - "$SSH_KEY_FINGERPRINT"  # Add your SSH key fingerprint from CircleCI project settings
+            - "$SSH_KEY_FINGERPRINT"
       - run:
           name: Deploy to Server
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'END_SSH'
               # Pull the latest Docker image
               docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
             
@@ -113,9 +116,8 @@ jobs:
                 -p 3000:3000 \
                 vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
             
-              # Optional: Nginx configuration for reverse proxy
-              # Ensure you have a pre-configured Nginx setup on the server
-              cat > /etc/nginx/sites-available/cloudinator-ui <<EOF2
+              # Nginx configuration for reverse proxy
+              cat > /etc/nginx/sites-available/cloudinator-ui << 'END_NGINX'
               server {
                 listen 80;
                 server_name cloudinator-ui.naktech.pro;
@@ -129,12 +131,12 @@ jobs:
                     proxy_cache_bypass \$http_upgrade;
                 }
               }
-            EOF2
+              END_NGINX
             
               # Enable the site and restart Nginx
               ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
               nginx -t && systemctl restart nginx
-            EOF
+            END_SSH
 
 workflows:
   build-and-deploy:
