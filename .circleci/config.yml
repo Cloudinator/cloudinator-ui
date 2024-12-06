@@ -104,7 +104,7 @@ jobs:
           command: |
             IMAGE_TAG="${CIRCLE_SHA1:-latest}"
 
-            ssh -o StrictHostKeyChecking=no "$SSH_USER"@"$SSH_HOST" bash <<EOF
+            ssh -o StrictHostKeyChecking=no "$SSH_USER"@"$SSH_HOST" bash << EOF
               # Pull the latest Docker image
               docker pull "vathanaksol/cloudinator-ui:$IMAGE_TAG"
 
