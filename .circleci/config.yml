@@ -140,8 +140,6 @@ jobs:
               sudo nginx -t && sudo systemctl restart nginx || echo "Nginx restart failed"
             END_SSH
 
-
-
 workflows:
   build-and-deploy:
     jobs:
