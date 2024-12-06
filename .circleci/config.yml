@@ -102,43 +102,44 @@ jobs:
       - run:
           name: Deploy to Server
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
-            # Define image tag
+            # Use environment variables directly
             IMAGE_TAG="${CIRCLE_SHA1:-latest}"
-
-            # Pull the latest Docker image
-            docker pull vathanaksol/cloudinator-ui:$IMAGE_TAG
-          
-            # Stop and remove the existing container if it exists
-            docker stop cloudinator-ui || true
-            docker rm cloudinator-ui || true
-          
-            # Run the new container
-            docker run -d \
-              --name cloudinator-ui \
-              -p 3000:3000 \
-              vathanaksol/cloudinator-ui:$IMAGE_TAG
-          
-            # Nginx configuration for reverse proxy
-            cat > /etc/nginx/sites-available/cloudinator-ui << NGINX_EOF
-            server {
-              listen 80;
-              server_name cloudinator-ui.naktech.pro;
-          
-              location / {
-                  proxy_pass http://157.245.153.57:3000;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade \$http_upgrade;
-                  proxy_set_header Connection 'upgrade';
-                  proxy_set_header Host \$host;
-                  proxy_cache_bypass \$http_upgrade;
+            
+            # SSH deployment command
+            ssh -o StrictHostKeyChecking=no "$SSH_USER"@"$SSH_HOST" bash <<'EOF'
+              # Pull the latest Docker image
+              docker pull "vathanaksol/cloudinator-ui:$IMAGE_TAG"
+            
+              # Stop and remove the existing container if it exists
+              docker stop cloudinator-ui || true
+              docker rm cloudinator-ui || true
+            
+              # Run the new container
+              docker run -d \
+                --name cloudinator-ui \
+                -p 3000:3000 \
+                "vathanaksol/cloudinator-ui:$IMAGE_TAG"
+            
+              # Nginx configuration for reverse proxy
+              cat > /etc/nginx/sites-available/cloudinator-ui <<NGINX_EOF
+              server {
+                listen 80;
+                server_name cloudinator-ui.naktech.pro;
+            
+                location / {
+                    proxy_pass http://157.245.153.57:3000;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                }
               }
-            }
-            NGINX_EOF
-          
-            # Enable the site and restart Nginx
-            ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
-            nginx -t && systemctl restart nginx
+              NGINX_EOF
+            
+              # Enable the site and restart Nginx
+              ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
+              nginx -t && systemctl restart nginx
             EOF
             
 workflows:
