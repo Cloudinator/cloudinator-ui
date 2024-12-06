@@ -77,53 +77,51 @@ jobs:
             - Dockerfile
             - docker-compose.yml  # Add if you have one
   
-  deploy-to-server:
-    executor: deploy-executor
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - add_ssh_keys:
-          fingerprints:
-            - "$SSH_KEY_FINGERPRINT"  # Add your SSH key fingerprint from CircleCI project settings
-      - run:
-          name: Deploy to Server
-          command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
-              # Pull the latest Docker image
-              docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-              
-              # Stop and remove the existing container if it exists
-              docker stop cloudinator-ui || true
-              docker rm cloudinator-ui || true
-              
-              # Run the new container
-              docker run -d \
-                --name cloudinator-ui \
-                -p 3000:3000 \
-                vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-              
-              # Optional: Nginx configuration for reverse proxy
-              # Ensure you have a pre-configured Nginx setup on the server
-              cat > /etc/nginx/sites-available/cloudinator <<EOF2
-              server {
-                listen 80;
-                server_name yourdomain.com;
-                
-                location / {
-                    proxy_pass http://localhost:3000;
-                    proxy_http_version 1.1;
-                    proxy_set_header Upgrade \$http_upgrade;
-                    proxy_set_header Connection 'upgrade';
-                    proxy_set_header Host \$host;
-                    proxy_cache_bypass \$http_upgrade;
-                }
-              }
-            EOF2
-              
-              # Enable the site and restart Nginx
-              ln -sf /etc/nginx/sites-available/cloudinator /etc/nginx/sites-enabled/
-              nginx -t && systemctl restart nginx
-            EOF
+  - run:
+      name: Deploy to Server
+      command: |
+        ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
+          set -e  # Exit immediately if a command exits with a non-zero status
+  
+          # Pull the latest Docker image
+          echo "Pulling the latest Docker image..."
+          docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+          
+          # Stop and remove the existing container if it exists
+          echo "Stopping existing container if it exists..."
+          docker stop cloudinator-ui || true
+          docker rm cloudinator-ui || true
+          
+          # Run the new container
+          echo "Running the new container..."
+          docker run -d \
+            --name cloudinator-ui \
+            -p 3000:3000 \
+            vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+          
+          # Optional: Nginx configuration for reverse proxy
+          echo "Creating Nginx configuration..."
+          cat > /etc/nginx/sites-available/cloudinator <<EOF2
+          server {
+            listen 80;
+            server_name yourdomain.com;  # Replace with your actual domain
+            
+            location / {
+                proxy_pass http://localhost:3000;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade \$http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host \$host;
+                proxy_cache_bypass \$http_upgrade;
+            }
+          }
+  EOF2
+          
+          # Enable the site and restart Nginx
+          echo "Enabling the site and restarting Nginx..."
+          ln -sf /etc/nginx/sites-available/cloudinator /etc/nginx/sites-enabled/
+          nginx -t && systemctl restart nginx || echo "Nginx restart failed"
+        EOF
 
 workflows:
   build-and-deploy:
