@@ -32,4 +32,4 @@ workflows:
     # - deploy:
     #     requires:
     #       - build-node
-version: 2
+version: 2.1
