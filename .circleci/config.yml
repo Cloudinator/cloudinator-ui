@@ -13,10 +13,6 @@ executors:
     machine:
       image: ubuntu-2004:current
 
-  deploy-executor:
-    docker:
-      - image: cimg/base:stable
-
 jobs:
   build-nextjs:
     executor: node-executor
@@ -41,16 +37,8 @@ jobs:
           name: Build the Next.js project
           command: npm run build
 
-      - run:
-          name: Prepare Build Artifacts
-          command: |
-            mkdir -p ~/artifacts/.next
-            mkdir -p ~/artifacts/public
-            cp -R .next/* ~/artifacts/.next/ || true
-            cp -R public/* ~/artifacts/public/ || true
-
       - persist_to_workspace:
-          root: ~/artifacts
+          root: .
           paths:
             - .next
             - public
@@ -61,13 +49,13 @@ jobs:
       - checkout
 
       - attach_workspace:
-          at: ~/artifacts
+          at: .
 
       - run:
           name: Prepare Docker Build Context
           command: |
-            cp -R ~/artifacts/.next .next
-            cp -R ~/artifacts/public public
+            cp -R .next ~/project/.next
+            cp -R public ~/project/public
 
       - run:
           name: Build Docker Image
@@ -86,57 +74,54 @@ jobs:
           command: |
             docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - Dockerfile
-
   deploy-to-server:
-    executor: deploy-executor
+    executor: docker-executor
     steps:
       - attach_workspace:
-          at: ~/project
+          at: .
+
       - add_ssh_keys:
           fingerprints:
             - "$SSH_KEY_FINGERPRINT"
+
       - run:
           name: Deploy to Server
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'END_SSH'
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
               # Pull the latest Docker image
               docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-            
+
               # Stop and remove the existing container if it exists
               docker stop cloudinator-ui || true
               docker rm cloudinator-ui || true
-            
+
               # Run the new container
               docker run -d \
                 --name cloudinator-ui \
                 -p 3000:3000 \
                 vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-            
-              # Nginx configuration for reverse proxy
-              cat > /etc/nginx/sites-available/cloudinator-ui << 'END_NGINX'
+
+              # Configure Nginx for reverse proxy
+              cat > /etc/nginx/sites-available/cloudinator-ui <<EOL
               server {
                 listen 80;
                 server_name cloudinator-ui.naktech.pro;
-            
+
                 location / {
-                    proxy_pass http://157.245.153.57:3000;
-                    proxy_http_version 1.1;
-                    proxy_set_header Upgrade \$http_upgrade;
-                    proxy_set_header Connection 'upgrade';
-                    proxy_set_header Host \$host;
-                    proxy_cache_bypass \$http_upgrade;
+                  proxy_pass http://157.245.153.57:3000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade \$http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host \$host;
+                  proxy_cache_bypass \$http_upgrade;
                 }
               }
-              END_NGINX
-            
+EOL
+
               # Enable the site and restart Nginx
               ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
               nginx -t && systemctl restart nginx
-            END_SSH
+            EOF
 
 workflows:
   build-and-deploy:
@@ -150,4 +135,4 @@ workflows:
             - docker-build-and-push
           filters:
             branches:
-              only: circleci-project-setup
+              only: main
