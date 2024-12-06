@@ -86,12 +86,10 @@ jobs:
           command: |
             docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
-      # Persisting the Dockerfile is not necessary unless you need it later.
-      # Uncomment if needed.
-      # - persist_to_workspace:
-      #     root: .
-      #     paths:
-      #       - Dockerfile
+      - persist_to_workspace:
+          root: .
+          paths:
+            - Dockerfile
 
   deploy-to-server:
     executor: deploy-executor
@@ -104,28 +102,26 @@ jobs:
       - run:
           name: Deploy to Server
           command: |
-            IMAGE_TAG="${CIRCLE_SHA1:-latest}"
-
-            ssh -o StrictHostKeyChecking=no "$SSH_USER"@"$SSH_HOST" bash << EOF
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'END_SSH'
               # Pull the latest Docker image
-              docker pull "vathanaksol/cloudinator-ui:$IMAGE_TAG"
-
+              docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+            
               # Stop and remove the existing container if it exists
               docker stop cloudinator-ui || true
               docker rm cloudinator-ui || true
-
+            
               # Run the new container
               docker run -d \
                 --name cloudinator-ui \
                 -p 3000:3000 \
-                "vathanaksol/cloudinator-ui:$IMAGE_TAG"
-
+                vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+            
               # Nginx configuration for reverse proxy
-              cat > /etc/nginx/sites-available/cloudinator-ui <<NGINX_EOF
+              cat > /etc/nginx/sites-available/cloudinator-ui << 'END_NGINX'
               server {
                 listen 80;
                 server_name cloudinator-ui.naktech.pro;
-
+            
                 location / {
                     proxy_pass http://157.245.153.57:3000;
                     proxy_http_version 1.1;
@@ -135,12 +131,12 @@ jobs:
                     proxy_cache_bypass \$http_upgrade;
                 }
               }
-              NGINX_EOF
-
+              END_NGINX
+            
               # Enable the site and restart Nginx
               ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
-              nginx -t && systemctl restart nginx || echo "Nginx restart failed"
-            EOF
+              nginx -t && systemctl restart nginx
+            END_SSH
 
 workflows:
   build-and-deploy:
