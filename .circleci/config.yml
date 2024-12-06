@@ -1,22 +1,17 @@
 version: 2.1
-
 orbs:
   node: circleci/node@5
   docker: circleci/docker@2.8.1
-
 executors:
   node-executor:
     docker:
       - image: cimg/node:20.17.0
-
   docker-executor:
     machine:
       image: ubuntu-2004:current
-
   deploy-executor:
     docker:
       - image: cimg/base:stable
-
 jobs:
   build-nextjs:
     executor: node-executor
@@ -28,7 +23,6 @@ jobs:
       - run:
           name: Set Node.js Environment
           command: echo 'NODE_ENV=production' >> $BASH_ENV
-
       - restore_cache:
           keys:
             - npm-deps-{{ checksum "package-lock.json" }}
@@ -36,11 +30,9 @@ jobs:
           key: npm-deps-{{ checksum "package-lock.json" }}
           paths:
             - ~/.npm
-
       - run:
           name: Build the Next.js project
           command: npm run build
-
       - run:
           name: Prepare Build Artifacts
           command: |
@@ -48,44 +40,43 @@ jobs:
             mkdir -p ~/artifacts/public
             cp -R .next/* ~/artifacts/.next/ || true
             cp -R public/* ~/artifacts/public/ || true
-
       - persist_to_workspace:
           root: ~/artifacts
           paths:
             - .next
             - public
-
+  
   docker-build-and-push:
     executor: docker-executor
     steps:
       - checkout
-
       - attach_workspace:
           at: ~/artifacts
-
       - run:
           name: Prepare Docker Build Context
           command: |
             cp -R ~/artifacts/.next .next
             cp -R ~/artifacts/public public
-
       - run:
           name: Build Docker Image
           command: |
             docker build \
               --build-arg NEXT_BUILD_ID=${CIRCLE_SHA1} \
-              -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1} .
-
+              -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
       - run:
           name: Docker Login
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-
       - run:
           name: Push Docker Image
           command: |
-            docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1}
-
+            docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - Dockerfile
+            - docker-compose.yml  # Add if you have one
+  
   deploy-to-server:
     executor: deploy-executor
     steps:
@@ -93,49 +84,46 @@ jobs:
           at: ~/project
       - add_ssh_keys:
           fingerprints:
-            - "$SSH_KEY_FINGERPRINT"
+            - "$SSH_KEY_FINGERPRINT"  # Add your SSH key fingerprint from CircleCI project settings
       - run:
           name: Deploy to Server
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << END_SSH
-              set -e  # Exit immediately if a command exits with a non-zero status
-
-              echo "Pulling the latest Docker image..."
-              docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1}
-
-              echo "Stopping existing container if it exists..."
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
+              # Pull the latest Docker image
+              docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+              
+              # Stop and remove the existing container if it exists
               docker stop cloudinator-ui || true
-
-              echo "Removing existing container if it exists..."
               docker rm cloudinator-ui || true
-
-              echo "Running the new container..."
+              
+              # Run the new container
               docker run -d \
                 --name cloudinator-ui \
                 -p 3000:3000 \
-                vathanaksol/cloudinator-ui:${CIRCLE_SHA1}
-
-              echo "Creating Nginx configuration for reverse proxy..."
-              cat << END_NGINX | sudo tee /etc/nginx/sites-available/cloudinator-ui
+                vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+              
+              # Optional: Nginx configuration for reverse proxy
+              # Ensure you have a pre-configured Nginx setup on the server
+              cat > /etc/nginx/sites-available/cloudinator <<EOF2
               server {
                 listen 80;
-                server_name cloudinator-ui.naktech.pro;
-
+                server_name yourdomain.com;
+                
                 location / {
-                  proxy_pass http://localhost:3000;  # Use localhost since it's on the same server
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade \$http_upgrade;
-                  proxy_set_header Connection 'upgrade';
-                  proxy_set_header Host \$host;
-                  proxy_cache_bypass \$http_upgrade;
+                    proxy_pass http://localhost:3000;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
                 }
               }
-              END_NGINX
-
-              echo "Enabling the site and restarting Nginx..."
-              sudo ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
-              sudo nginx -t && sudo systemctl restart nginx || echo "Nginx restart failed"
-            END_SSH
+            EOF2
+              
+              # Enable the site and restart Nginx
+              ln -sf /etc/nginx/sites-available/cloudinator /etc/nginx/sites-enabled/
+              nginx -t && systemctl restart nginx
+            EOF
 
 workflows:
   build-and-deploy:
@@ -147,3 +135,6 @@ workflows:
       - deploy-to-server:
           requires:
             - docker-build-and-push
+          filters:
+            branches:
+              only: main  # Only deploy from main branch
