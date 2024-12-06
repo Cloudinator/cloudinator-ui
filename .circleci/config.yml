@@ -9,6 +9,8 @@ jobs:
   build-nextjs:
     # Build Next.js project
     executor: node/default
+    docker:
+      - image: cimg/node:20.17.0
     steps:
       - checkout
       - run:
@@ -37,24 +39,26 @@ jobs:
   docker-build-and-push:
     # Build and push Docker image
     executor: docker/default
+    docker:
+      - image: cimg/docker:24.0  # Use a recent Docker image
     steps:
       - checkout
       - setup_remote_docker:
-          version: 20.10.16  # Ensure Docker is properly set up
+          version: 20.10.16
       - attach_workspace:
-          at: /workspace  # Attach persisted artifacts
+          at: /workspace
       - run:
-          name: Build and Tag Docker Image
+          name: Build Docker Image
           command: |
-            docker build -t vathanaksol/cloudinator-ui:latest .
+            docker build -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
       - run:
-          name: Authenticate with Docker Hub
+          name: Docker Login
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - run:
           name: Push Docker Image
           command: |
-            docker push vathanaksol/cloudinator-ui:latest
+            docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
 workflows:
   build-and-deploy:
