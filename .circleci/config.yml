@@ -5,11 +5,18 @@ orbs:
   node: circleci/node@5
   docker: circleci/docker@2.8.1
 
-jobs:
-  build-nextjs:
-    executor: node/default
+executors:
+  node-executor:
     docker:
       - image: cimg/node:20.17.0
+
+  docker-executor:
+    machine:
+      image: ubuntu-2004:current
+
+jobs:
+  build-nextjs:
+    executor: node-executor
     steps:
       - checkout
       - node/install-packages:
@@ -31,7 +38,6 @@ jobs:
           name: Build the Next.js project
           command: npm run build
 
-      # Ensure artifacts directory exists and copy build artifacts
       - run:
           name: Prepare Build Artifacts
           command: |
@@ -47,19 +53,13 @@ jobs:
             - public
 
   docker-build-and-push:
-    executor: docker/default
-    docker:
-      - image: cimg/docker:24.0
+    executor: docker-executor
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.16
 
-      # Attach workspace before Docker build
       - attach_workspace:
           at: ~/artifacts
 
-      # Add Docker build context preparation step
       - run:
           name: Prepare Docker Build Context
           command: |
@@ -73,7 +73,6 @@ jobs:
               --build-arg NEXT_BUILD_ID=${CIRCLE_SHA1} \
               -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
 
-      # Use environment variables for Docker credentials
       - run:
           name: Docker Login
           command: |
