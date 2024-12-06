@@ -1,4 +1,4 @@
-# CircleCI Configuration for Next.js 15 project with `npm install --force`
+# CircleCI Configuration for Next.js 15 project with Docker build and deploy
 version: 2.1
 
 orbs:
@@ -28,24 +28,23 @@ jobs:
           command: |
             cp -R .next ~/artifacts/.next 2>/dev/null || true  # Copy .next directory
             cp -R public ~/artifacts/public 2>/dev/null || true  # Copy public directory
-      - store_artifacts:
-          path: ~/artifacts
-          destination: nextjs-build
       - persist_to_workspace:
           root: ~/artifacts
           paths:
             - .next  # Persist the Next.js build artifacts
             - public  # Persist public assets
+
   docker-build-and-push:
+    # Build and push Docker image
     executor: docker/default
     steps:
       - checkout
       - setup_remote_docker:
-           version: 20.10.16
+          version: 20.10.16  # Ensure Docker is properly set up
       - attach_workspace:
-          at: /workspace
+          at: /workspace  # Attach persisted artifacts
       - run:
-          name: Build Docker Image
+          name: Build and Tag Docker Image
           command: |
             docker build -t vathanaksol/cloudinator-ui:latest .
       - run:
@@ -53,15 +52,12 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - run:
-          name: Tag Docker Image
-          command: |
-            docker tag cloudinator-ui:latest vathanaksol/cloudinator-ui:latest
-      - run:
           name: Push Docker Image
           command: |
             docker push vathanaksol/cloudinator-ui:latest
+
 workflows:
-  build-and-test:
+  build-and-deploy:
     jobs:
       - build-nextjs
       - docker-build-and-push:
