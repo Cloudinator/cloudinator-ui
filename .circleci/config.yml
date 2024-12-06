@@ -1,4 +1,4 @@
-# CircleCI Configuration for Next.js 15 project
+# CircleCI Configuration for Next.js 15 project with `npm install --force`
 version: 2.1
 
 orbs:
@@ -10,8 +10,9 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
+      - run:
+          name: Install Dependencies with npm install --force
+          command: npm install --force
       - run:
           name: Set Node.js Environment
           command: echo 'NODE_ENV=production' >> $BASH_ENV  # Ensure production environment
