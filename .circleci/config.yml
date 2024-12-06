@@ -102,9 +102,12 @@ jobs:
       - run:
           name: Deploy to Server
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'END_SSH'
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
+              # Define image tag
+              IMAGE_TAG="${CIRCLE_SHA1:-latest}"
+
               # Pull the latest Docker image
-              docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+              docker pull vathanaksol/cloudinator-ui:$IMAGE_TAG
             
               # Stop and remove the existing container if it exists
               docker stop cloudinator-ui || true
@@ -114,10 +117,10 @@ jobs:
               docker run -d \
                 --name cloudinator-ui \
                 -p 3000:3000 \
-                vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+                vathanaksol/cloudinator-ui:$IMAGE_TAG
             
               # Nginx configuration for reverse proxy
-              cat > /etc/nginx/sites-available/cloudinator-ui << 'END_NGINX'
+              cat > /etc/nginx/sites-available/cloudinator-ui << NGINX_EOF
               server {
                 listen 80;
                 server_name cloudinator-ui.naktech.pro;
@@ -131,13 +134,13 @@ jobs:
                     proxy_cache_bypass \$http_upgrade;
                 }
               }
-              END_NGINX
+              NGINX_EOF
             
               # Enable the site and restart Nginx
               ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
               nginx -t && systemctl restart nginx
-            END_SSH
-
+            EOF
+            
 workflows:
   build-and-deploy:
     jobs:
