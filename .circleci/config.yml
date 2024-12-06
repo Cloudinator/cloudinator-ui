@@ -74,7 +74,7 @@ jobs:
           command: |
             docker build \
               --build-arg NEXT_BUILD_ID=${CIRCLE_SHA1} \
-              -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
+              -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1} .
 
       - run:
           name: Docker Login
@@ -84,12 +84,7 @@ jobs:
       - run:
           name: Push Docker Image
           command: |
-            docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - Dockerfile
+            docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1}
 
   deploy-to-server:
     executor: deploy-executor
@@ -106,7 +101,7 @@ jobs:
               set -e  # Exit immediately if a command exits with a non-zero status
 
               echo "Pulling the latest Docker image..."
-              docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+              docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1}
 
               echo "Stopping existing container if it exists..."
               docker stop cloudinator-ui || true
@@ -118,7 +113,7 @@ jobs:
               docker run -d \
                 --name cloudinator-ui \
                 -p 3000:3000 \
-                vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+                vathanaksol/cloudinator-ui:${CIRCLE_SHA1}
 
               echo "Creating Nginx configuration for reverse proxy..."
               cat << END_NGINX | sudo tee /etc/nginx/sites-available/cloudinator-ui
@@ -152,6 +147,3 @@ workflows:
       - deploy-to-server:
           requires:
             - docker-build-and-push
-          filters:
-            branches:
-              only: circleci-project-setup
