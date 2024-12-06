@@ -102,28 +102,30 @@ jobs:
       - run:
           name: Deploy to Server
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST <<END_SSH
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << END_SSH
               set -e  # Exit immediately if a command exits with a non-zero status
-      
-              # Pull the latest Docker image
+
+              echo "Pulling the latest Docker image..."
               docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-      
-              # Stop and remove the existing container if it exists
+
+              echo "Stopping existing container if it exists..."
               docker stop cloudinator-ui || true
+
+              echo "Removing existing container if it exists..."
               docker rm cloudinator-ui || true
-      
-              # Run the new container
+
+              echo "Running the new container..."
               docker run -d \
                 --name cloudinator-ui \
                 -p 3000:3000 \
                 vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-      
-              # Create Nginx configuration for reverse proxy
-              cat <<END_NGINX | sudo tee /etc/nginx/sites-available/cloudinator-ui
+
+              echo "Creating Nginx configuration for reverse proxy..."
+              cat << END_NGINX | sudo tee /etc/nginx/sites-available/cloudinator-ui
               server {
                 listen 80;
                 server_name cloudinator-ui.naktech.pro;
-      
+
                 location / {
                   proxy_pass http://localhost:3000;  # Use localhost since it's on the same server
                   proxy_http_version 1.1;
@@ -134,11 +136,11 @@ jobs:
                 }
               }
               END_NGINX
-      
-              # Enable the site and restart Nginx
+
+              echo "Enabling the site and restarting Nginx..."
               sudo ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
               sudo nginx -t && sudo systemctl restart nginx || echo "Nginx restart failed"
-            END_SSH
+           END_SSH
 
 workflows:
   build-and-deploy:
