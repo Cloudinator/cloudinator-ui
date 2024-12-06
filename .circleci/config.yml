@@ -138,7 +138,7 @@ jobs:
               nginx -t && systemctl restart nginx
             END_SSH
 
-workflows:s
+workflows:
   build-and-deploy:
     jobs:
       - build-nextjs
