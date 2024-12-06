@@ -102,7 +102,7 @@ jobs:
             - run:
           name: Deploy to Server
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'END_SSH'
+            ssh -o $SSH_USER@$SSH_HOST << 'END_SSH'
               # Pull the latest Docker image
               docker pull vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
