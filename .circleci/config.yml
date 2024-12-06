@@ -102,30 +102,28 @@ jobs:
       - run:
           name: Deploy to Server
           command: |
-            # Use environment variables directly
             IMAGE_TAG="${CIRCLE_SHA1:-latest}"
-            
-            # SSH deployment command
-            ssh -o StrictHostKeyChecking=no "$SSH_USER"@"$SSH_HOST" bash <<'EOF'
+
+            ssh -o StrictHostKeyChecking=no "$SSH_USER"@"$SSH_HOST" bash <<EOF
               # Pull the latest Docker image
               docker pull "vathanaksol/cloudinator-ui:$IMAGE_TAG"
-            
+
               # Stop and remove the existing container if it exists
               docker stop cloudinator-ui || true
               docker rm cloudinator-ui || true
-            
+
               # Run the new container
               docker run -d \
                 --name cloudinator-ui \
                 -p 3000:3000 \
                 "vathanaksol/cloudinator-ui:$IMAGE_TAG"
-            
+
               # Nginx configuration for reverse proxy
               cat > /etc/nginx/sites-available/cloudinator-ui <<NGINX_EOF
               server {
                 listen 80;
                 server_name cloudinator-ui.naktech.pro;
-            
+
                 location / {
                     proxy_pass http://157.245.153.57:3000;
                     proxy_http_version 1.1;
@@ -136,12 +134,12 @@ jobs:
                 }
               }
               NGINX_EOF
-            
+
               # Enable the site and restart Nginx
               ln -sf /etc/nginx/sites-available/cloudinator-ui /etc/nginx/sites-enabled/
               nginx -t && systemctl restart nginx
             EOF
-            
+
 workflows:
   build-and-deploy:
     jobs:
