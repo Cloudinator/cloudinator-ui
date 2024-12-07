@@ -54,19 +54,19 @@ jobs:
             - public
 
     scan-dependencies:
-    executor: node-executor
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-          override-ci-command: npm install --force
-
-      - trivy/scan:
-          scan-type: "fs"
-          severity: "HIGH,CRITICAL"
-          ignore-unfixed: true
-          exit-code: 1
-          path: "."
+      executor: node-executor
+      steps:
+        - checkout
+        - node/install-packages:
+            pkg-manager: npm
+            override-ci-command: npm install --force
+  
+        - trivy/scan:
+            scan-type: "fs"
+            severity: "HIGH,CRITICAL"
+            ignore-unfixed: true
+            exit-code: 1
+            path: "."
 
   docker-build-and-push-and-run:
     executor: docker-executor
