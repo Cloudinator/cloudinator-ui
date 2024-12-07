@@ -5,8 +5,8 @@ import HeroSection from "@/components/homepage/HeroSection";
 import FeatureService from "@/components/homepage/FeatureService";
 import FrameworkSection from "@/components/homepage/FrameworkSection";
 import ServiceComponent from "@/components/homepage/ServiceComponent";
-import WhyUsSection from "@/components/homepage/WhyUsSection";
 import {ParallaxProvider} from "react-scroll-parallax";
+import WhyUs from "@/components/homepage/WhyUsSection";
 
 export default function HomePage() {
   return (
@@ -18,7 +18,7 @@ export default function HomePage() {
           <ServiceComponent />
           <FrameworkSection />
           <FeatureService />
-          <WhyUsSection />
+          <WhyUs />
       </>
   );
 }

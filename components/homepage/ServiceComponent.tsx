@@ -72,11 +72,11 @@ export default function ServiceComponent() {
                 <div className="container mx-auto">
                     <div className="space-y-24">
                         {/* First service */}
-                        <motion.div className="grid md:grid-cols-2 gap-12 items-center" {...fadeInUp}>
-                            <div className="relative order-2 md:order-1">
+                        <motion.div className="grid md:grid-cols-2 gap-12 items-center justify-center" {...fadeInUp}>
+                            <div className="relative order-2 md:order-1 flex justify-center">
                                 <Lottie options={deployAnimation} width={500} height={500}/>
                             </div>
-                            <div className="space-y-6 order-1 md:order-2">
+                            <div className="space-y-6 order-1 md:order-2 text-center">
                                 <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                                     Full Service Deployment
                                 </h2>
@@ -92,8 +92,8 @@ export default function ServiceComponent() {
                         </motion.div>
 
                         {/* Second service */}
-                        <motion.div className="grid md:grid-cols-2 gap-12 items-center" {...fadeInUp}>
-                            <div className="space-y-6">
+                        <motion.div className="grid md:grid-cols-2 gap-12 items-center justify-center" {...fadeInUp}>
+                            <div className="space-y-6 text-center">
                                 <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                                     Continuous Integration
                                 </h2>
@@ -106,17 +106,17 @@ export default function ServiceComponent() {
                                     See More
                                 </button>
                             </div>
-                            <div className="relative order-2 md:order-1">
+                            <div className="relative order-2 md:order-1 flex justify-center">
                                 <Lottie options={cdAnimation} width={400} height={400}/>
                             </div>
                         </motion.div>
 
                         {/* Third service */}
-                        <motion.div className="grid md:grid-cols-2 gap-12 items-center" {...fadeInUp}>
-                            <div className="relative order-2 md:order-1">
+                        <motion.div className="grid md:grid-cols-2 gap-12 items-center justify-center" {...fadeInUp}>
+                            <div className="relative order-2 md:order-1 flex justify-center">
                                 <Lottie options={infraAnimation} width={400} height={400}/>
                             </div>
-                            <div className="space-y-6 order-1 md:order-2">
+                            <div className="space-y-6 order-1 md:order-2 text-center">
                                 <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                                     Scalable Infrastructure
                                 </h2>
@@ -132,8 +132,8 @@ export default function ServiceComponent() {
                         </motion.div>
 
                         {/* Fourth service */}
-                        <motion.div className="grid md:grid-cols-2 gap-12 items-center" {...fadeInUp}>
-                            <div className="space-y-6">
+                        <motion.div className="grid md:grid-cols-2 gap-12 items-center justify-center" {...fadeInUp}>
+                            <div className="space-y-6 text-center">
                                 <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-red-600 to-yellow-600 bg-clip-text text-transparent">
                                     24/7 Monitoring & Support
                                 </h2>
@@ -146,7 +146,7 @@ export default function ServiceComponent() {
                                     See More
                                 </button>
                             </div>
-                            <div className="relative order-2 md:order-1">
+                            <div className="relative order-2 md:order-1 flex justify-center">
                                 <Lottie options={cloudAnimation} width={500} height={500}/>
                             </div>
                         </motion.div>
