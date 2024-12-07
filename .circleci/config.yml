@@ -53,7 +53,7 @@ jobs:
             - .next
             - public
 
-  scan-dependencies:
+    scan-dependencies:
     executor: node-executor
     steps:
       - checkout
@@ -61,10 +61,12 @@ jobs:
           pkg-manager: npm
           override-ci-command: npm install --force
 
-      - run:
-          name: Scan Dependencies for Vulnerabilities with Trivy
-          command: |
-            trivy fs --exit-code 1 --severity HIGH,CRITICAL . || true # Adjust severity as needed
+      - trivy/scan:
+          scan-type: "fs"
+          severity: "HIGH,CRITICAL"
+          ignore-unfixed: true
+          exit-code: 1
+          path: "."
 
   docker-build-and-push-and-run:
     executor: docker-executor
