@@ -47,7 +47,7 @@ jobs:
           name: Install Trivy
           command: |
             curl -sfL https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz | tar xz
-            mv trivy /usr/local/bin/
+            sudo mv trivy /usr/local/bin/
       - run:
           name: Verify Trivy Installation
           command: trivy --version
@@ -75,7 +75,7 @@ jobs:
           name: Install Trivy
           command: |
             curl -sfL https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz | tar xz
-            mv trivy /usr/local/bin/
+            sudo mv trivy /usr/local/bin/
       - run:
           name: Scan Docker Image with Trivy
           command: |
