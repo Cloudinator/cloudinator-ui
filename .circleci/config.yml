@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   node: circleci/node@5
   docker: circleci/docker@2.8.1
-  trivy: aquasecurity/trivy@0.7.0
+  trivy: fifteen5/trivy@1.0.0
 
 executors:
   node-executor:
