@@ -1,8 +1,10 @@
+# CircleCI Configuration for Next.js 15 project with Docker build and deploy
 version: 2.1
 
 orbs:
   node: circleci/node@5
   docker: circleci/docker@2.8.1
+  trivy: cci-labs/trivy@1.0.0
 
 executors:
   node-executor:
@@ -10,12 +12,8 @@ executors:
       - image: cimg/node:20.17.0
 
   docker-executor:
-    docker:
-      - image: docker:20.10.21
-    working_directory: ~/project
-    environment:
-      DOCKER_BUILDKIT: 1
-      TRIVY_VERSION: "0.34.0"
+    machine:
+      image: ubuntu-2004:current
 
 jobs:
   build-nextjs:
@@ -26,65 +24,77 @@ jobs:
           pkg-manager: npm
           override-ci-command: npm install --force
       - run:
+          name: Set Node.js Environment
+          command: echo 'NODE_ENV=production' >> $BASH_ENV
+
+      - restore_cache:
+          keys:
+            - npm-deps-{{ checksum "package-lock.json" }}
+      - save_cache:
+          key: npm-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+
+      - run:
           name: Build the Next.js project
           command: npm run build
+
+      - run:
+          name: Prepare Build Artifacts
+          command: |
+            mkdir -p ~/artifacts/.next
+            mkdir -p ~/artifacts/public
+            cp -R .next/* ~/artifacts/.next/ || true
+            cp -R public/* ~/artifacts/public/ || true
+
       - persist_to_workspace:
-          root: .
+          root: ~/artifacts
           paths:
             - .next
             - public
 
   scan-dependencies:
     executor: node-executor
-    environment:
-      TRIVY_VERSION: "0.34.0"
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: npm
           override-ci-command: npm install --force
+
       - run:
-          name: Install Trivy
+          name: Scan Dependencies for Vulnerabilities with Trivy
           command: |
-            curl -sfL https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz | tar xz
-            sudo mv trivy /usr/local/bin/
-      - run:
-          name: Verify Trivy Installation
-          command: trivy --version
-      - run:
-          name: Scan Dependencies for Vulnerabilities
-          command: trivy fs --exit-code 1 --severity HIGH,CRITICAL . || true # Adjust severity as needed
+            trivy fs --exit-code 1 --severity HIGH,CRITICAL . || true # Adjust severity as needed
 
   docker-build-and-push:
     executor: docker-executor
     steps:
       - checkout
+
       - attach_workspace:
-          at: .
+          at: ~/artifacts
+
       - run:
           name: Prepare Docker Build Context
           command: |
-            mkdir -p .next public
+            cp -R ~/artifacts/.next .next
+            cp -R ~/artifacts/public public
+
       - run:
           name: Build Docker Image
           command: |
             docker build \
               --build-arg NEXT_BUILD_ID=${CIRCLE_SHA1} \
               -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
+
       - run:
-          name: Install Trivy
+          name: Docker Login
           command: |
-            curl -sfL https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz | tar xz
-            sudo mv trivy /usr/local/bin/
-      - run:
-          name: Scan Docker Image with Trivy
-          command: |
-            trivy image --exit-code 1 --severity HIGH,CRITICAL \
-              vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+
       - run:
           name: Push Docker Image
           command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
 workflows:
