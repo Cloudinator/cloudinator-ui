@@ -13,6 +13,8 @@ executors:
   docker-executor:
     machine:
       image: ubuntu-2004:current
+    environment:
+      TRIVY_VERSION: "0.34.0"  # Specify the Trivy version here if needed
 
 jobs:
   build-nextjs:
@@ -90,6 +92,10 @@ jobs:
     executor: docker-executor
     steps:
       - checkout
+      - run:
+          name: Install Trivy
+          command: |
+            curl -sfL https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz | tar xz -C /usr/local/bin
 
       - run:
           name: Scan Docker Image with Trivy
