@@ -96,16 +96,6 @@ jobs:
           name: Push Docker Image
           command: |
             docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
-            
-  notify-telegram:
-    executor: node-executor
-    steps:
-      - run:
-          name: Send Notification to Telegram
-          command: |
-            curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=Build ${CIRCLE_BUILD_NUM} completed successfully!"
 
 workflows:
   build-and-deploy:
@@ -116,6 +106,4 @@ workflows:
           requires:
             - build-nextjs
             - scan-dependencies
-      - notify-telegram:
-          requires:
-            - docker-build-and-push
+      
