@@ -2,22 +2,22 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X } from 'lucide-react';
 import Image from "next/image";
 import logo from "@/public/logo.png";
 
 import { Button } from "@/components/ui/button";
-import {ModeToggle} from "@/components/ModeToggle";
+import { ModeToggle } from "@/components/ModeToggle";
 import NotificationBar from "../NotificationBar";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NavBarHomePage = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSticky, setIsSticky] = useState(false);
-    const [hasMounted, setHasMounted] = useState(false);
+
+    const { user, loading, error } = useAuth();
 
     useEffect(() => {
-        setHasMounted(true);
-
         const handleScroll = () => {
             const announcementHeight =
                 document.querySelector(".announcement-bar")?.clientHeight || 0;
@@ -28,10 +28,9 @@ const NavBarHomePage = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Delay rendering until mounted to avoid hydration mismatch
-    if (!hasMounted) {
-        return null;
-    }
+    useEffect(() => {
+        console.log('Auth state:', { user, loading, error });
+    }, [user, loading, error]);
 
     const navItems = [
         { path: "/", label: "Home" },
@@ -40,6 +39,41 @@ const NavBarHomePage = () => {
         { path: "/start-building", label: "Start Building" },
         { path: "/about", label: "About" },
     ];
+
+    const renderAuthButtons = () => {
+        if (loading) {
+            return <div className="h-10 w-24 bg-gray-200 animate-pulse rounded"></div>;
+        }
+
+        if (user && !error) {
+            return (
+                <Button
+                    asChild
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                    <Link href="/dashboard">DASHBOARD</Link>
+                </Button>
+            );
+        }
+
+        return (
+            <>
+                <Button
+                    asChild
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                    <Link href="/sign-up">SIGN UP</Link>
+                </Button>
+                <Button
+                    asChild
+                    variant="outline"
+                    className="border-purple-600 text-purple-600 hover:bg-purple-100 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900"
+                >
+                    <Link href="/login">SIGN IN</Link>
+                </Button>
+            </>
+        );
+    };
 
     return (
         <>
@@ -74,19 +108,7 @@ const NavBarHomePage = () => {
                         </nav>
                         <div className="hidden md:flex items-center space-x-4">
                             <ModeToggle />
-                            <Button
-                                asChild
-                                className="bg-purple-600 hover:bg-purple-700 text-white"
-                            >
-                                <Link href="/sign-up">SIGN UP</Link>
-                            </Button>
-                            <Button
-                                asChild
-                                variant="outline"
-                                className="border-purple-600 text-purple-600 hover:bg-purple-100 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900"
-                            >
-                                <Link href="/login">SIGN IN</Link>
-                            </Button>
+                            {renderAuthButtons()}
                         </div>
                         <Button
                             variant="ghost"
@@ -118,28 +140,16 @@ const NavBarHomePage = () => {
                             </nav>
                             <div className="mt-4 flex flex-col space-y-4 p-4">
                                 <ModeToggle />
-                                <Button
-                                    asChild
-                                    className="bg-purple-600 hover:bg-purple-700 text-white"
-                                >
-                                    <Link href="#">SIGN UP</Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    className="border-purple-600 text-purple-600 hover:bg-purple-100 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900"
-                                >
-                                    <Link href="#">SIGN IN</Link>
-                                </Button>
+                                {renderAuthButtons()}
                             </div>
                         </div>
                     )}
                 </div>
             </header>
-            {isSticky && <div style={{ height: "96px" }} />}{" "}
-            {/* Adjusted placeholder height */}
+            {isSticky && <div style={{ height: "96px" }} />}
         </>
     );
 };
 
 export default NavBarHomePage;
+
