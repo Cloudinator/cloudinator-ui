@@ -5,12 +5,12 @@ import { ThemeProvider } from "@/components/theme-provider"
 import NavBarHomePage from "@/components/navbar/NavBarHomePage";
 import BackToTopButton from "@/components/BackToTopButton";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
-import { SiteFooter } from "@/components/footer/SiteFooter";
 import TutorialPopup from "@/components/TutorialPopup";
 
 import { Poppins } from 'next/font/google';
 import { AuthProvider } from "@/contexts/AuthContext";
 import StoreProvider from "@/app/StoreProvider";
+import Footer from "@/components/footer/Footer";
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -45,7 +45,7 @@ export default function RootLayout({
                     <ScrollProgressBar />
                     {children}
                     <BackToTopButton />
-                    <SiteFooter />
+                    <Footer />
                     <TutorialPopup />
                 </ThemeProvider>
             </AuthProvider>
