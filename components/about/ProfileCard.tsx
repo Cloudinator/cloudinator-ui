@@ -155,7 +155,7 @@ export default function InteractiveTeamSection() {
             </section>
 
             <section className="space-y-8">
-                <h2 className="text-2xl font-bold text-center text-[#1e2c41]">Our Team</h2>
+                <h2 className="text-2xl font-bold text-center text-purple-500">Our Team</h2>
                 <div className="grid gap-16 max-w-5xl mx-auto">
                     {/* First row - 3 cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
