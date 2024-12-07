@@ -80,78 +80,56 @@ jobs:
             trivy fs --exit-code 1 --severity HIGH,CRITICAL . || true # Adjust severity as needed
 
 
-  docker-build:
-    executor: docker-executor
-    steps:
-      - checkout
-
-      - attach_workspace:
-          at: ~/artifacts
-
-      - run:
-          name: Prepare Docker Build Context
-          command: |
-            cp -R ~/artifacts/.next .next
-            cp -R ~/artifacts/public public
-
-      - run:
-          name: Build Docker Image
-          command: |
-            docker build \
-              --build-arg NEXT_BUILD_ID=${CIRCLE_SHA1} \
-              -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
-
-  scan-docker-image:
-    executor: docker-executor
-    steps:
-      - checkout
-      
-      - run:
-          name: Install Trivy
-          command: |
-            curl -sfL https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz | tar xz
-            sudo mv trivy /usr/local/bin/
+    docker-build-and-push:
+      executor: docker-executor
+      steps:
+        - checkout
   
-      - run:
-          name: Verify Trivy Installation
-          command: trivy --version
+        - attach_workspace:
+            at: ~/artifacts
+  
+        - run:
+            name: Prepare Docker Build Context
+            command: |
+              cp -R ~/artifacts/.next .next
+              cp -R ~/artifacts/public public
+  
+        - run:
+            name: Build Docker Image
+            command: |
+              docker build \
+                --build-arg NEXT_BUILD_ID=${CIRCLE_SHA1} \
+                -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
 
-      - run:
-          name: Scan Docker Image with Trivy
-          command: |
-            trivy image --exit-code 1 --severity HIGH,CRITICAL \
-              vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} || true # Adjust severity as needed
-              
-  docker-push:
-    executor: docker-executor
-    steps:
-      - checkout
+        - run:
+            name: Install Trivy
+            command: |
+              sudo apt-get update && apt-get install -y wget && \
+              wget https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.deb && \
+              dpkg -i trivy_0.18.3_Linux-64bit.deb && \
+              rm trivy_0.18.3_Linux-64bit.deb
 
-      - attach_workspace:
-          at: ~/artifacts
-      
-      - run:
-          name: Docker Login
-          command: |
-            echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-
-      - run:
-          name: Push Docker Image
-          command: |
-            docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+        - run:
+            name: Scan Docker Image with Trivy
+            command: |
+              trivy image --exit-code 1 --severity HIGH,CRITICAL vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} || true
+        
+        - run:
+            name: Docker Login
+            command: |
+              echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+  
+        - run:
+            name: Push Docker Image
+            command: |
+              docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
 workflows:
   build-and-deploy:
     jobs:
       - build-nextjs
       - scan-dependencies
-      - docker-build:
+      - docker-build-and-push:
           requires:
             - build-nextjs
             - scan-dependencies
-      - scan-docker-image:
-          requires:
-            - docker-build
-      - docker-push:
-          requires:
-            - scan-docker-image
