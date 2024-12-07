@@ -1,10 +1,9 @@
-# CircleCI Configuration for Next.js 15 project with Docker build and deploy
 version: 2.1
 
 orbs:
   node: circleci/node@5
   docker: circleci/docker@2.8.1
-  trivy: fifteen5/trivy@1.0.0
+  trivy: aquasecurity/trivy@0.7.0
 
 executors:
   node-executor:
@@ -30,6 +29,9 @@ jobs:
       - restore_cache:
           keys:
             - npm-deps-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install Dependencies
+          command: npm ci
       - save_cache:
           key: npm-deps-{{ checksum "package-lock.json" }}
           paths:
@@ -53,47 +55,41 @@ jobs:
             - .next
             - public
 
-    scan-dependencies:
-      executor: node-executor
-      steps:
-        - checkout
-        - node/install-packages:
-            pkg-manager: npm
-            override-ci-command: npm install --force
-  
-        - trivy/scan:
-            scan-type: "fs"
-            severity: "HIGH,CRITICAL"
-            ignore-unfixed: true
-            exit-code: 1
-            path: "."
+  scan-dependencies:
+    executor: node-executor
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+          override-ci-command: npm install --force
+      - trivy/scan:
+          scan-type: "fs"
+          severity: "HIGH,CRITICAL"
+          ignore-unfixed: true
+          exit-code: 1
+          path: "."
 
   docker-build-and-push-and-run:
     executor: docker-executor
     steps:
       - checkout
-
       - attach_workspace:
           at: ~/artifacts
-
       - run:
           name: Prepare Docker Build Context
           command: |
             cp -R ~/artifacts/.next .next
             cp -R ~/artifacts/public public
-
       - run:
           name: Build Docker Image
           command: |
             docker build \
               --build-arg NEXT_BUILD_ID=${CIRCLE_SHA1} \
               -t vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest} .
-
       - run:
           name: Docker Login
           command: |
             echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-
       - run:
           name: Push Docker Image
           command: |
