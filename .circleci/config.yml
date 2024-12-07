@@ -52,7 +52,7 @@ jobs:
             - .next
             - public
 
-  docker-build-and-push:
+  docker-build-and-push-and-run:
     executor: docker-executor
     steps:
       - checkout
@@ -83,10 +83,27 @@ jobs:
           command: |
             docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
+      - run:
+          name: Remove Previous Container
+          command: |
+            # Stop and remove the existing container if it exists
+            if [ "$(docker ps -aq -f name=cloudinator-ui)" ]; then
+            docker stop cloudinator-ui || true
+            docker rm cloudinator-ui || true
+            fi
+
+            - run:
+                name: Run Latest Docker Image
+                command: |
+                  docker run -d \
+                    --name cloudinator-ui \
+                    -p 80:80 \
+                    vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+
 workflows:
   build-and-deploy:
     jobs:
       - build-nextjs
-      - docker-build-and-push:
+      - docker-build-and-push-and-run:
           requires:
             - build-nextjs
