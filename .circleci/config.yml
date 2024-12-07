@@ -92,13 +92,13 @@ jobs:
             docker rm cloudinator-ui || true
             fi
 
-            - run:
-                name: Run Latest Docker Image
-                command: |
-                  docker run -d \
-                    --name cloudinator-ui \
-                    -p 80:80 \
-                    vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+      - run:
+          name: Run Latest Docker Image
+          command: |
+            docker run -d \
+              --name cloudinator-ui \
+              -p 80:80 \
+              vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
 workflows:
   build-and-deploy:
