@@ -14,7 +14,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 const DashboardHeaderProfile = () => {
-    const profileImage = "/profile.png";
+    const profileImage = "/ben.png";
     return (
         <div className="border-b px-4 sticky top-0 z-10 bg-white shadow-sm">
             <div className="flex h-14 items-center px-4">
