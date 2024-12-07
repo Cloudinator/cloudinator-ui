@@ -3,7 +3,7 @@ version: 2.1
 orbs:
   node: circleci/node@5
   docker: circleci/docker@2.8.1
-  trivy-orb: fifteen5/trivy-orb@1.0.0
+  trivy: cci-labs/trivy@1.0.0
 
 executors:
   node-executor:
