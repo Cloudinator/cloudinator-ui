@@ -5,10 +5,11 @@ import { ThemeProvider } from "@/components/theme-provider"
 import NavBarHomePage from "@/components/navbar/NavBarHomePage";
 import BackToTopButton from "@/components/BackToTopButton";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
-import {SiteFooter} from "@/components/footer/SiteFooter";
+import { SiteFooter } from "@/components/footer/SiteFooter";
 import TutorialPopup from "@/components/TutorialPopup";
 
 import { Poppins } from 'next/font/google';
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -17,34 +18,37 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Cloudinator",
-  description: "Cloudinator Application",
+    title: "Cloudinator",
+    description: "Cloudinator Application",
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
+                                       children,
+                                   }: Readonly<{
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={poppins.className}
-      >
-      <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-      >
-          <NavBarHomePage/>
-          <ScrollProgressBar />
-            {children}
-          <BackToTopButton />
-          <SiteFooter />
-          <TutorialPopup />
-      </ThemeProvider>
-      </body>
-    </html>
-);
+    return (
+        <html lang="en" suppressHydrationWarning>
+        <body
+            className={poppins.className}
+        >
+        <AuthProvider>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+            >
+                <NavBarHomePage/>
+                <ScrollProgressBar />
+                {children}
+                <BackToTopButton />
+                <SiteFooter />
+                <TutorialPopup />
+            </ThemeProvider>
+        </AuthProvider>
+        </body>
+        </html>
+    );
 }
+
