@@ -66,7 +66,7 @@ jobs:
           command: |
             trivy fs --exit-code 1 --severity HIGH,CRITICAL . || true # Adjust severity as needed
 
-  docker-build-and-push-and-run:
+  docker-build-and-push:
     executor: docker-executor
     steps:
       - checkout
@@ -96,13 +96,26 @@ jobs:
           name: Push Docker Image
           command: |
             docker push vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
+            
+  notify-telegram:
+    executor: node-executor
+    steps:
+      - run:
+          name: Send Notification to Telegram
+          command: |
+            curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=Build ${CIRCLE_BUILD_NUM} completed successfully!"
 
 workflows:
   build-and-deploy:
     jobs:
       - build-nextjs
       - scan-dependencies
-      - docker-build-and-push-and-run:
+      - docker-build-and-push:
           requires:
             - build-nextjs
             - scan-dependencies
+      - notify-telegram:
+          requires:
+            - docker-build-and-push
