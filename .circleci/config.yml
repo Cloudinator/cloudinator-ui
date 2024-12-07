@@ -97,7 +97,7 @@ jobs:
           command: |
             docker run -d \
               --name cloudinator-ui \
-              -p 80:80 \
+              -p 3000:3000 \
               vathanaksol/cloudinator-ui:${CIRCLE_SHA1:-latest}
 
 workflows:
