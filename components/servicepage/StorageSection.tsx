@@ -91,7 +91,7 @@ export default function StorageSection() {
 
     return (
         <div className="container mx-auto px-4 py-16 space-y-24">
-            <motion.h2 className="text-4xl md:text-5xl font-black tracking-tight text-center" variants={itemVariants}>Our
+            <motion.h2 className="text-4xl text-purple-500 md:text-5xl font-black tracking-tight text-center" variants={itemVariants}>Our
                 Cloud Storage
             </motion.h2>
             {/* Cloud Storage Section */}
@@ -131,7 +131,7 @@ export default function StorageSection() {
                 animate="visible"
                 variants={containerVariants}
             >
-                <motion.h2 className="text-4xl md:text-5xl font-black tracking-tight text-center"
+                <motion.h2 className="text-4xl md:text-5xl font-black tracking-tight text-center text-purple-500"
                            variants={itemVariants}>Our Deployment approach
                 </motion.h2>
                 <motion.div

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "../globals.css";
 
-import { ThemeProvider } from "@/components/theme-provider"
 import NavBarHomePage from "@/components/navbar/NavBarHomePage";
 import BackToTopButton from "@/components/BackToTopButton";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
@@ -11,6 +10,7 @@ import { Poppins } from 'next/font/google';
 import { AuthProvider } from "@/contexts/AuthContext";
 import StoreProvider from "@/app/StoreProvider";
 import Footer from "@/components/footer/Footer";
+import {ThemeProvider} from "next-themes";
 
 const poppins = Poppins({
     subsets: ['latin'],
