@@ -6,8 +6,8 @@ const teamMembers = [
     {
         name: "kay Keo",
         role: "Mentor",
-        quote: "Don't limit yourself, and say no to fast at least you have try it",
-        imageSrc: "/sovanra.jpg",
+        quote: "Every bug and error I faced makes me stronger. At this rate, I'll soon be invincible!",
+        imageSrc: "/keo.jpg",
         socialLinks: [
             { icon: Github, href: "https://github.com" },
             { icon: Linkedin, href: "https://linkedin.com" },
@@ -18,7 +18,7 @@ const teamMembers = [
         name: "Ing Muyleang",
         role: "Mentor",
         quote: "Design is not just what it looks like and feels like. Design is how it works.",
-        imageSrc: "/placeholder.svg?height=256&width=256",
+        imageSrc: "/muyleang.jpg",
         socialLinks: [
             { icon: Github, href: "https://github.com" },
             { icon: Linkedin, href: "https://linkedin.com" },
@@ -28,7 +28,7 @@ const teamMembers = [
     {
         name: "Ruos Sovanra",
         role: "Full Stack Developer",
-        quote: "The best error message is the one that never shows up.",
+        quote: "Don't limit yourself or Say no to fast. At least give it a try.",
         imageSrc: "/sovanra.jpg",
         socialLinks: [
             { icon: Github, href: "https://github.com" },
@@ -60,7 +60,7 @@ const teamMembers = [
         name: "Pov Sokny",
         role: "Frontend Developer",
         quote: "Make it simple, but significant.",
-        imageSrc: "/",
+        imageSrc: "/sokny.jpg",
         socialLinks: [
             { icon: Linkedin, href: "https://linkedin.com" },
             { icon: Twitter, href: "https://twitter.com" },
@@ -70,7 +70,7 @@ const teamMembers = [
         name: "Mom Makara",
         role: "Infrastucture Engineer",
         quote: "Security is a process, not a product.",
-        imageSrc: "/placeholder.svg?height=256&width=256",
+        imageSrc: "/makara.jpg",
         socialLinks: [
             { icon: Github, href: "https://github.com" },
             { icon: Linkedin, href: "https://linkedin.com" },
