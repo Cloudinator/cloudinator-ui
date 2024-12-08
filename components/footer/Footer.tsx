@@ -36,33 +36,33 @@ export default function Footer() {
     return (
         <footer className="bg-white dark:bg-gray-800">
             <Container fullWidth>
-                <div className=" container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="py-12">
-                        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="py-16">
+                        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
                             {/* Logo */}
-                            <div className="col-span-2 md:col-span-1">
-                                <h2 className="text-purple-500 text-xl font-bold mb-4">Cloudinator</h2>
+                            <div className="col-span-1 lg:col-span-2">
+                                <h2 className="text-purple-500 text-3xl font-bold mb-6">Cloudinator</h2>
                                 <Image
                                     src="/logo.png"
                                     alt="Cloudinator Logo"
-                                    width={150}
-                                    height={150}
-                                    className="h-28 w-auto"
+                                    width={200}
+                                    height={200}
+                                    className="h-40 w-auto"
                                 />
                             </div>
 
                             {/* Navigation Links */}
                             {Object.entries(navigation).map(([category, items]) => (
                                 <div key={category} className="col-span-1">
-                                    <h3 className="text-sm font-semibold text-purple-600 dark:text-purple-300 mb-4 capitalize">
+                                    <h3 className="text-lg font-semibold text-purple-600 dark:text-purple-300 mb-6 capitalize">
                                         {category}
                                     </h3>
-                                    <ul className="space-y-2">
+                                    <ul className="space-y-4">
                                         {items.map((item) => (
                                             <li key={item.name}>
                                                 <Link
                                                     href={item.href}
-                                                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
+                                                    className="text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
                                                 >
                                                     {item.name}
                                                 </Link>
@@ -71,33 +71,33 @@ export default function Footer() {
                                     </ul>
                                 </div>
                             ))}
-
-                            {/* Sponsors */}
-                            <div className="col-span-2 md:col-span-1">
-                                <h3 className="text-sm font-semibold text-purple-600 dark:text-purple-300 mb-4">
-                                    Our Sponsors
-                                </h3>
-                                <div className="flex flex-wrap gap-4 items-center">
-                                    {sponsors.map((sponsor) => (
-                                        <Image
-                                            key={sponsor.name}
-                                            src={sponsor.src}
-                                            alt={`${sponsor.name} logo`}
-                                            width={100}
-                                            height={40}
-                                            className="h-8 w-auto"
-                                        />
-                                    ))}
-                                </div>
-                            </div>
                         </div>
                     </div>
 
-                    <Separator className="my-8" />
+                    {/* Sponsors */}
+                    <div className="py-12">
+                        <h3 className="text-xl font-semibold text-purple-600 dark:text-purple-300 mb-8 text-center">
+                            Our Sponsors
+                        </h3>
+                        <div className="flex flex-wrap justify-center gap-8 items-center">
+                            {sponsors.map((sponsor) => (
+                                <Image
+                                    key={sponsor.name}
+                                    src={sponsor.src}
+                                    alt={`${sponsor.name} logo`}
+                                    width={150}
+                                    height={60}
+                                    className="h-12 w-auto"
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <Separator className="my-12" />
 
                     {/* Copyright */}
                     <div className="py-8">
-                        <p className="text-sm text-gray-600 text-center dark:text-gray-300">
+                        <p className="text-base text-gray-600 text-center dark:text-gray-300">
                             © {new Date().getFullYear()} Your DevOps Platform by CSTAD. All rights reserved.
                         </p>
                     </div>
