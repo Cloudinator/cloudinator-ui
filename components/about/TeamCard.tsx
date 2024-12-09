@@ -137,4 +137,3 @@ function SocialIcon({ icon: Icon, href }: { icon: LucideIcon, href: string }) {
         </motion.a>
     )
 }
-

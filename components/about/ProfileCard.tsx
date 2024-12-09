@@ -142,7 +142,7 @@ function ProfileCard({ member }: { member: TeamMember }) {
     )
 }
 
-export default function InteractiveTeamSection() {
+export default function TeamSection() {
     return (
         <div className="container py-16 mx-auto">
             <section className="space-y-8 mb-16">
