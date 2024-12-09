@@ -81,18 +81,23 @@ const teamMembers = [
 
 export default function TeamPage() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-16 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 py-16 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-5xl font-bold text-center text-gray-900 mb-16 relative">
+                <h1 className="text-5xl font-bold text-center text-gray-900 dark:text-white mb-16 relative">
                     Our Team
-                    <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-green-500 rounded-full"></span>
+                    <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-green-500 dark:bg-green-400 rounded-full"></span>
                 </h1>
                 <div className="space-y-24">
                     {teamMembers.map((member, index) => (
-                        <ArtisticProfile key={index} {...member} isReversed={index % 2 !== 0} />
+                        <ArtisticProfile
+                            key={index}
+                            {...member}
+                            isReversed={index % 2 !== 0}
+                            className="bg-white dark:bg-gray-800 shadow-lg dark:shadow-none text-gray-900 dark:text-gray-100"
+                        />
                     ))}
                 </div>
             </div>
         </div>
-    )
+    );
 }
