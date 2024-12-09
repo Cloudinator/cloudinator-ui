@@ -65,8 +65,14 @@ jobs:
       - run:
           name: Install Trivy
           command: |
-            # Download and install Trivy
-            sudo curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+            # Download and install Trivy without sudo
+            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/.local/bin
+
+      - run:
+          name: Add Trivy to PATH
+          command: |
+            echo 'export PATH=$PATH:$HOME/.local/bin' >> $BASH_ENV
+            source $BASH_ENV
 
       - run:
           name: Scan Dependencies for Vulnerabilities with Trivy
