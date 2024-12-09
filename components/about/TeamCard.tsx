@@ -93,7 +93,7 @@ export function ArtisticProfile({
                     >
                         &quot;
                     </span>
-                    <p className="text-lg px-4 leading-relaxed italic text-white tracking-wide">
+                    <p className="text-lg px-4 leading-relaxed italic text-gray-500 dark:text-white racking-wide">
                         {quote}
                     </p>
                     <span
@@ -115,7 +115,7 @@ export function ArtisticProfile({
                 </motion.div>
             </div>
             <motion.div
-                className={`absolute -bottom-16 ${isReversed ? '-left-16' : '-right-16'} w-64 h-64 bg-blue-100 rounded-full opacity-20`}
+                className={`absolute -bottom-16 ${isReversed ? '-left-16' : '-right-16'} w-64 h-64 bg-blue-100 rounded-full opacity-40 dark:opacity-20`}
                 animate={{
                     scale: [1, 1.2, 1],
                     x: [0, 20, 0],

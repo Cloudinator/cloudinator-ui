@@ -9,6 +9,7 @@ import TerminalPage from "@/components/servicepage/terminal";
 import FeatureCard from "@/components/servicepage/FeatureCard";
 import AnimatedBackground from "@/components/servicepage/AnimatedBackground";
 import StorageSection from "@/components/servicepage/StorageSection";
+import Link from "next/link";
 
 export default function ServicePage() {
     const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -43,13 +44,15 @@ export default function ServicePage() {
                             </p>
 
                             <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                                <Button
-                                    size="lg"
-                                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                                >
-                                    Get Started Now
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
+                                <Link href="/start-building">
+                                    <Button
+                                        size="lg"
+                                        className="bg-purple-500 hover:bg-purple-700 text-white"
+                                    >
+                                        Get Started Now
+                                        <ArrowRight className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </Link>
                                 <Button
                                     size="lg"
                                     variant="outline"
@@ -117,15 +120,15 @@ export default function ServicePage() {
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg max-w-3xl w-full">
                         <div className="aspect-w-16 aspect-h-9">
                             <iframe
-                                src="https://cstad.edu.kh"
+                                src="https://cloudinator-ui.naktech.pro"
                                 frameBorder="0"
                                 allow="autoplay; encrypted-media"
                                 allowFullScreen
-                                className="w-full h-full"
+                                className="w-full h-[500px]"
                             ></iframe>
                         </div>
                         <Button
-                            className="mt-4 dark:bg-gray-700 dark:text-gray-300"
+                            className="mt-4 dark:bg-gray-700 dark:text-gray-300 bg-purple-500"
                             onClick={() => setIsVideoOpen(false)}
                         >
                             Close

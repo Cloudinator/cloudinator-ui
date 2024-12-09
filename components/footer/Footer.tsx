@@ -8,18 +8,18 @@ import { Mail, MapPin, Phone } from 'lucide-react'
 
 const navigation = {
     links: [
-        { name: 'Home', href: '#' },
-        { name: 'Service', href: '#' },
-        { name: 'Document', href: '#' },
-        { name: 'Start Building', href: '#' },
-        { name: 'About US', href: '#' }
+        { name: 'Home', href: '/' },
+        { name: 'Service', href: 'service' },
+        { name: 'Document', href: 'https://cloudinator-doc-vercel.vercel.app/' },
+        { name: 'Start Building', href: '/start-building' },
+        { name: 'About US', href: '/about' }
     ]
 }
 
 const contact = {
     phone: '+855978443615',
     email: 'cloudinator@gmail.com',
-    address: 'No. 24, Street 562,Sangkat Boeung ...'
+    address: 'No. 24, Street 562 ,Sangkat Boeung Kok, Toul Kork, Phnom Penh City.'
 }
 
 const partners = [
@@ -92,7 +92,7 @@ export default function Footer() {
                         {/* Partners */}
                         <div>
                             <h3 className="text-lg font-semibold text-sky-600 mb-4">Sponsor</h3>
-                            <div className="grid gap-4">
+                            <div className="grid gafp-4">
                                 {partners.map((partner) => (
                                     <Image
                                         key={partner.name}

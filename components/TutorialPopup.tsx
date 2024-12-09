@@ -9,27 +9,27 @@ const tutorialSteps = [
     {
         title: "Welcome to Cloudinator",
         content: "Your deployment is not easier than that",
-        image: "/homepage.svg"
+        image: "/tutorial/homepage.png"
     },
     {
         title: "Deployment Pipeline",
-        content: "Create automating workflows with GitHub and Jenkins.",
-        image: "/assets/homepage.svg"
+        content: "Create automating workflows with CI/CD Tools.",
+        image: "/tutorial/service.png"
     },
     {
-        title: "Learning Resource",
-        content: "Provide interactive learning and a vast array of resources.",
-        image: "/assets/learningpage.svg"
+        title: "Personal Cloud Storage",
+        content: "Provision user about send and save file in clouds",
+        image: "/tutorial/cloud.png"
     },
     {
         title: "Documentation",
-        content: "A ton of resources for software developers to deep dive with Spring and DevOps",
-        image: "/assets/documentpage.svg"
+        content: "A ton of resources for software developers to deep dive with DevSecOps",
+        image: "/tutorial/document.png"
     },
     {
         title: "Get in Touch",
         content: "Ready to start? Contact us to begin your journey with SpringOps.",
-        image: "/assets/homepage.svg"
+        image: "/tutorial/contact.png"
     }
 ]
 
@@ -96,13 +96,15 @@ const TutorialPopup: React.FC = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 dark:bg-opacity-50 bg-opacity-50 dark:bg-gray-900 flex items-center justify-center p-4 z-50 backdrop-blur-sm" // Increased opacity here
+                        className="fixed inset-0 dark:bg-opacity-50 bg-opacity-50 dark:bg-gray-900 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
+                        onClick={closeTutorial} // Add click event here
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
                             className="bg-white dark:bg-gray-800 rounded-lg shadow-xl px-8 pt-4 pb-6 max-w-md w-full relative transition-transform duration-300 ease-in-out"
+                            onClick={(e) => e.stopPropagation()} // Prevent click event from bubbling up
                         >
                             <button onClick={closeTutorial} className="text-gray-500 flex justify-end w-full">
                                 Skip Tutorial
@@ -143,12 +145,12 @@ const TutorialPopup: React.FC = () => {
                                 >
                                     <ChevronLeft className="w-6 h-6" />
                                 </button>
-                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                <span className="text-md text-purple-500 dark:text-gray-400">
                   {currentStep + 1} / {tutorialSteps.length}
                 </span>
                                 <button
                                     onClick={nextStep}
-                                    className={`flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground ${currentStep === tutorialSteps.length - 1 ? 'bg-green-500' : ''} dark:bg-primary-dark dark:text-primary-foreground-dark`}
+                                    className={`flex items-center justify-center w-10 h-10 rounded-full bg-purple-500 text-primary-foreground ${currentStep === tutorialSteps.length - 1 ? 'bg-green-500' : ''} dark:bg-primary-dark dark:text-primary-foreground-dark`}
                                     aria-label={currentStep === tutorialSteps.length - 1 ? "Finish tutorial" : "Next step"}
                                 >
                                     <ChevronRight className="w-6 h-6" />
