@@ -66,7 +66,7 @@ jobs:
           name: Install Trivy
           command: |
             # Download and install Trivy
-            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+            sudo curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
       - run:
           name: Scan Dependencies for Vulnerabilities with Trivy
