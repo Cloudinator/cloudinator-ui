@@ -57,6 +57,7 @@ jobs:
     executor: node-executor
     steps:
       - checkout
+      
       - node/install-packages:
           pkg-manager: npm
           override-ci-command: npm install --force
@@ -64,7 +65,8 @@ jobs:
       - run:
           name: Install Trivy
           command: |
-            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+            # Download and install Trivy
+            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
       - run:
           name: Scan Dependencies for Vulnerabilities with Trivy
