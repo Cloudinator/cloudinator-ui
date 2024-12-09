@@ -40,6 +40,10 @@ const NavBarHomePage = () => {
         { path: "/about", label: "About" },
     ];
 
+    const handleLinkClick = () => {
+        setIsMenuOpen(false); // Close the menu when a link is clicked
+    };
+
     const renderAuthButtons = () => {
         if (loading) {
             return <div className="h-10 w-24 bg-gray-200 animate-pulse rounded"></div>;
@@ -102,7 +106,7 @@ const NavBarHomePage = () => {
                                     asChild
                                     className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200 ease-in-out"
                                 >
-                                    <Link href={item.path}>{item.label}</Link>
+                                    <Link href={item.path} onClick={handleLinkClick}>{item.label}</Link>
                                 </Button>
                             ))}
                         </nav>
@@ -134,7 +138,7 @@ const NavBarHomePage = () => {
                                         asChild
                                         className="justify-start text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200 ease-in-out"
                                     >
-                                        <Link href={item.path}>{item.label}</Link>
+                                        <Link href={item.path} onClick={handleLinkClick}>{item.label}</Link>
                                     </Button>
                                 ))}
                             </nav>
@@ -152,4 +156,3 @@ const NavBarHomePage = () => {
 };
 
 export default NavBarHomePage;
-

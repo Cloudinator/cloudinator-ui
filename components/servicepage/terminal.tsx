@@ -10,7 +10,7 @@ export default function TerminalPage() {
     const [currentLineIndex, setCurrentLineIndex] = useState(0)
 
     const tabs = [
-        { id: 'kubernetes', label: 'Deploy on Kubernetes', content: [
+        { id: 'kubernetes', label: 'Kubernetes', content: [
                 '$ kubectl create namespace my-app',
                 'namespace/my-app created',
                 '$ kubectl apply -f kubernetes-deployment.yaml',
@@ -25,7 +25,7 @@ export default function TerminalPage() {
                 'NAME    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE',
                 'my-app  ClusterIP   10.96.200.155   <none>        80/TCP    45s'
             ]},
-        { id: 'docker', label: 'Deploy with Docker Compose', content: [
+        { id: 'docker', label: 'Docker Compose', content: [
                 '$ docker-compose --version',
                 'docker-compose version 1.29.2, build 5becea4c',
                 '$ cat docker-compose.yml',
@@ -73,7 +73,7 @@ export default function TerminalPage() {
             const timer = setTimeout(() => {
                 setDisplayedContent(prev => [...prev, currentTab.content[currentLineIndex]])
                 setCurrentLineIndex(prev => prev + 1)
-            }, 100) // Increased speed for better user experience
+            }, 100)
 
             return () => clearTimeout(timer)
         }
@@ -87,17 +87,20 @@ export default function TerminalPage() {
                 </h2>
                 <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1">
-                            {tabs.map((tab) => (
-                                <TabsTrigger
-                                    key={tab.id}
-                                    value={tab.id}
-                                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                                >
-                                    {tab.label}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
+                        {/* Responsive Tabs List */}
+                        <div className="overflow-x-auto">
+                            <TabsList className="flex flex-wrap w-full bg-gray-100 p-1">
+                                {tabs.map((tab) => (
+                                    <TabsTrigger
+                                        key={tab.id}
+                                        value={tab.id}
+                                        className="flex-1 min-w-[120px] max-w-full text-center px-2 py-1 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                                    >
+                                        {tab.label}
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                        </div>
                         {tabs.map((tab) => (
                             <TabsContent key={tab.id} value={tab.id} className="mt-0">
                                 <div className="bg-gray-900 rounded-b-lg h-[500px] w-full">

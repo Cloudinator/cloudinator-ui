@@ -7,6 +7,7 @@ import { ParallaxProvider, Parallax } from 'react-scroll-parallax'
 import dynamic from 'next/dynamic'
 import TypeHeading from '@/components/homepage/TypeHeading'
 import hero from '@/public/hero.json'
+import Link from "next/link";
 
 const Lottie = dynamic(() => import('react-lottie'), { ssr: false })
 
@@ -90,14 +91,16 @@ export default function HeroSection() {
                                     , we are on a mission to revolutionize the way you work. Say goodbye to manual
                                     tasks and hello to automation.
                                 </p>
-                                <motion.button
-                                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white px-6 py-3 rounded-md font-semibold transition-transform transform hover:scale-105"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    <Rocket className="w-5 h-5" />
-                                    Start Deploy
-                                </motion.button>
+                                <Link href="/start-building">
+                                    <motion.button
+                                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white px-6 py-3 rounded-md font-semibold transition-transform transform hover:scale-105"
+                                        whileHover={{scale: 1.05}}
+                                        whileTap={{scale: 0.95}}
+                                    >
+                                        <Rocket className="w-5 h-5"/>
+                                        Start Deploy
+                                    </motion.button>
+                                </Link>
                             </div>
 
                             {/* Right Content */}
@@ -107,8 +110,8 @@ export default function HeroSection() {
                                 onMouseLeave={handleHover}
                                 onTouchStart={handleHover}
                                 animate={controls}
-                                initial={{ opacity: 0, x: 100 }}
-                                whileInView={{ opacity: 1, x: 0 }}
+                                initial={{opacity: 0, x: 100}}
+                                whileInView={{opacity: 1, x: 0}}
                                 transition={{ duration: 0.7 }}
                                 viewport={{ once: true }}
                             >

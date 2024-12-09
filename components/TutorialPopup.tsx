@@ -85,7 +85,7 @@ const TutorialPopup: React.FC = () => {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-8 left-6 bg-purple-500 text-primary-foreground px-4 py-2 rounded-full shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-primary-dark dark:text-primary-foreground-dark dark:hover:bg-primary-dark/90"
+                className="fixed bottom-8 left-6 bg-purple-500 text-primary-foreground px-4 py-2 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-primary-dark dark:text-primary-foreground-dark dark:hover:bg-primary-dark/90"
                 aria-label="Open Tutorial"
             >
                 ?
