@@ -1,5 +1,6 @@
 
 import type {Metadata} from "next";
+import ProjectDetail from "@/components/profiledashboard/deployment/DeploymentDetail";
 
 export const metadata: Metadata = {
     title: "Deployment Profile",
@@ -9,9 +10,7 @@ export const metadata: Metadata = {
 export default function DeploymentPage() {
     return (
         <>
-            <div className="w-full h-screen grid place-content-center">
-                <h1>This is Deployment Profile</h1>
-            </div>
+            <ProjectDetail />
         </>
     );
 }
