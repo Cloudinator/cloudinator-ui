@@ -103,13 +103,13 @@ export function ArtisticProfile({
                     </span>
                 </motion.div>
                 <motion.div
-                    className={`flex ${isReversed ? 'justify-end' : 'justify-start'} space-x-6`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
+                    className={`flex justify-center space-x-6`}
+                    initial={{opacity: 0}}
+                    animate={{opacity: 1}}
+                    transition={{delay: 0.5}}
                 >
                     {socialLinks.map((link, index) => (
-                        <SocialIcon key={index} icon={link.icon} href={link.href} />
+                        <SocialIcon key={index} icon={link.icon} href={link.href}/>
                     ))}
                 </motion.div>
             </div>

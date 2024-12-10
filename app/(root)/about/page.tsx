@@ -6,8 +6,8 @@ import JoinTeamSection from "@/components/about/JoinTeamSection";
 import TeamPage from "@/components/about/TeamSection";
 
 export const metadata: Metadata = {
-    title: "About Page",
-    description: "Cloudinator Application",
+    title: "About",
+    description: "About Page Cloudinator Application",
 };
 
 export default function AboutPage() {

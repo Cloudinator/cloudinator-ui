@@ -81,7 +81,7 @@ export default function FrameworkSection() {
                 </h2>
             </div>
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-4xl font-bold mb-4">
+                <h1 className="text-4xl font-bold mb-4 text-center">
                     Your framework,
                     <br />
                     your way

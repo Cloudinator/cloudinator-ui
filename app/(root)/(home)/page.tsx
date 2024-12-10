@@ -1,24 +1,15 @@
-"use client";
+import HomePage from "@/components/homepage/Home";
+import type {Metadata} from "next";
 
-import FeatureSection from "@/components/homepage/FeatureSection";
-import HeroSection from "@/components/homepage/HeroSection";
-import FeatureService from "@/components/homepage/FeatureService";
-import FrameworkSection from "@/components/homepage/FrameworkSection";
-import ServiceComponent from "@/components/homepage/ServiceComponent";
-import {ParallaxProvider} from "react-scroll-parallax";
-import WhyUs from "@/components/homepage/WhyUsSection";
+export const metadata: Metadata = {
+    title: "Home",
+    description: "Home Page Cloudinator Application",
+};
 
-export default function HomePage() {
+export default function Homes() {
   return (
       <>
-          <ParallaxProvider>
-              <HeroSection />
-          </ParallaxProvider>
-          <FeatureSection />
-          <ServiceComponent />
-          <FrameworkSection />
-          <FeatureService />
-          <WhyUs />
+          <HomePage />
       </>
   );
 }
