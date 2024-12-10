@@ -45,7 +45,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
                 setError(new Error(data.description || 'Failed to fetch user data'));
             }
         } catch (err) {
-            console.error(err);
+            // console.error(err);
             setUser(null);
             setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         } finally {

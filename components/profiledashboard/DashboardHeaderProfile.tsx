@@ -15,8 +15,9 @@ import Image from "next/image";
 
 const DashboardHeaderProfile = () => {
     const profileImage = "/ben.png";
+
     return (
-        <div className="border-b px-4 sticky top-0 z-10 bg-white shadow-sm">
+        <div className="border-b p-2 sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm">
             <div className="flex h-14 items-center px-4">
                 {/* Search bar */}
                 <div className="flex-1 flex items-center max-w-xl">
@@ -24,7 +25,7 @@ const DashboardHeaderProfile = () => {
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Search deployments..."
-                            className="pl-8 w-full"
+                            className="pl-8 w-full bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200" // Background color for light and dark modes
                         />
                     </div>
                 </div>
@@ -35,7 +36,7 @@ const DashboardHeaderProfile = () => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative" size="icon">
-                                <Bell className="h-5 w-5" />
+                                <Bell className="h-5 w-5 text-gray-800 dark:text-gray-200" />
                                 <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-600" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -60,7 +61,7 @@ const DashboardHeaderProfile = () => {
                     {/* Profile */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button className="relative h-8 w-8 rounded-full bg-gray-500">
+                            <Button className="relative h-8 w-8 rounded-full overflow-hidden bg-gray-500">
                                 <Image
                                     src={profileImage}
                                     alt="Profile"
@@ -73,20 +74,23 @@ const DashboardHeaderProfile = () => {
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>User Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
+                            {/* Uncomment if you want to add a profile link */}
                             {/*<DropdownMenuItem>*/}
                             {/*    <User className="mr-2 h-4 w-4" />*/}
                             {/*    Profile*/}
                             {/*</DropdownMenuItem>*/}
                             <DropdownMenuItem asChild>
-                                <Link href="/setting/account">
+                                <Link href="/setting/account" className="flex items-center">
                                     <Settings className="mr-2 h-4 w-4" />
                                     Setting
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                                <LogOut className="mr-2 h-4 w-4" />
-                                Log out
+                            <DropdownMenuItem asChild>
+                                <Link href="/logout" className="flex items-center">
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    Log out
+                                </Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

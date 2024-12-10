@@ -3,7 +3,7 @@
 import { BarChart, Globe, Home, Settings, Terminal, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
+import { useState } from 'react';
 import {
     Sidebar,
     SidebarContent,
@@ -14,6 +14,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import Image from "next/image";
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -26,19 +27,29 @@ const navigation = [
 ]
 
 export function SidebarDashboardProfile() {
-    const pathname = usePathname()
+    const pathname = usePathname();
+    const [darkMode, setDarkMode] = useState(false); // State for dark mode
+
+    const toggleDarkMode = () => {
+        setDarkMode(prev => !prev);
+        document.body.classList.toggle('dark', !darkMode); // Toggle dark class on body
+    };
 
     return (
-        <Sidebar>
-            <SidebarHeader className="border-b p-4">
+        <Sidebar className={`flex flex-col h-full ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <SidebarHeader className="border-b p-3">
                 <Link href="/" className="flex items-center gap-2 font-semibold text-purple-500">
-                    <Terminal className="h-6 w-6 text-purple-500" />
+                    <Image
+                        src="/logo.png"
+                        alt="cloudinator logo"
+                        width={50}
+                        height={50}
+                    />
                     <span>Cloudinator</span>
                 </Link>
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className="flex-grow justify-between p-2">
                 <SidebarGroup>
-                    {/* <SidebarGroupLabel>Navigation</SidebarGroupLabel> */}
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {navigation.map((item) => (
@@ -49,20 +60,20 @@ export function SidebarDashboardProfile() {
                                     >
                                         <Link
                                             href={item.href}
-                                            className={`flex items-center gap-2 ${
+                                            className={`flex items-center gap-4 p-3 rounded-lg transition-colors duration-200 mb-2 ${
                                                 pathname === item.href
-                                                    ? 'text-purple-500 font-bold'
-                                                    : 'text-gray-700'
+                                                    ? 'text-purple-500 font-bold bg-gray-100 dark:bg-gray-700'
+                                                    : 'text-gray-700 hover:bg-gray-100 hover:dark:bg-gray-700'
                                             }`}
                                         >
                                             <item.icon
-                                                className={`h-4 w-4 ${
+                                                className={`h-5 w-5 ${
                                                     pathname === item.href
                                                         ? 'text-purple-500'
-                                                        : 'text-gray-700 '
+                                                        : 'text-gray-700 dark:text-gray-300'
                                                 }`}
                                             />
-                                            <span>{item.name}</span>
+                                            <span className="text-lg dark:text-gray-300">{item.name}</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -70,7 +81,11 @@ export function SidebarDashboardProfile() {
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
+                {/* Dark Mode Toggle Button */}
+                <button onClick={toggleDarkMode} className="p-2 mt-auto">
+                    Switch Theme
+                </button>
             </SidebarContent>
         </Sidebar>
-    )
+    );
 }

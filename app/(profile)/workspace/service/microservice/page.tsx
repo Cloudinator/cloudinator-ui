@@ -5,10 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { SpringMicroservice } from "@/components/profiledashboard/workspace/service/spring-microservice/SpringMicroservice";
 import Link from "next/link";
-import {
-    ServiceCreationFlow
-} from "@/components/profiledashboard/workspace/service/spring-microservice/ServiceCreationFlow";
-
+import { ServiceCreationFlow } from "@/components/profiledashboard/workspace/service/spring-microservice/ServiceCreationFlow";
 
 const services = [
     {
@@ -57,7 +54,7 @@ const services = [
 
 export default function SpringMicroservices() {
     return (
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto p-6 bg-white dark:bg-gray-900"> {/* Background color for light and dark mode */}
             <div className="flex items-center justify-between pb-6">
                 <div className="flex items-center space-x-2">
                     <Link href="/workspace/service">
@@ -73,9 +70,7 @@ export default function SpringMicroservices() {
                 </Button>
             </div>
 
-
-            {/*<ServiceDropdown />*/}
-            {/* Embed the ServiceDropdown here */}
+            {/* Embed the ServiceCreationFlow here */}
             <ServiceCreationFlow />
 
             <Tabs defaultValue="relationships" className="mb-6">
@@ -85,6 +80,7 @@ export default function SpringMicroservices() {
                 </TabsList>
             </Tabs>
 
+            {/* Services Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {services.map((service, index) => (
                     <div key={index} className="relative">
@@ -95,7 +91,6 @@ export default function SpringMicroservices() {
                     </div>
                 ))}
             </div>
-
         </div>
     );
 }

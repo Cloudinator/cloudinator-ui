@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-import { ChevronDown, Filter, Folder, FolderGit2, Terminal, TrendingUp} from 'lucide-react';
+import { ChevronDown, Filter, Folder, FolderGit2, Terminal, TrendingUp } from 'lucide-react';
 import { ProjectCard } from "@/components/profiledashboard/workspace/ProjectCard";
-import {StatsCard} from "@/components/profiledashboard/workspace/StatsCard";
+import { StatsCard } from "@/components/profiledashboard/workspace/StatsCard";
 
 const projects = [
     {
@@ -94,13 +93,11 @@ const projects = [
 
 export default function Workspace() {
     return (
-        <div className="container mx-auto p-6 space-y-6">
+        <div className="w-full min-h-screen p-8 space-y-6 bg-white dark:bg-gray-900"> {/* Background color for light and dark mode */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                    <Terminal className="h-8 w-8 text-purple-500"/>
-                    <h1 className="text-3xl font-bold tracking-tight text-purple-500">
-                        Workspace
-                    </h1>
+                    <Terminal className="h-8 w-8 text-purple-500" />
+                    <h1 className="text-3xl font-bold tracking-tight text-purple-500">Workspace</h1>
                 </div>
 
                 <Button className="bg-purple-500 text-white hover:bg-purple-400">
@@ -110,15 +107,13 @@ export default function Workspace() {
             </div>
 
             <div className="flex items-center gap-4">
-                <Button variant="outline"
-                        className="flex items-center gap-2 border-purple-500 text-purple-500 hover:bg-purple-100">
+                <Button variant="outline" className="flex items-center gap-2 border-purple-500 text-purple-500 hover:bg-purple-100 dark:border-purple-300 dark:text-purple-300 hover:bg-purple-700">
                     <span>Personal Workspace</span>
-                    <ChevronDown className="h-4 w-4"/>
+                    <ChevronDown className="h-4 w-4" />
                 </Button>
 
-                <Button variant="outline"
-                        className="flex items-center gap-2 border-purple-500 text-purple-500 hover:bg-purple-100">
-                    <Filter className="h-4 w-4"/>
+                <Button variant="outline" className="flex items-center gap-2 border-purple-500 text-purple-500 hover:bg-purple-100 dark:border-purple-300 dark:text-purple-300 hover:bg-purple-700">
+                    <Filter className="h-4 w-4" />
                     <span>Filter project</span>
                 </Button>
 
@@ -126,7 +121,7 @@ export default function Workspace() {
                     <Input
                         type="text"
                         placeholder="Search projects..."
-                        className="w-full border-purple-500 focus:border-purple-500 focus:ring focus:ring-purple-200"
+                        className="w-full border-purple-500 focus:border-purple-500 focus:ring focus:ring-purple-200 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200"
                     />
                 </div>
             </div>
@@ -136,28 +131,27 @@ export default function Workspace() {
                     title="Total Workspace"
                     value="25"
                     change="+10% from last month"
-                    icon={<Terminal className="h-8 w-8"/>}
+                    icon={<Terminal className="h-8 w-8" />}
                 />
                 <StatsCard
                     title="Total Sub-Workspace"
                     value="3"
                     change="+20% from last month"
-                    icon={<Folder className="h-8 w-8"/>}
+                    icon={<Folder className="h-8 w-8" />}
                 />
                 <StatsCard
                     title="Total Projects"
                     value="37"
                     change="+16% from last month"
-                    icon={<FolderGit2 className="h-8 w-8"/>}
+                    icon={<FolderGit2 className="h-8 w-8" />}
                 />
                 <StatsCard
                     title="Recently Workspace"
                     value="7"
                     changeValue="+7"
-                    icon={<TrendingUp className="h-8 w-8"/>}
+                    icon={<TrendingUp className="h-8 w-8" />}
                 />
             </div>
-
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {projects.map((project, index) => (
