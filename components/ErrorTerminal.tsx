@@ -1,17 +1,19 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { devopsCommands } from '@/utils/devopsCommands'
 
 export function ErrorTerminal() {
     const [input, setInput] = useState('')
     const [output, setOutput] = useState<string[]>([
-        'Welcome to the DevOps Error Terminal!',
-        'Error: Unspecified error occurred.',
+        'Cloudinator!',
+        'Error: Unspecified page cannot be found!',
         'Type "help" to see available commands.',
     ])
     const [suggestions, setSuggestions] = useState<string[]>([])
     const terminalRef = useRef<HTMLDivElement>(null)
+    const router = useRouter() // Initialize router
 
     useEffect(() => {
         // Auto-scroll to bottom
@@ -44,22 +46,26 @@ export function ErrorTerminal() {
         setSuggestions([])
     }
 
+    const handleHomeClick = () => {
+        router.push('/')
+    }
+
     return (
         <div className="bg-black p-4 rounded-lg shadow-lg font-mono text-sm">
             <div
                 ref={terminalRef}
-                className="h-96 overflow-y-auto mb-4 whitespace-pre-wrap text-green-400"
+                className="h-96 overflow-y-auto mb-4 whitespace-pre-wrap text-green-400" // Changed text color to green for hacker theme
             >
                 {output.map((line, index) => (
                     <div
                         key={index}
                         className={`mb-1 ${
-                            line.startsWith('❌') ? 'text-red-500' : 'text-green-400'
+                            line.startsWith('❌') ? 'text-red-500' : 'text-green-400' // Consistent green color for output
                         }`}
                     >
                         {line.startsWith('$ ') ? (
                             <span
-                                className="cursor-pointer hover:text-blue-500"
+                                className="cursor-pointer hover:text-cyan-400" // Change hover color to cyan for links
                                 onClick={() => setInput(line.replace('$ ', ''))}
                             >
                                 {line}
@@ -71,8 +77,8 @@ export function ErrorTerminal() {
                 ))}
             </div>
             <div className="relative">
-                <div className="flex items-center bg-gray-800 p-2 rounded-md">
-                    <span className="text-green-500 mr-2">$</span>
+                <div className="flex items-center bg-gray-900 p-2 rounded-md"> {/* Darker background for input area */}
+                    <span className="text-green-400 mr-2">$</span> {/* Change prompt color to green */}
                     <input
                         type="text"
                         value={input}
@@ -89,7 +95,7 @@ export function ErrorTerminal() {
                             <li
                                 key={index}
                                 onClick={() => handleSuggestionClick(suggestion)}
-                                className="px-4 py-2 cursor-pointer hover:bg-gray-700 text-green-400"
+                                className="px-4 py-2 cursor-pointer hover:bg-gray-700 text-green-400" // Keep suggestion text green
                             >
                                 {suggestion}
                             </li>
@@ -97,6 +103,13 @@ export function ErrorTerminal() {
                     </ul>
                 )}
             </div>
+            {/* Button to return to home */}
+            <button
+                onClick={handleHomeClick}
+                className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-200"
+            >
+                Go Home
+            </button>
         </div>
     )
 }
