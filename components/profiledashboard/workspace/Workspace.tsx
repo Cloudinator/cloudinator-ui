@@ -102,7 +102,7 @@ export default function Workspace() {
 
                 <Button className="bg-purple-500 text-white hover:bg-purple-400">
                     <span className="mr-2">+</span>
-                    Add Workspace
+                    Create Project
                 </Button>
             </div>
 

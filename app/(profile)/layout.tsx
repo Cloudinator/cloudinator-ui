@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import "../globals.css";
 
+import { ThemeProvider } from "@/components/theme-provider"
 import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
 import {SidebarDashboardProfile} from "@/components/profiledashboard/SidebarDashboardProfile";
+import DashboardHeaderProfile from "@/components/profiledashboard/DashboardHeaderProfile";
 
 import { Poppins } from 'next/font/google';
-import {ThemeProvider} from "next-themes";
 import StoreProvider from "@/app/StoreProvider";
-import {AuthProvider} from "@/contexts/AuthContext";
-import {Toaster} from "@/components/ui/toaster";
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -31,24 +30,25 @@ export default function DashboardLayout({
       <body
         className={poppins.className}
       >
-      <StoreProvider>
-          <AuthProvider>
-              <ThemeProvider
-                  attribute="class"
-                  defaultTheme="system"
-                  enableSystem
-                  disableTransitionOnChange
-              >
-                  <SidebarProvider>
-                      <SidebarDashboardProfile />
-                      <SidebarInset>
-                          {children}
-                      </SidebarInset>
-                  </SidebarProvider>
-              </ThemeProvider>
-              <Toaster />
-          </AuthProvider>
-      </StoreProvider>
+      <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+      >
+          <StoreProvider>
+              <SidebarProvider>
+
+                  <SidebarDashboardProfile />
+                  <SidebarInset>
+                      <DashboardHeaderProfile />
+                      {children}
+                  </SidebarInset>
+
+              </SidebarProvider>
+          </StoreProvider>
+
+      </ThemeProvider>
       </body>
     </html>
   );

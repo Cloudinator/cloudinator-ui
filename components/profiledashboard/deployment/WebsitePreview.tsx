@@ -12,16 +12,11 @@ export default function WebsitePreview({ url }: WebsitePreviewProps) {
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false)
-        }, 3000) // Simulate loading for 3 seconds
-
+        const timer = setTimeout(() => setLoading(false), 5000) // Increase timeout to 5 seconds
         return () => clearTimeout(timer)
     }, [])
 
-    const handleIframeLoad = () => {
-        setLoading(false)
-    }
+    const handleIframeLoad = () => setLoading(false)
 
     const handleIframeError = () => {
         setLoading(false)
@@ -29,22 +24,20 @@ export default function WebsitePreview({ url }: WebsitePreviewProps) {
     }
 
     if (error) {
-        return <div className="text-red-500">{error}</div>
+        return <div className="text-red-500 p-4 bg-red-100 rounded-lg">{error}</div>
     }
 
     return (
-        <div className="relative w-full aspect-video p-4">
-            {loading && (
-                <Skeleton className="absolute inset-0 w-full h-full" />
-            )}
+        <div className="relative w-full aspect-video">
+            {loading && <Skeleton className="absolute inset-0 w-full h-full rounded-lg" />}
             <iframe
                 src={url}
-                className={`w-full h-full border-0 rounded-lg ${loading ? 'invisible' : 'visible'}`}
+                className={`w-full h-full border-0 rounded-lg transition-opacity duration-300 ${loading ? 'opacity-0' : 'opacity-100'}`}
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}
                 title="Website Preview"
-                scrolling="no"
-                style={{overflow: 'hidden'}}
+                sandbox="allow-scripts allow-same-origin"
+                loading="lazy"
             />
         </div>
     )

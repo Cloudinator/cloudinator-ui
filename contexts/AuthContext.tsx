@@ -22,6 +22,8 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
+    console.log('AuthProvider', user);
+
     const checkAuth = async () => {
         try {
             setLoading(true);
@@ -45,7 +47,6 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
                 setError(new Error(data.description || 'Failed to fetch user data'));
             }
         } catch (err) {
-            // console.error(err);
             setUser(null);
             setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         } finally {
