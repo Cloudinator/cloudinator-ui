@@ -1,15 +1,15 @@
 import type {Metadata} from "next";
-import Workspace from "@/components/profiledashboard/workspace/Workspace";
+import Service from "@/components/profiledashboard/workspace/service/Service";
 
 export const metadata: Metadata = {
-    title: "Workspace Profile",
+    title: "Service Profile",
     description: "Cloudinator Application",
 };
 
-export default function WorkspacePage() {
+export default function ServicePage() {
     return (
         <>
-            <Workspace />
+            <Service />
         </>
     );
 }

@@ -1,8 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {ArrowUpRight, Cloud, GitBranch, Globe, Home, Zap} from "lucide-react";
-import DeploymentOverview from "@/components/profiledashboard/dashboard/DeploymentOverview";
-import RecentDeployments from "@/components/profiledashboard/dashboard/RecentDeployments";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowUpRight, Cloud, GitBranch, Globe, Home, Zap } from 'lucide-react'
+import DeploymentOverview from "@/components/profiledashboard/dashboard/DeploymentOverview"
+import RecentDeployments from "@/components/profiledashboard/dashboard/RecentDeployments"
+import {CreateWorkspaceModal} from "@/components/profiledashboard/workspace/CreateWorkspaceModal";
+
 
 export const metadata = {
     title: "Deployments Dashboard",
@@ -28,16 +29,13 @@ export default function DashboardPage() {
         <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="flex items-center justify-between space-y-2">
                 <div className="flex items-center space-x-2">
-                    <Home className="h-8 w-8 text-purple-500"/>
+                    <Home className="h-8 w-8 text-purple-500" />
                     <h2 className="text-3xl font-bold tracking-tight text-purple-500">
                         Deployment Dashboard
                     </h2>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <Button className="bg-purple-500 hover:bg-purple-700">
-                        <Zap className="mr-2 h-4 w-4"/>
-                        New Deployment
-                    </Button>
+                    <CreateWorkspaceModal />
                 </div>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -109,15 +107,16 @@ export default function DashboardPage() {
                 <Card className="col-span-3">
                     <CardHeader>
                         <div className="flex items-center space-x-2 text-md text-purple-500">
-                            <Zap className="h-6 w-6 text-purple-500"/>
+                            <Zap className="h-6 w-6 text-purple-500" />
                             <CardTitle>Recent Deployments</CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <RecentDeployments/>
+                        <RecentDeployments />
                     </CardContent>
                 </Card>
             </div>
         </div>
-    );
+    )
 }
+

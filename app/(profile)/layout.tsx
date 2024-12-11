@@ -7,6 +7,7 @@ import {SidebarDashboardProfile} from "@/components/profiledashboard/SidebarDash
 import DashboardHeaderProfile from "@/components/profiledashboard/DashboardHeaderProfile";
 
 import { Poppins } from 'next/font/google';
+import StoreProvider from "@/app/StoreProvider";
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -31,18 +32,21 @@ export default function DashboardLayout({
       >
       <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
       >
-          <SidebarProvider>
+          <StoreProvider>
+              <SidebarProvider>
 
-              <SidebarDashboardProfile />
-              <SidebarInset>
-                  <DashboardHeaderProfile />
-                  {children}
-              </SidebarInset>
-          </SidebarProvider>
+                  <SidebarDashboardProfile />
+                  <SidebarInset>
+                      <DashboardHeaderProfile />
+                      {children}
+                  </SidebarInset>
+
+              </SidebarProvider>
+          </StoreProvider>
 
       </ThemeProvider>
       </body>

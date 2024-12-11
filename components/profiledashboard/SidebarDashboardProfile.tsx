@@ -14,6 +14,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import {useGetWorkspacesQuery} from "@/redux/api/projectApi";
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -27,6 +28,10 @@ const navigation = [
 
 export function SidebarDashboardProfile() {
     const pathname = usePathname()
+
+    const {data} = useGetWorkspacesQuery();
+
+    console.log('SidebarDashboardProfile', data)
 
     return (
         <Sidebar>
@@ -46,6 +51,7 @@ export function SidebarDashboardProfile() {
                                     <SidebarMenuButton
                                         asChild
                                         isActive={pathname === item.href}
+                                        disabled={item.name === 'Workspace' && !data}
                                     >
                                         <Link
                                             href={item.href}
@@ -53,14 +59,14 @@ export function SidebarDashboardProfile() {
                                                 pathname === item.href
                                                     ? 'text-purple-500 font-bold'
                                                     : 'text-gray-700'
-                                            }`}
+                                            } ${item.name === 'Workspace' && !data ? 'pointer-events-none opacity-50' : ''}`}
                                         >
                                             <item.icon
                                                 className={`h-4 w-4 ${
                                                     pathname === item.href
                                                         ? 'text-purple-500'
-                                                        : 'text-gray-700 '
-                                                }`}
+                                                        : 'text-gray-700'
+                                                } ${item.name === 'Workspace' && !data ? 'opacity-50' : ''}`}
                                             />
                                             <span>{item.name}</span>
                                         </Link>
