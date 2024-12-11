@@ -11,7 +11,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import StoreProvider from "@/app/StoreProvider";
 import Footer from "@/components/footer/Footer";
 import {ThemeProvider} from "next-themes";
-
+import {RouteTransition} from "@/components/RouteTransition";
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -31,29 +31,29 @@ export default function HomeLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-        <body
-            className={poppins.className}
-        >
-            <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
+            <body
+                className={poppins.className}
             >
-                <StoreProvider>
-                    <AuthProvider>
-
-                        <NavBarHomePage/>
-                        <ScrollProgressBar />
-                            {children}
-                        <BackToTopButton />
-                        <Footer />
-                        <TutorialPopup />
-
-                    </AuthProvider>
-                </StoreProvider>
-            </ThemeProvider>
-        </body>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <StoreProvider>
+                        <AuthProvider>
+                            <NavBarHomePage/>
+                            <ScrollProgressBar />
+                                <RouteTransition >
+                                    {children}
+                                </RouteTransition>
+                            <BackToTopButton />
+                            <Footer />
+                            <TutorialPopup />
+                        </AuthProvider>
+                    </StoreProvider>
+                </ThemeProvider>
+            </body>
         </html>
     );
 }

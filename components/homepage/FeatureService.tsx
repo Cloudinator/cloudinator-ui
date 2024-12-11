@@ -12,26 +12,22 @@ type Feature = {
     benefits: string[];
 }
 
-const FeatureCard = ({ feature, index }: { feature: Feature; index: number }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: index * 0.1 }}
-    >
-        <Card className="h-full flex flex-col">
+const FeatureCard = ({ feature }: { feature: Feature; index: number }) => (
+    <motion.div className="h-full">
+        <Card className="h-full flex flex-col transition-shadow duration-300 hover:shadow-xl hover:bg-gray-100 dark:hover:bg-gray-800">
             <CardHeader>
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                     {React.createElement(feature.icon, { className: "h-6 w-6 text-primary" })}
                 </div>
-                <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
-                <CardDescription className="text-muted-foreground">{feature.description}</CardDescription>
+                <CardTitle className="text-xl mb-2 text-gray-900 dark:text-gray-100">{feature.title}</CardTitle>
+                <CardDescription className="text-muted-foreground dark:text-gray-400">{feature.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
                 <ul className="space-y-2">
                     {feature.benefits.map((benefit: string, i: number) => (
                         <li key={i} className="flex items-center">
                             <CheckCircle className="mr-2 h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span className="text-sm">{benefit}</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">{benefit}</span>
                         </li>
                     ))}
                 </ul>
@@ -42,7 +38,7 @@ const FeatureCard = ({ feature, index }: { feature: Feature; index: number }) =>
 
 export default function FeatureService() {
     return (
-        <div className="flex flex-col min-h-screen bg-background">
+        <div className="flex flex-col min-h-screen bg-background dark:bg-gray-900">
             <main className="flex-grow container mx-auto px-4 py-16">
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
@@ -54,7 +50,7 @@ export default function FeatureService() {
                         <h2 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text inline-block">
                             Explore The Benefits of Our Features
                         </h2>
-                        <p className="text-muted-foreground max-w-3xl mx-auto text-lg">
+                        <p className="text-muted-foreground max-w-3xl mx-auto text-lg dark:text-gray-400">
                             Unique and powerful suite of software to run your entire business, brought to you by a company with the long-term
                             vision to transform the way you work.
                         </p>
@@ -87,9 +83,9 @@ const features = [
         description: "Create, deploy, and manage microservices with ease.",
         icon: Layers,
         benefits: [
-            "service2 discovery",
+            "Service discovery",
             "Load balancing",
-            "Inter-service2 communication",
+            "Inter-service communication",
         ],
     },
     {
@@ -131,5 +127,5 @@ const features = [
             "Role-based access control",
             "Compliance reporting",
         ],
-    },
+    }
 ]

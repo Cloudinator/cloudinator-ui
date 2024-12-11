@@ -35,10 +35,10 @@ const pirateAnimation = {
 const technologies = [
     { name: 'MongoDB', logo: '/programming/mongoDB.svg' },
     { name: 'PostgreSQL', logo: '/programming/postgres.svg' },
-    { name: 'SQL Server', logo: '/programming/sqlserver.svg' },
+    { name: 'GoLang', logo: '/programming/golang.png' },
     { name: 'MySQL', logo: '/programming/mysql.svg' },
     { name: 'Spring', logo: '/programming/spring.svg' },
-    { name: 'Ruby', logo: '/programming/ruby.svg' },
+    { name: 'Nextjs', logo: '/programming/nextjs.png' },
     { name: 'PHP', logo: '/programming/php.svg' },
     { name: 'Vue.js', logo: '/programming/vue.svg' },
     { name: 'React', logo: '/programming/react.svg' },

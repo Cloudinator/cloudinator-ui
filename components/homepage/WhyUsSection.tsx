@@ -19,7 +19,7 @@ export default function WhyUs() {
                     </div>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 justify-items-center">
-                    <Card className="bg-purple-600 text-white">
+                    <Card className="bg-purple-600 text-white transition-all duration-300 ease-in-out hover:bg-purple-700 hover:scale-105 hover:shadow-xl">
                         <CardContent className="p-6 space-y-2 text-center">
                             <h3 className="text-xl font-semibold">Expertise</h3>
                             <p className="text-purple-100">
@@ -27,7 +27,7 @@ export default function WhyUs() {
                             </p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-purple-600 text-white">
+                    <Card className="bg-purple-600 text-white transition-all duration-300 ease-in-out hover:bg-purple-700 hover:scale-105 hover:shadow-xl">
                         <CardContent className="p-6 space-y-2 text-center">
                             <h3 className="text-xl font-semibold">Tech</h3>
                             <p className="text-purple-100">
@@ -35,7 +35,7 @@ export default function WhyUs() {
                             </p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-purple-600 text-white">
+                    <Card className="bg-purple-600 text-white transition-all duration-300 ease-in-out hover:bg-purple-700 hover:scale-105 hover:shadow-xl">
                         <CardContent className="p-6 space-y-2 text-center">
                             <h3 className="text-xl font-semibold">Solutions</h3>
                             <p className="text-purple-100">
@@ -43,7 +43,7 @@ export default function WhyUs() {
                             </p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-purple-600 text-white">
+                    <Card className="bg-purple-600 text-white transition-all duration-300 ease-in-out hover:bg-purple-700 hover:scale-105 hover:shadow-xl">
                         <CardContent className="p-6 space-y-2 text-center">
                             <h3 className="text-xl font-semibold">Result</h3>
                             <p className="text-purple-100">

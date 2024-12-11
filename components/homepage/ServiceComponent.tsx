@@ -5,8 +5,6 @@ import { motion } from 'framer-motion';
 import Service from "@/components/animation/Service";
 import {cdAnimation, cloudAnimation, deployAnimation, fadeInUp, infraAnimation} from "@/components/animation/animate";
 
-
-
 const ServiceComponent: React.FC = () => {
     return (
         <div className="container mx-auto px-4">

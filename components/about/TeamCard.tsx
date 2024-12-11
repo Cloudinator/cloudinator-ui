@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { type LucideIcon } from 'lucide-react'
+import { useEffect, useState } from 'react';
 
 interface SocialLink {
     icon: LucideIcon;
@@ -26,6 +27,22 @@ export function ArtisticProfile({
                                     socialLinks,
                                     isReversed,
                                 }: ArtisticProfileProps) {
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Effect to check window size
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768); // Adjust this value for your responsive breakpoint
+        };
+
+        handleResize(); // Check on mount
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     return (
         <motion.div
             className={`flex flex-col ${isReversed ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-12 p-8 relative overflow-hidden`}
@@ -113,19 +130,23 @@ export function ArtisticProfile({
                     ))}
                 </motion.div>
             </div>
-            <motion.div
-                className={`absolute -bottom-16 ${isReversed ? '-left-16' : '-right-16'} w-64 h-64 bg-purple-100 rounded-full opacity-40 dark:opacity-20`} // Background color changed to light purple
-                animate={{
-                    scale: [1, 1.2, 1],
-                    x: [0, 20, 0],
-                    y: [0, -20, 0],
-                }}
-                transition={{
-                    duration: 15,
-                    repeat: Infinity,
-                    repeatType: "reverse"
-                }}
-            />
+
+            {/* Conditional rendering of the bubble based on screen size */}
+            {!isMobile && (
+                <motion.div
+                    className={`absolute -bottom-16 ${isReversed ? '-left-16' : '-right-16'} w-64 h-64 bg-purple-100 rounded-full opacity-40 dark:opacity-20`} // Background color changed to light purple
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        x: [0, 20, 0],
+                        y: [0, -20, 0],
+                    }}
+                    transition={{
+                        duration: 15,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                    }}
+                />
+            )}
         </motion.div>
     )
 }

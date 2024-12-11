@@ -86,7 +86,7 @@ export default function FrameworkSection() {
                     <br />
                     your way
                     {hoveredFramework && (
-                        <span className="text-blue-600 ml-2 transition-opacity duration-300">
+                        <span className="text-purple-500 ml-2 transition-opacity duration-300">
                             {hoveredFramework}
                         </span>
                     )}
