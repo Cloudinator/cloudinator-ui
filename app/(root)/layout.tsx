@@ -10,7 +10,7 @@ import { Poppins } from 'next/font/google';
 import { AuthProvider } from "@/contexts/AuthContext";
 import StoreProvider from "@/app/StoreProvider";
 import Footer from "@/components/footer/Footer";
-import {ThemeProvider} from "@/components/theme-provider";
+import {ThemeProvider} from "next-themes";
 
 
 const poppins = Poppins({
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     description: "Cloudinator Application",
 };
 
-export default function RootLayout({
+export default function HomeLayout({
                                        children,
                                    }: Readonly<{
     children: React.ReactNode;
@@ -34,23 +34,25 @@ export default function RootLayout({
         <body
             className={poppins.className}
         >
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-        >
-            <StoreProvider>
-                <AuthProvider>
-                    <NavBarHomePage/>
-                    <ScrollProgressBar />
-                        {children}
-                    <BackToTopButton />
-                    <Footer />
-                    <TutorialPopup />
-                </AuthProvider>
-            </StoreProvider>
-        </ThemeProvider>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+            >
+                <StoreProvider>
+                    <AuthProvider>
+
+                        <NavBarHomePage/>
+                        <ScrollProgressBar />
+                            {children}
+                        <BackToTopButton />
+                        <Footer />
+                        <TutorialPopup />
+
+                    </AuthProvider>
+                </StoreProvider>
+            </ThemeProvider>
         </body>
         </html>
     );

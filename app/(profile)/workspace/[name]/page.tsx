@@ -19,8 +19,6 @@ export type PropsParams = {
 export default function ProjectDetailPage(props: PropsParams) {
     const [params, setParams] = useState<{ name: string } | null>(null);
 
-
-
     useEffect(() => {
         props.params.then(setParams);
     }, [props.params]);

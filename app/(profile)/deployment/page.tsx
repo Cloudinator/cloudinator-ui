@@ -1,6 +1,6 @@
 
 import type {Metadata} from "next";
-import ProjectDetail from "@/components/profiledashboard/deployment/DeploymentDetail";
+import Deployments from "@/components/profiledashboard/deployment/DeploymentPage";
 
 export const metadata: Metadata = {
     title: "Deployment Profile",
@@ -10,7 +10,8 @@ export const metadata: Metadata = {
 export default function DeploymentPage() {
     return (
         <>
-            <ProjectDetail />
+            <Deployments />
+            {/*<ProjectDetail />*/}
         </>
     );
 }
