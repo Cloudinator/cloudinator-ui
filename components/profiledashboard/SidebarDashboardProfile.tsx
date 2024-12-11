@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart, Globe, Home, Settings, Terminal, User } from 'lucide-react'
+import {DatabaseBackup, Globe, Home, Package, Settings, Terminal} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react';
@@ -19,10 +19,9 @@ import Image from "next/image";
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Workspace', href: '/workspace', icon: Terminal },
-    { name: 'Backup', href: '/backup', icon: BarChart },
+    { name: 'Backup', href: '/backup', icon: DatabaseBackup },
     { name: 'Domain', href: '/domain', icon: Globe },
-    { name: 'User', href: '/user', icon: User },
-    { name: 'Deployment', href: '/deployment', icon: Globe },
+    { name: 'Deployment', href: '/deployment', icon: Package },
     { name: 'Setting', href: '/setting/account', icon: Settings },
 ]
 

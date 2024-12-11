@@ -1,9 +1,10 @@
 import { createServiceApi } from './baseApi'
 
-interface User {
+export interface User {
     id: string
     username: string
     email: string
+    password: string
 }
 
 const identityApi = createServiceApi('identity')

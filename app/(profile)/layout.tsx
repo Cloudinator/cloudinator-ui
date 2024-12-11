@@ -8,6 +8,7 @@ import { Poppins } from 'next/font/google';
 import {ThemeProvider} from "next-themes";
 import StoreProvider from "@/app/StoreProvider";
 import {AuthProvider} from "@/contexts/AuthContext";
+import {Toaster} from "@/components/ui/toaster";
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -45,9 +46,9 @@ export default function DashboardLayout({
                       </SidebarInset>
                   </SidebarProvider>
               </ThemeProvider>
+              <Toaster />
           </AuthProvider>
       </StoreProvider>
-
       </body>
     </html>
   );
