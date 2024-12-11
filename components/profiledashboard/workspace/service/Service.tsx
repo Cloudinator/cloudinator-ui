@@ -29,9 +29,6 @@ import {useGetServiceDeploymentQuery, useGetWorkspacesQuery} from "@/redux/api/p
 
 const CreateProjectContent = lazy(() => import('@/components/profiledashboard/workspace/CreateProjectContent'))
 
-
-
-
 type ServiceType = {
     name: string
     gitUrl: string
@@ -39,7 +36,6 @@ type ServiceType = {
     subdomain: string
     type: 'frontend' | 'backend' | 'database' | 'subworkspace'
 }
-
 
 function getServiceIcon(type: ServiceType['type']) {
     switch (type) {
@@ -54,19 +50,13 @@ function getServiceIcon(type: ServiceType['type']) {
     }
 }
 
-
-
 export default function Service() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [filteredServices, setFilteredServices] = useState<ServiceType[]>([])
     const [selectedType, setSelectedType] = useState<ServiceType['type'] | 'all'>('all')
 
-
-
     const {data} = useGetWorkspacesQuery();
-
-
 
     const workspaces = data;
 
@@ -82,8 +72,6 @@ export default function Service() {
 
     console.log('servicesData:', servicesData)
 
-
-
     useEffect(() => {
         if (servicesData) {
             const filtered = servicesData?.results?.filter((service: ServiceType) =>
@@ -94,10 +82,7 @@ export default function Service() {
         }
     }, [searchTerm, selectedType, servicesData])
 
-
-
-
-    if (!data) return null
+    if (!data) return <div className="text-purple-500 grid place-content-center h-screen w-full text-3xl">Data Not Found!</div>
 
     return (
         <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">

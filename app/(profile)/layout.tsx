@@ -4,7 +4,6 @@ import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
 import {SidebarInset, SidebarProvider} from "@/components/ui/sidebar";
 import {SidebarDashboardProfile} from "@/components/profiledashboard/SidebarDashboardProfile";
-import DashboardHeaderProfile from "@/components/profiledashboard/DashboardHeaderProfile";
 
 import { Poppins } from 'next/font/google';
 import StoreProvider from "@/app/StoreProvider";
@@ -38,13 +37,10 @@ export default function DashboardLayout({
       >
           <StoreProvider>
               <SidebarProvider>
-
                   <SidebarDashboardProfile />
                   <SidebarInset>
-                      <DashboardHeaderProfile />
                       {children}
                   </SidebarInset>
-
               </SidebarProvider>
           </StoreProvider>
 

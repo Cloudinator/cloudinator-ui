@@ -5,7 +5,7 @@ import { AlertCircle, CheckCircle, Loader2, Terminal, AlertTriangle, Info } from
 import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
-
+import Loading from "@/components/Loading";
 
 type PropsParams = {
     params: Promise<{ name: string; buildNumber: number }>;
@@ -93,7 +93,7 @@ const LogPage = (props: PropsParams) => {
     }
 
     if (!params) {
-        return <div>Loading...</div>;
+        return <div><Loading /></div>;
     }
 
     return (

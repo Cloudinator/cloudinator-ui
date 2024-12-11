@@ -10,7 +10,8 @@ import { Poppins } from 'next/font/google';
 import { AuthProvider } from "@/contexts/AuthContext";
 import StoreProvider from "@/app/StoreProvider";
 import Footer from "@/components/footer/Footer";
-import {ThemeProvider} from "next-themes";
+import {ThemeProvider} from "@/components/theme-provider";
+
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -33,25 +34,24 @@ export default function RootLayout({
         <body
             className={poppins.className}
         >
-        <StoreProvider>
-            <AuthProvider>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+            <StoreProvider>
+                <AuthProvider>
                     <NavBarHomePage/>
                     <ScrollProgressBar />
-                    {children}
+                        {children}
                     <BackToTopButton />
                     <Footer />
                     <TutorialPopup />
-                </ThemeProvider>
-            </AuthProvider>
-        </StoreProvider>
+                </AuthProvider>
+            </StoreProvider>
+        </ThemeProvider>
         </body>
         </html>
     );
 }
-
