@@ -15,6 +15,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import Image from "next/image";
+import {useGetWorkspacesQuery} from "@/redux/api/projectApi";
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -33,6 +34,10 @@ export function SidebarDashboardProfile() {
         setDarkMode(prev => !prev);
         document.body.classList.toggle('dark', !darkMode); // Toggle dark class on body
     };
+
+    const {data} = useGetWorkspacesQuery();
+
+    console.log(data);
 
     return (
         <Sidebar className={`flex flex-col h-full ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
