@@ -20,6 +20,18 @@ type SubWorkspace = {
     workspace: string,
 }
 
+export type SpringProject = {
+    name: string
+    folder: string
+    group: string
+    dependencies: string[]
+}
+
+type BuildNumber = {
+    buildNumber: number
+    status: string
+}
+
 const projectApi = createServiceApi('project')
 
 export const projectsApi = projectApi.injectEndpoints({
@@ -91,9 +103,37 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
+        getSubWorkspaces: builder.query<Service[], { workspaceName: string,size: number,page:number }>({
+            query: ({ workspaceName,size,page }) => `api/v1/sub-workspace/${workspaceName}?size=${size}&page=${page}`,
+        }),
+
+        createProject: builder.mutation<SpringProject, { name: string, group: string, folder: string, dependencies: string[] }>({
+            query: ({ name, group, folder, dependencies }) => ({
+                url: '/api/v1/spring/create-service',
+                method: 'POST',
+                body: { name, group, folder, dependencies },
+            }),
+        }),
+
+        getProjects: builder.query<Service[], { subWorkspace: string,size: number,page:number }>({
+            query: ({ subWorkspace,size,page }) => `api/v1/spring/${subWorkspace}?size=${size}&page=${page}`,
+        }),
+
+        getBuildNumberInFolder : builder.query<BuildNumber, { folder: string,name:string }>({
+            query: ({ folder,name }) => `api/v1/spring/get-build-numbers/${folder}/${name}`,
+        }),
+
+        buildSpringService: builder.mutation<void, { folder: string, name: string, serviceName: string[] }>({
+            query: ({ folder, name, serviceName }) => ({
+                url: `api/v1/spring/start-build/${folder}/${name}`,
+                method: 'POST',
+                params: { serviceName },
+            }),
+        }),
+
 
     }),
 })
 
 
-export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation} = projectsApi
+export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation} = projectsApi

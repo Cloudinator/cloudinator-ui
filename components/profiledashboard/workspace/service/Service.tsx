@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import React, {useState, useEffect, lazy, Suspense, useMemo} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGetServiceDeploymentQuery, useGetWorkspacesQuery } from "@/redux/api/projectApi";
+import {useGetServiceDeploymentQuery, useGetSubWorkspacesQuery, useGetWorkspacesQuery} from "@/redux/api/projectApi";
 
 const CreateProjectContent = lazy(() => import('@/components/profiledashboard/workspace/CreateProjectContent'));
 
@@ -54,6 +54,24 @@ type ServiceDeploymentResponse = {
     totalElements: number;
     results: ServiceType[];
 };
+
+type SubWorkspaceType = {
+    name: string;
+    type: 'subworkspace';
+    uuid: string;
+    gitUrl: string;
+    branch: string;
+    subdomain: string;
+}
+
+type SubWorkSpaceResponse = {
+    next: boolean;
+    previous: boolean;
+    total: number;
+    totalElements: number;
+    results: SubWorkspaceType[];
+};
+
 
 function getServiceIcon(type: ServiceType['type']) {
     switch (type) {
@@ -87,15 +105,35 @@ export default function Service() {
         page: 0,
     }) as unknown as { data: ServiceDeploymentResponse };
 
+    const { data: subWorkspace } = useGetSubWorkspacesQuery({
+        workspaceName: selectedWorkspace,
+        size: 10,
+        page: 0,
+    }) as unknown as { data: SubWorkSpaceResponse };
+
+
+
+
+    console.log(subWorkspace)
+
+    const combinedResults = useMemo(() => {
+        const services = servicesData?.results || [];
+        const subWorkspaces = subWorkspace?.results || [];
+        return [...services, ...subWorkspaces];
+    }, [servicesData, subWorkspace]);
+
+    console.log(combinedResults);
+
+
     useEffect(() => {
-        if (servicesData && servicesData.results) {
-            const filtered = servicesData.results.filter((service: ServiceType) =>
+        if (combinedResults) {
+            const filtered = combinedResults.filter((service: ServiceType | SubWorkspaceType) =>
                 service.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
                 (selectedType === 'all' || service.type === selectedType)
             );
             setFilteredServices(filtered);
         }
-    }, [searchTerm, selectedType, servicesData]);
+    }, [searchTerm, selectedType, combinedResults]);
 
     if (!workspacesData) {
         return (
@@ -222,7 +260,7 @@ export default function Service() {
                             exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.3, delay: index * 0.1 }}
                         >
-                            <Link href={`/workspace/${service.name}`}>
+                            <Link href={service.type === 'subworkspace' ? `/workspace/sub-workspace` : `/workspace/${service.name}`}>
                                 <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full">
                                     <div className="flex items-center gap-3">
                                         {getServiceIcon(service.type)}
