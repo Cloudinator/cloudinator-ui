@@ -20,7 +20,8 @@ export function FrontendForm({ onClose,selectedWorkspace }: FrontendFormProps) {
         gitUrl: '',
         subdomain: '',
         automate: false,
-        token: ''
+        token: '',
+        type: 'frontend'
     })
 
 

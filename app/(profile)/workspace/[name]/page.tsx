@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {Rocket, RotateCcw, StopCircle, ExternalLink, CheckCircle, Github, Code} from 'lucide-react'
-import {useGetBuildInfoByNameQuery, useGetServiceByNameQuery} from "@/redux/api/projectApi";
+import {useBuildServiceMutation, useGetBuildInfoByNameQuery, useGetServiceByNameQuery} from "@/redux/api/projectApi";
 
 import WebsitePreview from "@/components/profiledashboard/deployment/WebsitePreview";
 import Link from "next/link";
@@ -16,8 +16,14 @@ export type PropsParams = {
     params: Promise<{ name: string }>;
 };
 
+type BuildType = {
+    buildNumber: number;
+    status: string;
+}
+
 export default function ProjectDetailPage(props: PropsParams) {
     const [params, setParams] = useState<{ name: string } | null>(null);
+    const [buildService] = useBuildServiceMutation();
 
     useEffect(() => {
         props.params.then(setParams);
@@ -29,9 +35,25 @@ export default function ProjectDetailPage(props: PropsParams) {
         }
     }, [params]);
 
+    const handleBuildService = async () => {
+        try {
+            const result = await buildService({
+                name: params?.name || '',
+            }).unwrap();
+            console.log('Service build initiated:', result);
+        } catch (error) {
+            console.log('Failed to initiate service build:', error);
+        }
+    }
+
     const {data} = useGetServiceByNameQuery({name: params?.name || ''})
 
     const {data:builds} = useGetBuildInfoByNameQuery({name: params?.name || ''})
+
+
+
+
+
 
     console.log(builds);
 
@@ -64,7 +86,7 @@ export default function ProjectDetailPage(props: PropsParams) {
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-3 mt-4 lg:mt-0">
-                        <Button className="flex items-center gap-2">
+                        <Button onClick={()=>handleBuildService()} className="flex items-center gap-2">
                             <Rocket className="w-4 h-4" />
                             Deploy
                         </Button>
@@ -150,10 +172,10 @@ export default function ProjectDetailPage(props: PropsParams) {
                             </CardHeader>
                             <CardContent>
                                 <ul className="space-y-4">
-                                    {builds?.map((build) => (
+                                    {Array.isArray(builds) && builds.map((build: BuildType) => (
                                         <li key={build.buildNumber} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                                             <div className="flex items-center gap-4">
-                                                <Badge variant={build.status === "SUCCESS" ? "success" : "destructive"}>
+                                                <Badge variant={build.status === "SUCCESS" ? "outline" : "destructive"}>
                                                     {build.status}
                                                 </Badge>
                                                 <span className="text-sm text-gray-500">{params.name}</span>

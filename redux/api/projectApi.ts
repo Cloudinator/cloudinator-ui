@@ -11,9 +11,13 @@ type Service = {
     gitUrl: string,
     branch: string,
     subdomain: string,
-    workspaceName: string,
-    token: string,
     type: string,
+}
+
+type SubWorkspace = {
+    uuid: string,
+    name: string,
+    workspace: string,
 }
 
 const projectApi = createServiceApi('project')
@@ -53,6 +57,13 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
+        buildService: builder.mutation<Service,{name:string}>({
+            query: ({name}) => ({
+                url: `api/v1/deploy-service/run-service/${name}`,
+                method: 'POST',
+            }),
+        }),
+
         getBuildingLogs: builder.query<Service, { jobName: string,buildNumber:number }>({
             query: ({ jobName,buildNumber }) => `api/v1/deploy-service/stream-logs/${jobName}/${buildNumber}`,
         }),
@@ -71,8 +82,18 @@ export const projectsApi = projectApi.injectEndpoints({
                 method: 'DELETE',
             }),
         }),
+
+        createSubWorkspace: builder.mutation<SubWorkspace, { name: string, workspaceName: string }>({
+            query: ({ name, workspaceName }) => ({
+                url: 'api/v1/sub-workspace/create',
+                method: 'POST',
+                body: { name, workspaceName },
+            }),
+        }),
+
+
     }),
 })
 
 
-export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery} = projectsApi
+export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation} = projectsApi

@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import {Github, Gitlab, X} from 'lucide-react'
+import {Github, Gitlab} from 'lucide-react'
 
 interface ProviderModalProps {
     open: boolean

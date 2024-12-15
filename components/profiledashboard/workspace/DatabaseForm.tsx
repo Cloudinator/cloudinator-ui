@@ -5,7 +5,7 @@ import { FormField } from './FormField'
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { useCreateServiceDeploymentMutation } from "@/redux/api/projectApi"
+
 import { Database, User, Lock } from 'lucide-react'
 
 interface DatabaseFormProps {
@@ -13,7 +13,7 @@ interface DatabaseFormProps {
 }
 
 export function DatabaseForm({ onClose }: DatabaseFormProps) {
-    const [createServiceDeployment] = useCreateServiceDeploymentMutation()
+    // const [createServiceDeployment] = useCreateServiceDeploymentMutation()
     const [projectFields, setProjectFields] = useState({
         dbname: '',
         dbuser: '',
@@ -33,11 +33,7 @@ export function DatabaseForm({ onClose }: DatabaseFormProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            const result = await createServiceDeployment({
-                type: 'database',
-                ...projectFields
-            }).unwrap()
-            console.log('Database service2 deployment created:', result)
+            console.log('Database service2 deployment created:')
             onClose()
         } catch (error) {
             console.error('Failed to create database service2 deployment:', error)
