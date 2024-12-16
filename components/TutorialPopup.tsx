@@ -14,7 +14,7 @@ const tutorialSteps = [
     {
         title: "Deployment Pipeline",
         content: "Create automating workflows with CI/CD Tools.",
-        image: "/tutorial/service2.png"
+        image: "/tutorial/service.png"
     },
     {
         title: "Personal Cloud Storage",
