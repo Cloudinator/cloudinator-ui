@@ -68,19 +68,15 @@ const dependencies: Dependency[] = [
     },
 ]
 
-const projectTypes = [
-    { value: 'maven', label: 'Maven Project' },
-    { value: 'gradle', label: 'Gradle Project' },
-    { value: 'ant', label: 'Ant Project' },
-]
 
 type SpringInitializerProps = {
     isOpen: boolean
     onClose: () => void
-    folder: string
+    folder: string,
+    springProjects: SpringProject[]
 }
 
-export function SpringInitializer({ isOpen, onClose,folder }: SpringInitializerProps) {
+export function SpringInitializer({ isOpen, onClose,folder,springProjects }: SpringInitializerProps) {
     const [projectName, setProjectName] = useState('demo')
     const [groupId, setGroupId] = useState('com.example')
     const [selectedDependencies, setSelectedDependencies] = useState<Dependency[]>([])
@@ -124,6 +120,7 @@ export function SpringInitializer({ isOpen, onClose,folder }: SpringInitializerP
                 name:projectName,
                 group:groupId,
                 folder:folder,
+                servicesNames:selectedProjectTypes,
                 dependencies:selectedDependencies.map(dep => dep.id)
             });
             console.log(result);
@@ -150,6 +147,7 @@ export function SpringInitializer({ isOpen, onClose,folder }: SpringInitializerP
                 : [...prev, value]
         )
     }
+    console.log("spring init",springProjects)
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -192,7 +190,7 @@ export function SpringInitializer({ isOpen, onClose,folder }: SpringInitializerP
                                 </div>
 
                                 <div className="col-span-2">
-                                    <Label>Project Type</Label>
+                                    <Label>Please select the service depend on please if it have</Label>
                                     <Popover open={openProjectTypes} onOpenChange={setOpenProjectTypes}>
                                         <PopoverTrigger asChild>
                                             <Button
@@ -203,24 +201,24 @@ export function SpringInitializer({ isOpen, onClose,folder }: SpringInitializerP
                                             >
                                                 {selectedProjectTypes.length > 0
                                                     ? `${selectedProjectTypes.length} selected`
-                                                    : "Select project types..."}
-                                                <Check className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                    : "Select Service please..."}
+                                                <Check className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-full p-0">
                                             <Command>
-                                                <CommandInput placeholder="Search project types..." className="h-9" />
-                                                <CommandEmpty>No project type found.</CommandEmpty>
+                                                <CommandInput placeholder="Search project types..." className="h-9"/>
+                                                <CommandEmpty>No Service found.</CommandEmpty>
                                                 <CommandGroup>
-                                                    {projectTypes.map((type) => (
+                                                    {springProjects.map((project) => (
                                                         <CommandItem
-                                                            key={type.value}
-                                                            onSelect={() => toggleProjectType(type.value)}
+                                                            key={project.name}
+                                                            onSelect={() => toggleProjectType(project.name)}
                                                         >
-                                                            {type.label}
+                                                            {project.name}
                                                             <Check
                                                                 className={`ml-auto h-4 w-4 ${
-                                                                    selectedProjectTypes.includes(type.value) ? "opacity-100" : "opacity-0"
+                                                                    selectedProjectTypes.includes(project.name) ? "opacity-100" : "opacity-0"
                                                                 }`}
                                                             />
                                                         </CommandItem>

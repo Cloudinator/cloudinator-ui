@@ -107,11 +107,11 @@ export const projectsApi = projectApi.injectEndpoints({
             query: ({ workspaceName,size,page }) => `api/v1/sub-workspace/${workspaceName}?size=${size}&page=${page}`,
         }),
 
-        createProject: builder.mutation<SpringProject, { name: string, group: string, folder: string, dependencies: string[] }>({
-            query: ({ name, group, folder, dependencies }) => ({
+        createProject: builder.mutation<SpringProject, { name: string, group: string, folder: string, dependencies: string[],servicesNames:string[] }>({
+            query: ({ name, group, folder, dependencies,servicesNames }) => ({
                 url: '/api/v1/spring/create-service',
                 method: 'POST',
-                body: { name, group, folder, dependencies },
+                body: { name, group, folder,servicesNames, dependencies },
             }),
         }),
 

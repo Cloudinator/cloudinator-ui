@@ -260,7 +260,7 @@ export default function Service() {
                             exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.3, delay: index * 0.1 }}
                         >
-                            <Link href={service.type === 'subworkspace' ? `/workspace/sub-workspace` : `/workspace/${service.name}`}>
+                            <Link href={service.type === 'subworkspace' ? `/workspace/sub-workspace/${service.name}` : `/workspace/${service.name}`}>
                                 <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full">
                                     <div className="flex items-center gap-3">
                                         {getServiceIcon(service.type)}
