@@ -8,11 +8,11 @@ import { Progress } from "@/components/ui/progress"
 import Loading from "@/components/Loading";
 
 type PropsParams = {
-    params: Promise<{ name: string; buildNumber: number }>;
+    params: Promise<{ name: string; jobName:string; buildNumber: number }>;
 };
 
 const LogPage = (props: PropsParams) => {
-    const [params, setParams] = useState<{ name: string; buildNumber: number } | null>(null);
+    const [params, setParams] = useState<{ name: string; jobName:string; buildNumber: number } | null>(null);
 
     useEffect(() => {
         props.params.then(setParams);
@@ -31,8 +31,8 @@ const LogPage = (props: PropsParams) => {
     useEffect(() => {
         if (!params) return;
 
-        const { name, buildNumber } = params;
-        const url = `http://localhost:8085/api/v1/jenkins/stream-log/${name}/${buildNumber}`
+        const { name, buildNumber,jobName } = params;
+        const url = `http://localhost:8085/api/v1/jenkins/stream-log/folder/${name}/${jobName}/${buildNumber}`
         console.log(`Connecting to: ${url}`)
 
         eventSourceRef.current = new EventSource(url)

@@ -62,6 +62,7 @@ type SubWorkspaceType = {
     gitUrl: string;
     branch: string;
     subdomain: string;
+    status: boolean;
 }
 
 type SubWorkSpaceResponse = {
