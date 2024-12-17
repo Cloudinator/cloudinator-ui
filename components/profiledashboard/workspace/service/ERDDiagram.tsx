@@ -36,9 +36,9 @@ const ERDDiagram: React.FC<ERDDiagramProps> = ({ projects }) => {
 
     const initialEdges: Edge[] = []
     projects.forEach((project) => {
-        if (project.dependencies.includes('amqp')) {
+        if (project.dependencies?.includes('amqp')) {
             projects.forEach((otherProject) => {
-                if (project.uuid !== otherProject.uuid && otherProject.dependencies.includes('amqp')) {
+                if (project.uuid !== otherProject.uuid && otherProject.dependencies?.includes('amqp')) {
                     initialEdges.push({
                         id: `${project.uuid}-${otherProject.uuid}`,
                         source: project.uuid,
@@ -51,7 +51,7 @@ const ERDDiagram: React.FC<ERDDiagramProps> = ({ projects }) => {
         }
     })
 
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+    const [nodes, , onNodesChange] = useNodesState(initialNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
 
     const onConnect = useCallback(

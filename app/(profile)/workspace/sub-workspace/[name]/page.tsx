@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ChevronRight, Plus, MoreVertical, Cpu, Layers, Rocket, FileText, ChevronDown } from 'lucide-react'
+import { ChevronRight, Plus, MoreVertical, Cpu, Rocket, FileText, ChevronDown } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -152,11 +152,11 @@ export default function SubWorkspacePage(props: PropsParams) {
                                 <div className="p-4 border rounded-lg space-y-4">
                                     <div className="text-sm text-muted-foreground">Selected services:</div>
                                     <div className="flex flex-wrap gap-2">
-                                        {selectedProjects.map((projectId) => {
-                                            const project = springProjects.find(p => p.uuid === projectId)
+                                        {selectedProjects.map((projectName) => {
+                                            const project = springProjects.find(p => p.name === projectName)
                                             return project ? (
                                                 <Badge
-                                                    key={project.uuid}
+                                                    key={project.name}
                                                     variant="secondary"
                                                     className="bg-purple-100 text-purple-700 hover:bg-purple-200"
                                                 >
@@ -167,28 +167,29 @@ export default function SubWorkspacePage(props: PropsParams) {
                                     </div>
                                 </div>
                                 <Collapsible className="mt-4">
-                                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border p-4 text-left text-sm font-medium hover:bg-gray-100">
+                                    <CollapsibleTrigger
+                                        className="flex w-full items-center justify-between rounded-lg border p-4 text-left text-sm font-medium hover:bg-gray-100">
                                         {selectedProjects.length} services selected
-                                        <ChevronDown className="h-4 w-4" />
+                                        <ChevronDown className="h-4 w-4"/>
                                     </CollapsibleTrigger>
                                     <CollapsibleContent className="mt-2">
                                         <div className="rounded-lg border p-4 space-y-3">
                                             {springProjects.map((project) => (
-                                                <div key={project.uuid} className="flex items-center space-x-2">
+                                                <div key={project.name} className="flex items-center space-x-2">
                                                     <Checkbox
-                                                        id={project.uuid}
-                                                        checked={selectedProjects.includes(project.uuid)}
+                                                        id={project.name}
+                                                        checked={selectedProjects.includes(project.name)}
                                                         onCheckedChange={(checked) => {
                                                             setSelectedProjects(
                                                                 checked
-                                                                    ? [...selectedProjects, project.uuid]
-                                                                    : selectedProjects.filter((id) => id !== project.uuid)
+                                                                    ? [...selectedProjects, project.name]
+                                                                    : selectedProjects.filter((name) => name !== project.name)
                                                             )
                                                         }}
                                                         className="border-purple-500 text-purple-500"
                                                     />
                                                     <label
-                                                        htmlFor={project.uuid}
+                                                        htmlFor={project.name}
                                                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                     >
                                                         {project.name}
@@ -211,7 +212,7 @@ export default function SubWorkspacePage(props: PropsParams) {
                         </DialogContent>
                     </Dialog>
                     <Button onClick={() => setIsSpringInitializerOpen(true)}>
-                        <Plus className="mr-2 h-4 w-4" />
+                        <Plus className="mr-2 h-4 w-4"/>
                         Create Spring Project
                     </Button>
                 </div>
@@ -238,21 +239,21 @@ export default function SubWorkspacePage(props: PropsParams) {
                                 <CardContent>
                                     <div className="flex justify-between text-sm mb-2">
                                         <span className="flex items-center">
-                                            <Cpu className="h-4 w-4 mr-1" />
+                                            <Cpu className="h-4 w-4 mr-1"/>
                                             {project.group}
                                         </span>
-                                        <span className="flex items-center">
-                                            <Layers className="h-4 w-4 mr-1" />
-                                            {project.dependencies.length} dependencies
-                                        </span>
+                                        {/*<span className="flex items-center">*/}
+                                        {/*    <Layers className="h-4 w-4 mr-1" />*/}
+                                        {/*    {project.dependencies.length} dependencies*/}
+                                        {/*</span>*/}
                                     </div>
-                                    <div className="flex flex-wrap gap-2 mt-2">
-                                        {project.dependencies.map((dep) => (
-                                            <Badge key={dep} variant="secondary">
-                                                {dep}
-                                            </Badge>
-                                        ))}
-                                    </div>
+                                    {/*<div className="flex flex-wrap gap-2 mt-2">*/}
+                                    {/*    {project.dependencies.map((dep) => (*/}
+                                    {/*        <Badge key={dep} variant="secondary">*/}
+                                    {/*            {dep}*/}
+                                    {/*        </Badge>*/}
+                                    {/*    ))}*/}
+                                    {/*</div>*/}
                                     <div className="mt-4 flex justify-between items-center">
                                         <Button
                                             variant="outline"
@@ -349,6 +350,7 @@ export default function SubWorkspacePage(props: PropsParams) {
                 onClose={() => setIsSpringInitializerOpen(false)}
                 // onCreateProject={handleCreateSpringProject}
                 folder={params?.name ?? ''}
+                springProjects={springProjects}
             />
         </div>
     )

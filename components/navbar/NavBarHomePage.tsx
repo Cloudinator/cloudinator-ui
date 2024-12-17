@@ -73,7 +73,7 @@ const NavBarHomePage = () => {
                     variant="outline"
                     className="border-purple-600 text-purple-600 hover:bg-purple-100 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900"
                 >
-                    <Link href="/login">SIGN IN</Link>
+                    <Link href={"/oauth2/authorization/devops"}>SIGN IN</Link>
                 </Button>
             </>
         );
