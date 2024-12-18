@@ -16,8 +16,6 @@ RUN npm install --force
 # Copy all project files
 COPY . .
 
-COPY .env .env
-
 # Install sharp with force if needed for image processing
 RUN npm i sharp --force
 
