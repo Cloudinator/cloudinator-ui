@@ -51,12 +51,15 @@ const NavBarHomePage = () => {
 
         if (user && !error) {
             return (
-                <Button
+                <>
+                    <Button
                     asChild
                     className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
+                    >
                     <Link href="/dashboard">DASHBOARD</Link>
-                </Button>
+                    </Button>
+                </>
+            
             );
         }
 
@@ -73,7 +76,7 @@ const NavBarHomePage = () => {
                     variant="outline"
                     className="border-purple-600 text-purple-600 hover:bg-purple-100 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900"
                 >
-                    <Link href={"http://34.87.156.153:8080/"}>SIGN IN</Link>
+                    <Link href={"http://localhost:8080/"}>SIGN IN</Link>
                 </Button>
             </>
         );

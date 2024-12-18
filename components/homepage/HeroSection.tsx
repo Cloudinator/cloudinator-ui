@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Cloud, Code, Rocket, Settings } from 'lucide-react'
 import { motion, useAnimation } from 'framer-motion'
 import { ParallaxProvider, Parallax } from 'react-scroll-parallax'
@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic'
 import TypeHeading from '@/components/homepage/TypeHeading'
 import hero from '@/public/hero.json'
 import Link from "next/link";
+import { useGetMeQuery } from '@/redux/api/userApi'
 
 const Lottie = dynamic(() => import('react-lottie'), { ssr: false })
 
@@ -23,6 +24,16 @@ const serverAnimation = {
 export default function HeroSection() {
     const [isHovered, setIsHovered] = useState(false)
     const controls = useAnimation()
+    const { data: userData, error, isLoading } = useGetMeQuery();
+    const [timeOfDay, setTimeOfDay] = useState('')
+
+    useEffect(() => {
+        const hour = new Date().getHours()
+        if (hour < 12) setTimeOfDay('Morning')
+        else if (hour < 18) setTimeOfDay('Afternoon')
+        else if (hour < 20) setTimeOfDay('Evening')
+        else setTimeOfDay('Night')
+    }, [])
 
     const handleHover = () => {
         setIsHovered(!isHovered)
@@ -32,6 +43,12 @@ export default function HeroSection() {
         })
     }
 
+    const getGreeting = () => {
+        if (isLoading) return "Welcome"
+        if (error) return "Hello there"
+        return `Good ${timeOfDay}, ${userData?.username || 'there'}`
+    }
+    
     return (
         <ParallaxProvider>
             <div className="min-h-screen flex justify-center bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 relative overflow-hidden">
@@ -73,6 +90,7 @@ export default function HeroSection() {
                                 >
                                     <TypeHeading
                                         texts={[
+                                            { text: getGreeting() },
                                             { text: 'Say Goodbye To Manual' },
                                             {
                                                 text: 'Say Hello To Automation!',

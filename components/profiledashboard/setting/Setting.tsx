@@ -1,3 +1,4 @@
+"use client";
 
 import { useParams } from 'next/navigation'
 import { useGetMeQuery, useUpdateUserByUsernameMutation } from '@/redux/api/userApi'
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
 import Loading from "@/components/Loading"
+import SignOutModal from './SignOutModal'
 
 export default function ProfilePage() {
     const params = useParams()
@@ -24,6 +26,7 @@ export default function ProfilePage() {
     const [displayUsername, setDisplayUsername] = useState<string>('')
     const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.png")
     const [timezone, setTimezone] = useState<string>('')
+    const [isSignOutModalOpen, setSignOutModalOpen] = useState<boolean>(false);
 
     const { data: userData, error, isLoading } = useGetMeQuery()
     const [updateUser, { isLoading: isUpdating }] = useUpdateUserByUsernameMutation()
@@ -76,11 +79,24 @@ export default function ProfilePage() {
 
     return (
         <div className="flex flex-col bg-background min-h-screen w-full p-6 md:p-10">
-            <div className="w-full max-w-2xl mx-auto">
-                <h1 className="text-3xl font-bold text-purple-500 flex items-center mb-8">
-                    <User className="mr-2 h-8 w-8"/>
-                    Profile Information
-                </h1>
+            <div className="w-full">
+
+                <div className="flex justify-between">
+                    <h1 className="text-3xl font-bold text-purple-500 flex items-center mb-8">
+                        <User className="mr-2 h-8 w-8"/>
+                        Profile Information
+                    </h1>
+                    
+                    <Button
+                        type="button"
+                        onClick={() => setSignOutModalOpen(true)} 
+                        variant="destructive" 
+                        className="bg-red-500 text-white hover:bg-red-700"
+                    >
+                        Logout
+                    </Button>
+                </div>
+                
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="flex items-start space-x-4">
@@ -160,6 +176,11 @@ export default function ProfilePage() {
                         </SelectContent>
                     </Select>
 
+                    {/* Sign Out Modal */}
+                    <SignOutModal 
+                        isOpen={isSignOutModalOpen} 
+                        onClose={() => setSignOutModalOpen(false)} 
+                    />
 
                     <div className="flex justify-end">
                         <Button

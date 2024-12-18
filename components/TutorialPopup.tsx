@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image';
+import { useGetMeQuery } from '@/redux/api/userApi'
 
 const tutorialSteps = [
     {
@@ -36,13 +37,14 @@ const tutorialSteps = [
 const TutorialPopup: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [currentStep, setCurrentStep] = useState(0)
+    const { data: userData, isLoading: isUserLoading} = useGetMeQuery();
 
     useEffect(() => {
         const hasSeenTutorial = localStorage.getItem('hasSeenTutorial')
-        if (!hasSeenTutorial) {
+        if (!hasSeenTutorial && !isUserLoading && userData) {
             setIsOpen(true)
         }
-    }, [])
+    }, [isUserLoading, userData])
 
     const closeTutorial = () => {
         setIsOpen(false)
@@ -81,6 +83,22 @@ const TutorialPopup: React.FC = () => {
         };
     }, [currentStep]);
 
+    const getPersonalizedContent = (step: typeof tutorialSteps[0]) => {
+        if (userData) {
+            switch (step.title) {
+                case "Welcome to Cloudinator":
+                    return `Welcome, ${userData.username}! Your deployment journey starts here.`
+                case "Deployment Pipeline":
+                    return `${userData.username}, create automating workflows with our CI/CD Tools.`
+                case "Personal Cloud Storage":
+                    return `${userData.username}, securely send and save files in your personal cloud.`
+                default:
+                    return step.content
+            }
+        }
+        return step.content
+    }
+
     return (
         <>
             <button
@@ -97,18 +115,26 @@ const TutorialPopup: React.FC = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 dark:bg-opacity-50 bg-opacity-50 dark:bg-gray-900 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
-                        onClick={closeTutorial} // Add click event here
+                        onClick={closeTutorial}
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
                             className="bg-white dark:bg-gray-800 rounded-lg shadow-xl px-8 pt-4 pb-6 max-w-md w-full relative transition-transform duration-300 ease-in-out"
-                            onClick={(e) => e.stopPropagation()} // Prevent click event from bubbling up
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <button onClick={closeTutorial} className="text-gray-500 flex justify-end w-full">
-                                Skip Tutorial
-                            </button>
+                            <div className="flex items-center justify-between">
+                                <span className="text-gray-500 flex items-center px-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="m12 16l1.4-1.4l-1.6-1.6H16v-2h-4.2l1.6-1.6L12 8l-4 4zm0 6q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="m12 16l4-4l-4-4l-1.4 1.4l1.6 1.6H8v2h4.2l-1.6 1.6zm0 6q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"/></svg>
+                                    <h1 className="ml-2">Navigate</h1>
+                                </span>
+                                <button onClick={closeTutorial} className="text-gray-500">
+                                    Skip Tutorial
+                                </button>
+                            </div>
+                            
                             <div className="mb-4 pt-2">
                                 <motion.div
                                     key={currentStep}
@@ -128,7 +154,7 @@ const TutorialPopup: React.FC = () => {
                             </div>
                             <div className="pb-16">
                                 <h2 className="text-2xl font-bold mb-2 text-purple-500">{tutorialSteps[currentStep].title}</h2>
-                                <p className="mb-4 dark:text-gray-400">{tutorialSteps[currentStep].content}</p>
+                                <p className="mb-4 dark:text-gray-400">{getPersonalizedContent(tutorialSteps[currentStep])}</p>
                             </div>
                             <div className="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded">
                                 <div
@@ -146,8 +172,8 @@ const TutorialPopup: React.FC = () => {
                                     <ChevronLeft className="w-6 h-6" />
                                 </button>
                                 <span className="text-md text-purple-500 dark:text-gray-400">
-                  {currentStep + 1} / {tutorialSteps.length}
-                </span>
+                                    {currentStep + 1} / {tutorialSteps.length}
+                                </span>
                                 <button
                                     onClick={nextStep}
                                     className={`flex items-center justify-center w-10 h-10 rounded-full bg-purple-500 text-primary-foreground ${currentStep === tutorialSteps.length - 1 ? 'bg-green-500' : ''} dark:bg-primary-dark dark:text-primary-foreground-dark`}
