@@ -26,7 +26,7 @@ const SignOutModal: React.FC<SignOutModalProps> = ({
     const handleSignOut = async () => {
         try {
             // Redirect to external logout URL
-            const logoutUrl = 'http://34.124.129.117:8081/logout';
+            const logoutUrl = 'http://localhost:8081/logout';
             window.location.href = logoutUrl;
 
             // Show success toast after redirection
