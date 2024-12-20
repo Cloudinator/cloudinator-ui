@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { FaFolder, FaFolderOpen, FaFile } from 'react-icons/fa'
+import { FaFolder, FaFile } from 'react-icons/fa'
 import { TreeItem } from '@/types/github'
 
 interface FileNodeProps {
@@ -14,7 +14,8 @@ const FileNode: React.FC<FileNodeProps> = ({ node, currentPath }) => {
     const isDirectory = node.type === 'tree'
     const fileName = node.path.split('/').pop() || ''
     const href = `/${node.path}`
-
+    console.log(href,"href")
+    console.log(isDirectory,"fileName")
     return (
         <Link
             href={href}
@@ -27,7 +28,13 @@ const FileNode: React.FC<FileNodeProps> = ({ node, currentPath }) => {
                     ) : (
                         <FaFile className="text-gray-400 shrink-0" />
                     )}
-                    <span className="truncate text-sm">{fileName}</span>
+
+                    <Link
+                        href={`/test-decode/${fileName}`}
+
+                    >
+                        <span className="truncate text-sm">{fileName}</span>
+                    </Link>
                 </div>
                 <div className="hidden group-hover:flex items-center gap-2 text-sm text-gray-500">
                     <span className="truncate">Initialize project using Create React App</span>
@@ -40,8 +47,10 @@ const FileNode: React.FC<FileNodeProps> = ({ node, currentPath }) => {
 
 export default function FileExplorer({ currentPath = '' }: { currentPath?: string }) {
     const [structure, setStructure] = useState<TreeItem[]>([])
-    const [loading, setLoading] = useState(true)
+    const [structureRepo, setStructureRepo] = useState<TreeItem[]>([])
 
+    const [loading, setLoading] = useState(true)
+    console.log("loading",structureRepo)
     useEffect(() => {
         fetch('/api/repos/MuyleangIng/cloudinator-ui/git/trees/main?recursive=1')
             .then(res => res.json())
@@ -51,6 +60,7 @@ export default function FileExplorer({ currentPath = '' }: { currentPath?: strin
                     return item.path.startsWith(currentPath) &&
                         item.path.split('/').length === currentPath.split('/').length + 1
                 })
+                setStructureRepo(data)
                 setStructure(filteredTree)
                 setLoading(false)
             })
