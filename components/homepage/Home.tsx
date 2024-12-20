@@ -8,7 +8,9 @@ import ServiceComponent from "@/components/homepage/ServiceComponent";
 import {ParallaxProvider} from "react-scroll-parallax";
 import WhyUs from "@/components/homepage/WhyUsSection";
 
+
 export default function HomePage() {
+    
     return (
         <>
             <ParallaxProvider>

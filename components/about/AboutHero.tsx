@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Cloud, Cog, Zap } from 'lucide-react'
 import CloudParticles from "@/components/about/CloudParticles";
+import { AnimatedGradientText } from '../AnimatedGradientText'
 
 export default function AboutHero() {
     const [isDeploying, setIsDeploying] = useState(false)
@@ -24,8 +25,14 @@ export default function AboutHero() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
+                    <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                     Welcome to Cloudinator
+                    </AnimatedGradientText>
+                   
                 </motion.h1>
+
+                
+
                 <motion.p
                     className="text-lg leading-relaxed text-muted-foreground max-w-2xl mx-auto"
                     initial={{ opacity: 0, y: 20 }}

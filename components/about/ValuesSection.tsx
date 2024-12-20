@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Target, Shield, Network } from 'lucide-react'
 import { motion } from "framer-motion"
+import { AnimatedGradientText } from "../AnimatedGradientText"
 
 const values = [
     {
@@ -31,14 +32,9 @@ export default function ValuesSection() {
     return (
         <section className="py-12 md:py-24 lg:py-32">
             <div className="container mx-auto px-4 md:px-6">
-                <motion.h2
-                    className="text-3xl font-bold tracking-tighter text-center mb-12 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
+                <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                     Our Values
-                </motion.h2>
+                </AnimatedGradientText>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {values.map((value, index) => {
                         const Icon = value.icon

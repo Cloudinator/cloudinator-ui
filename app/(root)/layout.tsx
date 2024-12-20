@@ -38,12 +38,12 @@ export default function HomeLayout({
                         <StoreProvider>
                             <NavBarHomePage />
                             <ScrollProgressBar />
-                            <RouteTransition>
-                                {children}
-                            </RouteTransition>
+                                <RouteTransition>
+                                    {children}
+                                </RouteTransition>
                             <BackToTopButton />
                             <Footer />
-                            <InnerContent /> {/* Render InnerContent separately */}
+                            <InnerContent /> 
                         </StoreProvider>
                     </AuthProvider>
                 </ThemeProvider>

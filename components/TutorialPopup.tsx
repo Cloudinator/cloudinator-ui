@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image';
+import Link from 'next/link';
 import { useGetMeQuery } from '@/redux/api/userApi'
 
 const tutorialSteps = [
@@ -155,6 +156,11 @@ const TutorialPopup: React.FC = () => {
                             <div className="pb-16">
                                 <h2 className="text-2xl font-bold mb-2 text-purple-500">{tutorialSteps[currentStep].title}</h2>
                                 <p className="mb-4 dark:text-gray-400">{getPersonalizedContent(tutorialSteps[currentStep])}</p>
+                                {tutorialSteps[currentStep].title === "Documentation" && (
+                                    <Link href="https://cloudinator-doc-vercel.vercel.app/">
+                                        <span className="text-purple-500 underline">Go to Documentation</span>
+                                    </Link>
+                                )}
                             </div>
                             <div className="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded">
                                 <div

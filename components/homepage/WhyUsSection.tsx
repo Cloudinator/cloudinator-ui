@@ -2,13 +2,18 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
+import { AnimatedGradientText } from "../AnimatedGradientText";
 
 export default function WhyUs() {
     return (
         <section className="container mx-auto px-4 py-16 md:py-24">
             <div className="grid gap-8 lg:grid-cols-[1fr,1.5fr] items-center justify-center">
                 <div className="space-y-4 text-center">
-                    <h2 className="text-4xl font-bold tracking-tight pr-28 text-purple-600">Why Us?</h2>
+                    
+                    <AnimatedGradientText className="text-4xl md:text-5xl font-extrabold mb-4 inline-block">
+                        Why Us?
+                    </AnimatedGradientText>
+
                     <div className="relative h-[300px] w-[300px]">
                         <Image
                             src="/whyus.png"

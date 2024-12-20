@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import octopus from '@/public/Octopus.json'
 import pirate from '@/public/Pirateship.json'
 import dynamic from "next/dynamic";
+import { AnimatedGradientText } from '../AnimatedGradientText'
 const Lottie = dynamic(() => import('react-lottie'), {ssr: false});
 
 const octopusAnimation = {
@@ -260,10 +261,11 @@ export default function StartBuildingPage() {
                             transition={{ duration: 0.8 }}
                             className="text-center lg:w-1/2"
                         >
-                            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400">
+
+                            <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                                 Start Cloudinator
-                            </h1>
-                            <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-purple-800 dark:text-purple-300">
+                            </AnimatedGradientText>
+                            <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-purple-500 dark:text-purple-300">
                                 Better Runtime Product
                             </h2>
                             <p className="text-lg text-muted-foreground dark:text-gray-400 mb-8">
@@ -307,9 +309,10 @@ export default function StartBuildingPage() {
                         transition={{ duration: 0.8, delay: 0.2 }}
                         className="text-center mb-12"
                     >
-                        <h2 className="text-3xl font-bold mb-4 text-purple-600 dark:text-purple-300">
+                        <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                             Project KickStarts
-                        </h2>
+                        </AnimatedGradientText>
+
                         <p className="text-lg text-muted-foreground dark:text-gray-400">
                             Choose from a wide range of technologies to kickstart your project
                         </p>
@@ -357,9 +360,11 @@ export default function StartBuildingPage() {
                         transition={{ duration: 0.8 }}
                         className="text-center mb-16"
                     >
-                        <h2 className="text-4xl font-bold text-purple-500 mb-4">
+
+                        <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                             Our Backend Process Technology
-                        </h2>
+                        </AnimatedGradientText>
+
                         <p className="text-black dark:text-gray-300 text-lg max-w-2xl mx-auto">
                             Our backend process technology is designed to be scalable, reliable, and secure, floating on
                             the waves of innovation.
@@ -376,9 +381,11 @@ export default function StartBuildingPage() {
             {/* Timeline Section */}
             <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-black">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500 dark:from-purple-300 dark:to-blue-400">
+                
+                    <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                         Our Process
-                    </h2>
+                    </AnimatedGradientText>
+
                     <div className="max-w-6xl mx-auto">
                         <div className="flex flex-col md:flex-row gap-6 md:gap-0">
                             {timelineSteps.map((step, index) => (

@@ -5,6 +5,7 @@ import { Database, HardDrive, Image as ImageIcon, GitBranch, LineChart, Code, Bo
 import { motion } from 'framer-motion'
 import cloud from '@/public/cloud.json'
 import dynamic from "next/dynamic";
+import { AnimatedGradientText } from "../AnimatedGradientText"
 
 const Lottie = dynamic(() => import('react-lottie'), { ssr: false });
 
@@ -91,9 +92,10 @@ export default function StorageSection() {
 
     return (
         <div className="container mx-auto px-4 py-16 space-y-24">
-            <motion.h2 className="text-4xl text-purple-500 md:text-5xl font-black tracking-tight text-center" variants={itemVariants}>Our
+            <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                 Cloud Storage
-            </motion.h2>
+            </AnimatedGradientText>
+
             {/* Cloud Storage Section */}
             <motion.section
                 className="grid md:grid-cols-2 gap-12 items-center"
@@ -131,9 +133,11 @@ export default function StorageSection() {
                 animate="visible"
                 variants={containerVariants}
             >
-                <motion.h2 className="text-4xl md:text-5xl font-black tracking-tight text-center text-purple-500"
-                           variants={itemVariants}>Our Deployment approach
-                </motion.h2>
+
+                <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
+                    Our Deployment approach
+                </AnimatedGradientText>
+                
                 <motion.div
                     className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                     variants={containerVariants}

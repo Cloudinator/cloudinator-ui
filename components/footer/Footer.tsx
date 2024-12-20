@@ -26,14 +26,14 @@ const partners = [
     {
         name: 'CBRD',
         src: '/cbrd.png',
-        height: 60,
-        width: 150
+        height: 200,
+        width: 200
     },
     {
         name: 'MPTC',
         src: '/mptc.png',
-        height: 60,
-        width: 150
+        height: 200,
+        width: 200
     }
 ]
 
@@ -90,9 +90,9 @@ export default function Footer() {
                         </div>
 
                         {/* Partners */}
-                        <div>
+                        <div className="space-y-4">
                             <h3 className="text-lg font-semibold text-sky-600 mb-4">Sponsor</h3>
-                            <div className="grid gafp-4">
+                            <div className="grid gap-4 sm:gap-6">
                                 {partners.map((partner) => (
                                     <Image
                                         key={partner.name}

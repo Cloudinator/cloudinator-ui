@@ -28,7 +28,7 @@ export const userApi = identityApi.injectEndpoints({
             }),
         }),
 
-        updateUserByUsername: builder.mutation<void, { username: any , userUpdateRequest: UserUpdateRequest }>({
+        updateUserByUsername: builder.mutation<void, { username: string , userUpdateRequest: UserUpdateRequest }>({
             query: ({ username, userUpdateRequest }) => ({
                 url: `api/v1/users/${username}`,
                 method: 'PATCH',

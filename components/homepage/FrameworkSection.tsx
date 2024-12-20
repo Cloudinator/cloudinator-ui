@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { AnimatedGradientText } from "../AnimatedGradientText";
 
 const PixelLogo: React.FC<{ d: string; viewBox?: string }> = ({
                                                                   d,
@@ -76,9 +77,9 @@ export default function FrameworkSection() {
     return (
         <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white p-8"> {/* Added dark mode classes */}
             <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text inline-block">
+                <AnimatedGradientText className="text-4xl md:text-5xl font-extrabold mb-4 inline-block">
                     Supported frameworks and libraries for your project
-                </h2>
+                </AnimatedGradientText>
             </div>
             <div className="max-w-6xl mx-auto">
                 <h1 className="text-4xl font-bold mb-4 text-center">

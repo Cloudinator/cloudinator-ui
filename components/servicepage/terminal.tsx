@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { AnimatedGradientText } from '../AnimatedGradientText'
 
 export default function TerminalPage() {
     const [activeTab, setActiveTab] = useState('kubernetes')
@@ -80,11 +81,12 @@ export default function TerminalPage() {
     }, [activeTab, currentLineIndex, tabs])
 
     return (
-        <section className="bg-gray-50 py-16 md:py-24">
+        <section className="bg-gray-50 py-8 md:py-8">
             <div className="container mx-auto px-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            
+                <AnimatedGradientText className="text-4xl md:text-5xl font-extrabold mb-4 inline-block text-center">
                     Work with the Tools You Already Love
-                </h2>
+                </AnimatedGradientText>
                 <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         {/* Responsive Tabs List */}
