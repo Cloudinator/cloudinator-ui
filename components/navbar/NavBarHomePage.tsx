@@ -35,7 +35,7 @@ const NavBarHomePage = () => {
     const navItems = [
         { path: "/", label: "Home" },
         { path: "/service", label: "Service" },
-        { path: "https://cloudinator-document.psa-khmer.world/", label: "Document" },
+        { path: "https://cloudinator-document.soben.me", label: "Document" },
         { path: "/start-building", label: "Start Building" },
         { path: "/about", label: "About" },
     ];
