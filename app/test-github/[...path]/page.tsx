@@ -6,7 +6,7 @@ import { RepoStructure } from '@/types/github'
 
 async function getRepoStructure(): Promise<RepoStructure> {
     const res = await fetch(
-        'http://localhost:3000/api/repos/MuyleangIng/cloudinator-ui.vercel.app/git/trees/main',
+        'http://localhost:3000/api/repos/MuyleangIng/reactjs-with-dockerfile/git/trees/main',
         { cache: 'no-store' }
     )
     if (!res.ok) throw new Error('Failed to fetch repo structure')
