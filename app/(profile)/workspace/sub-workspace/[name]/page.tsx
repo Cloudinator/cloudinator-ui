@@ -1,19 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ChevronRight, Plus, MoreVertical, Cpu, Rocket, FileText, ChevronDown } from 'lucide-react'
+import { ChevronRight, Plus, FileText, ChevronDown } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
     Collapsible,
     CollapsibleContent,
@@ -38,6 +30,7 @@ import {
     useGetBuildNumberInFolderQuery,
     useGetProjectsQuery
 } from "@/redux/api/projectApi"
+import Link from "next/link";
 
 export type PropsParams = {
     params: Promise<{ name: string }>;
@@ -49,6 +42,9 @@ type SpringProjectType = {
     folder: string;
     group: string;
     dependencies: string[];
+    branch: string;
+    namespace: string;
+    git: string;
 }
 
 type SpringProjectResponse = {
@@ -94,10 +90,6 @@ export default function SubWorkspacePage(props: PropsParams) {
         name : params?.name ?? ''
     });
 
-    // const handleCreateSpringProject = (projectDetails: SpringProject) => {
-    //     console.log("Creating new Spring project:", projectDetails)
-    //     setIsSpringInitializerOpen(false)
-    // }
 
     const handleDeployProject = () => {
         console.log("Deploying projects:", selectedProjects)
@@ -123,9 +115,9 @@ export default function SubWorkspacePage(props: PropsParams) {
     return (
         <div className="flex-1 space-y-6 p-8">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <span>Projects</span>
+                <Link href={'/workspace'}>Workspace</Link>
                 <ChevronRight className="h-4 w-4" />
-                <span>Spring Microservices</span>
+                <span className="font-medium text-foreground">{params?.name}</span>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
@@ -137,7 +129,7 @@ export default function SubWorkspacePage(props: PropsParams) {
                     <Dialog open={isDeployDialogOpen} onOpenChange={setIsDeployDialogOpen}>
                         <DialogTrigger asChild>
                             <Button>
-                                <Rocket className="mr-2 h-4 w-4" />
+                                <Plus className="mr-2 h-4 w-4" />
                                 Deploy/Build
                             </Button>
                         </DialogTrigger>
@@ -227,64 +219,34 @@ export default function SubWorkspacePage(props: PropsParams) {
                 <TabsContent value="spring-projects" className="space-y-4">
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {springProjects.map((project) => (
-                            <Card key={project.uuid}>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">
-                                        {project.name}
-                                    </CardTitle>
-                                    <Avatar className="h-9 w-9">
-                                        <AvatarFallback>{project.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                    </Avatar>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="flex justify-between text-sm mb-2">
-                                        <span className="flex items-center">
-                                            <Cpu className="h-4 w-4 mr-1"/>
-                                            {project.group}
-                                        </span>
-                                        {/*<span className="flex items-center">*/}
-                                        {/*    <Layers className="h-4 w-4 mr-1" />*/}
-                                        {/*    {project.dependencies.length} dependencies*/}
-                                        {/*</span>*/}
-                                    </div>
-                                    {/*<div className="flex flex-wrap gap-2 mt-2">*/}
-                                    {/*    {project.dependencies.map((dep) => (*/}
-                                    {/*        <Badge key={dep} variant="secondary">*/}
-                                    {/*            {dep}*/}
-                                    {/*        </Badge>*/}
-                                    {/*    ))}*/}
-                                    {/*</div>*/}
-                                    <div className="mt-4 flex justify-between items-center">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => {
-                                                setSelectedProjects([project.uuid])
-                                                setIsDeployDialogOpen(true)
-                                            }}
-                                        >
-                                            <Rocket className="h-4 w-4 mr-2" />
-                                            Deploy/Build
-                                        </Button>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>View Details</DropdownMenuItem>
-                                                <DropdownMenuItem>Edit Project</DropdownMenuItem>
-                                                <DropdownMenuItem>Build Project</DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                <Card key={project.uuid}>
+                                    <Link href={`/workspace/sub-workspace/${params?.name}/${project.name}`}>
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                            <CardTitle className="text-sm font-medium">
+                                                {project.name}
+                                            </CardTitle>
+                                            <Avatar className="h-9 w-9">
+                                                <AvatarFallback>{project.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                            </Avatar>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="space-y-2 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span className="text-muted-foreground">Branch:</span>
+                                                    <span>{project.branch}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-muted-foreground">Namespace:</span>
+                                                    <span>{project.namespace}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-muted-foreground">Git:</span>
+                                                    <span className="truncate max-w-[150px]">{project.git}</span>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Link>
+                                </Card>
                         ))}
                     </div>
                 </TabsContent>
@@ -333,7 +295,9 @@ export default function SubWorkspacePage(props: PropsParams) {
                                                     size="sm"
                                                 >
                                                     <FileText className="h-4 w-4 mr-2" />
+                                                    <Link href={`/workspace/sub-workspace/${params?.name}/${params?.name}/${build?.buildNumber}`}>
                                                     View Log
+                                                    </Link>
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
@@ -348,7 +312,6 @@ export default function SubWorkspacePage(props: PropsParams) {
             <SpringInitializer
                 isOpen={isSpringInitializerOpen}
                 onClose={() => setIsSpringInitializerOpen(false)}
-                // onCreateProject={handleCreateSpringProject}
                 folder={params?.name ?? ''}
                 springProjects={springProjects}
             />

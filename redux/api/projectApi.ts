@@ -5,13 +5,14 @@ type Workspace = {
     name: string,
 }
 
-type Service = {
+export type Service = {
     uuid: string,
     name: string,
     gitUrl: string,
     branch: string,
     subdomain: string,
     type: string,
+    status: boolean
 }
 
 type SubWorkspace = {
@@ -22,12 +23,15 @@ type SubWorkspace = {
 
 export type SpringProject = {
     name: string
+    namespace: string
+    git: string
+    branch: string
     folder: string
     group: string
     dependencies: string[]
 }
 
-type BuildNumber = {
+export type BuildNumber = {
     buildNumber: number
     status: string
 }
@@ -57,7 +61,7 @@ export const projectsApi = projectApi.injectEndpoints({
             query: ({ name }) => `api/v1/deploy-service/get-service/${name}`,
         }),
 
-        getBuildInfoByName: builder.query<Service, { name: string }>({
+        getBuildInfoByName: builder.query<BuildNumber, { name: string }>({
             query: ({ name }) => `api/v1/deploy-service/get-build-numbers/${name}`,
         }),
 
@@ -66,6 +70,20 @@ export const projectsApi = projectApi.injectEndpoints({
                 url: 'api/v1/deploy-service/create-service',
                 method: 'POST',
                 body: { name,gitUrl,branch,subdomain,workspaceName,token,type },
+            }),
+        }),
+
+        stopServiceDeployment: builder.mutation<Service, { name: string }>({
+            query: ({ name }) => ({
+                url: `api/v1/deploy-service/stop-service/${name}`,
+                method: 'POST',
+            }),
+        }),
+
+        startServiceDeployment: builder.mutation<Service, { name: string }>({
+            query: ({ name }) => ({
+                url: `api/v1/deploy-service/restart-service/${name}`,
+                method: 'POST',
             }),
         }),
 
@@ -115,6 +133,10 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
+        getProjectByName: builder.query<SpringProject, { name: string }>({
+            query: ({ name }) => `api/v1/spring/project/${name}`,
+        }),
+
         getProjects: builder.query<Service[], { subWorkspace: string,size: number,page:number }>({
             query: ({ subWorkspace,size,page }) => `api/v1/spring/${subWorkspace}?size=${size}&page=${page}`,
         }),
@@ -136,4 +158,4 @@ export const projectsApi = projectApi.injectEndpoints({
 })
 
 
-export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation} = projectsApi
+export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation} = projectsApi
