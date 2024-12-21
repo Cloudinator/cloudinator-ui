@@ -10,9 +10,10 @@ import { Code, GitBranch, Globe } from 'lucide-react'
 interface FrontendFormProps {
     onClose: () => void
     selectedWorkspace: string
+    data1 : () => void;
 }
 
-export function FrontendForm({ onClose,selectedWorkspace }: FrontendFormProps) {
+export function FrontendForm({ onClose,selectedWorkspace ,data1}: FrontendFormProps) {
     const [createServiceDeployment] = useCreateServiceDeploymentMutation()
     const [projectFields, setProjectFields] = useState({
         name: '',
@@ -47,9 +48,11 @@ export function FrontendForm({ onClose,selectedWorkspace }: FrontendFormProps) {
                 type: 'frontend'
             }).unwrap()
             console.log('Frontend service2 deployment created:', result)
-            onClose()
+
         } catch (error) {
-            console.error('Failed to create frontend service2 deployment:', error)
+            console.log('Failed to create frontend service2 deployment:', error)
+            data1()
+            onClose()
         }
     }
 

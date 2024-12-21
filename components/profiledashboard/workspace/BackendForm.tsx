@@ -10,9 +10,10 @@ import {AutomationToggle, FormField} from "@/components/profiledashboard/workspa
 interface BackendFormProps {
     onClose: () => void
     selectedWorkspace: string
+    data1: () => void;
 }
 
-export function BackendForm({ onClose ,selectedWorkspace}: BackendFormProps) {
+export function BackendForm({ onClose ,selectedWorkspace,data1}: BackendFormProps) {
     const [createServiceDeployment] = useCreateServiceDeploymentMutation()
     const [projectFields, setProjectFields] = useState({
         name: '',
@@ -44,9 +45,11 @@ export function BackendForm({ onClose ,selectedWorkspace}: BackendFormProps) {
                 type: 'backend'
             }).unwrap()
             console.log('Backend service2 deployment created:', result)
-            onClose()
+
         } catch (error) {
-            console.error('Failed to create backend service2 deployment:', error)
+            console.log('Failed to create backend service2 deployment:', error)
+            data1()
+            onClose()
         }
     }
 

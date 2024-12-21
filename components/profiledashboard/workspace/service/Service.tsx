@@ -1,8 +1,8 @@
 'use client'
 
 import React, {useState, useEffect, lazy, Suspense, useMemo} from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -20,22 +20,18 @@ import {
     Dialog,
     DialogContent,
     DialogTrigger,
-    DialogTitle,
+    DialogTitle
 } from "@/components/ui/dialog";
-import {
-    ArrowLeft,
-    Database,
-    Layout,
-    MoreVertical,
-    Server,
-    Share2,
-    User2,
-    Plus,
-    Search,
-} from "lucide-react";
+import { ArrowLeft, Database, Layout, MoreVertical, Server, Share2, User2, Plus, Search, GitBranch, Globe, ExternalLink } from 'lucide-react';
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import {useGetServiceDeploymentQuery, useGetSubWorkspacesQuery, useGetWorkspacesQuery} from "@/redux/api/projectApi";
+import {motion, AnimatePresence} from "framer-motion";
+import {
+    useDeleteServiceDeploymentMutation, useDeleteSubWorkSpaceMutation,
+    useGetServiceDeploymentQuery,
+    useGetSubWorkspacesQuery,
+    useGetWorkspacesQuery
+} from "@/redux/api/projectApi";
+import {useRouter} from "next/navigation";
 
 const CreateProjectContent = lazy(() => import('@/components/profiledashboard/workspace/CreateProjectContent'));
 
@@ -71,51 +67,53 @@ type SubWorkSpaceResponse = {
     total: number;
     totalElements: number;
     results: SubWorkspaceType[];
+
 };
 
 
 function getServiceIcon(type: ServiceType['type']) {
     switch (type) {
         case 'frontend':
-            return <Layout className="w-5 h-5 text-purple-600" />;
+            return <Layout className="w-5 h-5 text-purple-600"/>;
         case 'backend':
-            return <Server className="w-5 h-5 text-pink-600" />;
+            return <Server className="w-5 h-5 text-pink-600"/>;
         case 'database':
-            return <Database className="w-5 h-5 text-orange-600" />;
+            return <Database className="w-5 h-5 text-orange-600"/>;
         case 'subworkspace':
-            return <Share2 className="w-5 h-5 text-blue-600" />;
+            return <Share2 className="w-5 h-5 text-blue-600"/>;
     }
 }
 
 export default function Service() {
+    const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredServices, setFilteredServices] = useState<ServiceType[]>([]);
     const [selectedType, setSelectedType] = useState<ServiceType['type'] | 'all'>('all');
+    const [deleteServiceDeployment] = useDeleteServiceDeploymentMutation();
+    const [deleteSubWorkspace] = useDeleteSubWorkSpaceMutation();
 
-    const { data: workspacesData } = useGetWorkspacesQuery();
+    const {data: workspacesData} = useGetWorkspacesQuery();
     const workspaces = workspacesData || [];
 
     const [selectedWorkspace, setSelectedWorkspace] = useState(
         workspaces.length > 0 ? workspaces[0].name : ""
     );
 
-    const { data: servicesData } = useGetServiceDeploymentQuery({
+    const {data: servicesData, refetch: data1} = useGetServiceDeploymentQuery({
         workspaceName: selectedWorkspace,
         size: 10,
         page: 0,
-    }) as unknown as { data: ServiceDeploymentResponse };
+    }) as unknown as { data: ServiceDeploymentResponse, refetch: () => void };
 
-    const { data: subWorkspace } = useGetSubWorkspacesQuery({
+    const {data: subWorkspace, refetch: data2} = useGetSubWorkspacesQuery({
         workspaceName: selectedWorkspace,
         size: 10,
         page: 0,
-    }) as unknown as { data: SubWorkSpaceResponse };
+    }) as unknown as { data: SubWorkSpaceResponse, refetch: () => void };
 
 
 
-
-    console.log(subWorkspace)
 
     const combinedResults = useMemo(() => {
         const services = servicesData?.results || [];
@@ -136,6 +134,61 @@ export default function Service() {
         }
     }, [searchTerm, selectedType, combinedResults]);
 
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [serviceToDelete, setServiceToDelete] = useState<ServiceType | null>(null);
+    const [subWorkspaceToDelete, setSubWorkspaceToDelete] = useState<SubWorkspaceType | null>(null);
+    const [deleteConfirmationName, setDeleteConfirmationName] = useState('');
+
+    const handleDeleteClick = (service: ServiceType | SubWorkspaceType) => {
+        if (service.type === 'subworkspace') {
+            setSubWorkspaceToDelete(service as SubWorkspaceType);
+        } else {
+            setServiceToDelete(service as ServiceType);
+        }
+        setIsDeleteModalOpen(true);
+        setDeleteConfirmationName('');
+    };
+
+
+
+    const confirmDelete = async () => {
+        if (serviceToDelete && deleteConfirmationName === serviceToDelete.name) {
+            try {
+                const result = await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
+                console.log('Service deleted:', result);
+            } catch (error) {
+                console.log('Failed to delete service:', error);
+            } finally {
+                setIsDeleteModalOpen(false);
+                setServiceToDelete(null);
+                setDeleteConfirmationName('');
+                data1();
+                data2();
+            }
+        }
+    };
+
+    const confirmDeleteSubWorkspace = async () => {
+        if (subWorkspaceToDelete && deleteConfirmationName === subWorkspaceToDelete.name) {
+            try {
+                const result = await deleteSubWorkspace({ name: subWorkspaceToDelete.name}).unwrap();
+                console.log('Subworkspace deleted:', result);
+            } catch (error) {
+                console.error('Failed to delete subworkspace:', error);
+            } finally {
+                setIsDeleteModalOpen(false);
+                setSubWorkspaceToDelete(null);
+                setDeleteConfirmationName('');
+                data1();
+                data2();
+            }
+        }
+    }
+
+
+
+
+
     if (!workspacesData) {
         return (
             <div className="text-purple-500 grid place-content-center h-screen w-full text-3xl">
@@ -147,14 +200,14 @@ export default function Service() {
     return (
         <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                initial={{opacity: 0, y: -20}}
+                animate={{opacity: 1, y: 0}}
+                transition={{duration: 0.5}}
                 className="flex flex-col sm:flex-row items-center justify-between pb-6 space-y-4 sm:space-y-0"
             >
                 <div className="flex items-center space-x-2">
                     <Link href="/workspace">
-                        <ArrowLeft className="h-8 w-8 text-purple-500" />
+                        <ArrowLeft className="h-8 w-8 text-purple-500"/>
                     </Link>
                     <h1 className="text-3xl font-bold tracking-tight text-purple-500">
                         Workspace
@@ -163,7 +216,7 @@ export default function Service() {
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button className="bg-purple-500 hover:bg-purple-600 text-lg px-6 py-3">
-                            <Plus className="mr-2 h-5 w-5" />
+                            <Plus className="mr-2 h-5 w-5"/>
                             Create Project
                         </Button>
                     </DialogTrigger>
@@ -175,10 +228,10 @@ export default function Service() {
                             fallback={
                                 <div className="flex items-center justify-center h-64">
                                     <motion.div
-                                        animate={{ rotate: 360 }}
-                                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                        animate={{rotate: 360}}
+                                        transition={{duration: 1, repeat: Infinity, ease: "linear"}}
                                     >
-                                        <Database className="w-12 h-12 text-purple-500" />
+                                        <Database className="w-12 h-12 text-purple-500"/>
                                     </motion.div>
                                 </div>
                             }
@@ -186,6 +239,8 @@ export default function Service() {
                             <CreateProjectContent
                                 onClose={() => setIsDialogOpen(false)}
                                 selectedWorkspace={selectedWorkspace}
+                                data1={data1}
+                                data2={data2}
                             />
                         </Suspense>
                     </DialogContent>
@@ -193,9 +248,9 @@ export default function Service() {
             </motion.div>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+                initial={{opacity: 0, y: 20}}
+                animate={{opacity: 1, y: 0}}
+                transition={{duration: 0.5, delay: 0.2}}
                 className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-md"
             >
                 <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
@@ -206,8 +261,8 @@ export default function Service() {
                         }}
                     >
                         <SelectTrigger className="w-full sm:w-[200px]">
-                            <User2 className="mr-2 h-4 w-4" />
-                            <SelectValue placeholder="Select Workspace" />
+                            <User2 className="mr-2 h-4 w-4"/>
+                            <SelectValue placeholder="Select Workspace"/>
                         </SelectTrigger>
                         <SelectContent>
                             {workspaces.map((workspace) => (
@@ -218,7 +273,7 @@ export default function Service() {
                         </SelectContent>
                     </Select>
                     <div className="relative w-full sm:w-auto flex-grow">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"/>
                         <Input
                             type="text"
                             placeholder="Search projects..."
@@ -251,42 +306,117 @@ export default function Service() {
             <AnimatePresence>
                 <motion.div
                     layout
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"
                 >
                     {filteredServices.map((service, index) => (
                         <motion.div
                             key={service.name}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.3, delay: index * 0.1 }}
+                            initial={{opacity: 0, scale: 0.9}}
+                            animate={{opacity: 1, scale: 1}}
+                            exit={{opacity: 0, scale: 0.9}}
+                            transition={{duration: 0.3, delay: index * 0.1}}
                         >
-                            <Link href={service.type === 'subworkspace' ? `/workspace/sub-workspace/${service.name}` : `/workspace/${service.name}`}>
-                                <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full">
+                            <div
+                                className="p-6 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full cursor-pointer"
+
+                            >
+                                <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         {getServiceIcon(service.type)}
-                                        <div>
-                                            <h3 className="font-medium">{service.name}</h3>
-                                        </div>
+                                        <h3 className="font-semibold text-lg">{service.name}</h3>
                                     </div>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                <MoreVertical className="h-4 w-4" />
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.preventDefault()}>
+                                                <MoreVertical className="h-4 w-4"/>
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                                            <DropdownMenuItem>Share</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Edit</DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={(e) => {
+                                                e.preventDefault();
+                                                const path = service.type === 'subworkspace' ? `/workspace/sub-workspace/${service.name}` : `/workspace/${service.name}`;
+                                                router.push(path);
+                                            }}>
+                                                View Details
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleDeleteClick(service); }} className="text-red-600">
+                                                Delete
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
-                            </Link>
+                                <div className="space-y-3 text-sm">
+                                    <a href={service.gitUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
+                                        <GitBranch className="w-4 h-4 mr-2" />
+                                        {service.gitUrl}
+                                        <ExternalLink className="w-3 h-3 ml-1" />
+                                    </a>
+                                    {service?.type === 'subworkspace' ? (
+                                            <span className="text-gray-500">This is sub workspace where you can manage your microservices</span>
+                                        ):
+                                        <a href={`https://${service.subdomain}`} target="_blank"
+                                           rel="noopener noreferrer"
+                                           className="flex items-center text-green-600 hover:underline"
+                                           onClick={(e) => e.stopPropagation()}>
+                                            <Globe className="w-4 h-4 mr-2"/>
+                                            {service.subdomain}
+                                            <ExternalLink className="w-3 h-3 ml-1"/>
+                                        </a>}
+                                </div>
+                                <div className="mt-4 flex justify-between items-center">
+                                    {service?.type === 'subworkspace' ? (
+                                            <span></span>
+                                        ):
+                                        <Button variant="outline" size="sm"
+                                                className="text-purple-600 border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900"
+                                                onClick={(e) => e.preventDefault()}>
+                                            <Share2 className="w-4 h-4 mr-2"/>
+                                            Deploy
+                                        </Button>}
+                                    <span className="text-xs text-gray-500 flex items-center">
+                                        <GitBranch className="w-3 h-3 mr-1" />
+                                        {service?.type === 'subworkspace' ? 'Sub Workspace' : service.branch}
+                                    </span>
+                                </div>
+                            </div>
                         </motion.div>
                     ))}
                 </motion.div>
             </AnimatePresence>
+            <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                <DialogContent>
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <p>Please type the name of the service to confirm deletion: <strong>{serviceToDelete?.name}</strong>
+                    </p>
+                    <Input
+                        value={deleteConfirmationName}
+                        onChange={(e) => setDeleteConfirmationName(e.target.value)}
+                        placeholder="Type service name here"
+                    />
+                    <div className="flex justify-end space-x-2 mt-4">
+                        <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>
+                        {(serviceToDelete?.type === 'subworkspace' || subWorkspaceToDelete) ? (
+                            <Button
+                                onClick={confirmDeleteSubWorkspace}
+                                disabled={(!serviceToDelete && !subWorkspaceToDelete) || deleteConfirmationName !== (serviceToDelete?.name || subWorkspaceToDelete?.name)}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                                Confirm Delete
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={confirmDelete}
+                                disabled={!serviceToDelete || deleteConfirmationName !== serviceToDelete.name}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                                Confirm Delete
+                            </Button>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
+

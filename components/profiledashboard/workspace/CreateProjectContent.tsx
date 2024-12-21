@@ -14,14 +14,18 @@ import { BackendForm } from "@/components/profiledashboard/workspace/BackendForm
 import { DatabaseForm } from "@/components/profiledashboard/workspace/DatabaseForm"
 import { SubworkspaceForm } from "@/components/profiledashboard/workspace/Subworkspaceform"
 import GitlabImportForm from "@/components/profiledashboard/workspace/GitlabImportForm"
+import { ZipUploadForm } from "@/components/profiledashboard/workspace/ZipUploadForm"
 
 import { Progress } from "@/components/ui/progress"
-import {FrontendOptions, FrontendOptionType} from "@/components/profiledashboard/workspace/FrontendOptions";
-import {ProjectTypeCard} from "@/components/profiledashboard/workspace/ProjectTypeCard";
+import { FrontendOptions, FrontendOptionType } from "@/components/profiledashboard/workspace/FrontendOptions"
+import { BackendOptions, BackendOptionType } from "@/components/profiledashboard/workspace/BackendOptions"
+import { ProjectTypeCard } from "@/components/profiledashboard/workspace/ProjectTypeCard"
 
 interface CreateProjectContentProps {
-    onClose: () => void
-    selectedWorkspace: string
+    onClose: () => void;
+    selectedWorkspace: string;
+    data1: () => void;
+    data2: () => void;
 }
 
 const projectTypes = [
@@ -61,14 +65,16 @@ const projectTypes = [
 
 type ProjectType = typeof projectTypes[number]['type']
 
-export default function CreateProjectContent({ onClose, selectedWorkspace }: CreateProjectContentProps) {
+export default function CreateProjectContent({ onClose, selectedWorkspace, data1, data2 }: CreateProjectContentProps) {
     const [selectedType, setSelectedType] = useState<ProjectType | null>(null)
     const [selectedFrontendOption, setSelectedFrontendOption] = useState<FrontendOptionType | null>(null)
+    const [selectedBackendOption, setSelectedBackendOption] = useState<BackendOptionType | null>(null)
     const [progress, setProgress] = useState(0)
 
     const handleProjectTypeSelect = useCallback((type: ProjectType) => {
         setSelectedType(type)
         setSelectedFrontendOption(null)
+        setSelectedBackendOption(null)
         setProgress(33)
     }, [])
 
@@ -77,27 +83,47 @@ export default function CreateProjectContent({ onClose, selectedWorkspace }: Cre
         setProgress(66)
     }, [])
 
+    const handleBackendOptionSelect = useCallback((option: BackendOptionType) => {
+        setSelectedBackendOption(option)
+        setProgress(66)
+    }, [])
+
     const renderProjectForm = useMemo(() => {
         if (selectedType === 'frontend') {
-            if (selectedFrontendOption === 'github') {
-                return <FrontendForm onClose={onClose} selectedWorkspace={selectedWorkspace} />
-            } else if (selectedFrontendOption === 'gitlab') {
-                return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} />
+            switch (selectedFrontendOption) {
+                case 'github':
+                    return <FrontendForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1}/>;
+                case 'gitlab':
+                    return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;
+                case 'zipUpload':
+                    return <ZipUploadForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;
+                default:
+                    return null;
             }
-            return null
+        }
+
+        if (selectedType === 'backend') {
+            switch (selectedBackendOption) {
+                case 'github':
+                    return <BackendForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1}/>;
+                case 'gitlab':
+                    return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;;
+                case 'zipUpload':
+                    return <ZipUploadForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;
+                default:
+                    return null;
+            }
         }
 
         switch (selectedType) {
-            case 'backend':
-                return <BackendForm onClose={onClose} selectedWorkspace={selectedWorkspace} />
             case 'database':
-                return <DatabaseForm onClose={onClose} />
+                return <DatabaseForm onClose={onClose} />;
             case 'subworkspace':
-                return <SubworkspaceForm onClose={onClose} selectedWorkspace={selectedWorkspace}/>
+                return <SubworkspaceForm onClose={onClose} selectedWorkspace={selectedWorkspace} data2={data2}/>;
             default:
-                return null
+                return null;
         }
-    }, [selectedType, selectedFrontendOption, onClose, selectedWorkspace])
+    }, [selectedType, selectedFrontendOption, selectedBackendOption, onClose, selectedWorkspace, data1, data2])
 
     return (
         <div className="flex flex-col h-full max-h-[80vh]">
@@ -140,9 +166,15 @@ export default function CreateProjectContent({ onClose, selectedWorkspace }: Cre
                                 onOptionSelect={handleFrontendOptionSelect}
                             />
                         )}
-                        {(selectedType !== 'frontend' || selectedFrontendOption) && (
+                        {selectedType === 'backend' && !selectedBackendOption && (
+                            <BackendOptions
+                                selectedOption={selectedBackendOption}
+                                onOptionSelect={handleBackendOptionSelect}
+                            />
+                        )}
+                        {((selectedType !== 'frontend' && selectedType !== 'backend') || selectedFrontendOption || selectedBackendOption) && (
                             <motion.div
-                                key={`${selectedType}-${selectedFrontendOption}`}
+                                key={`${selectedType}-${selectedFrontendOption}-${selectedBackendOption}`}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -20 }}

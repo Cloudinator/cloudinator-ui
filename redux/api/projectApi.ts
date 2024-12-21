@@ -73,10 +73,31 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
+        deployZipService: builder.mutation<void, { file: File, name: string, workspaceName: string, token: string, type: string }>({
+            query: ({ file, name, workspaceName, token, type }) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('request', JSON.stringify({ name, workspaceName, token, type }));
+
+                return {
+                    url: 'api/v1/deploy-service/deploy-zip-service',
+                    method: 'POST',
+                    body: formData,
+                };
+            },
+        }),
+
         stopServiceDeployment: builder.mutation<Service, { name: string }>({
             query: ({ name }) => ({
                 url: `api/v1/deploy-service/stop-service/${name}`,
                 method: 'POST',
+            }),
+        }),
+
+        deleteServiceDeployment: builder.mutation<void, {name:string}>({
+            query: ({name}) => ({
+                url: `api/v1/deploy-service/delete-service/${name}`,
+                method: 'DELETE',
             }),
         }),
 
@@ -125,6 +146,13 @@ export const projectsApi = projectApi.injectEndpoints({
             query: ({ workspaceName,size,page }) => `api/v1/sub-workspace/${workspaceName}?size=${size}&page=${page}`,
         }),
 
+        deleteSubWorkSpace:builder.mutation<void, {name:string}>({
+            query: ({name}) => ({
+                url: `api/v1/sub-workspace/delete/${name}`,
+                method: 'DELETE',
+            }),
+        }),
+
         createProject: builder.mutation<SpringProject, { name: string, group: string, folder: string, dependencies: string[],servicesNames:string[] }>({
             query: ({ name, group, folder, dependencies,servicesNames }) => ({
                 url: '/api/v1/spring/create-service',
@@ -158,4 +186,4 @@ export const projectsApi = projectApi.injectEndpoints({
 })
 
 
-export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation} = projectsApi
+export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation} = projectsApi

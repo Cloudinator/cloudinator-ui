@@ -10,9 +10,10 @@ import {FormField} from "@/components/profiledashboard/workspace/FormField";
 interface SubworkspaceFormProps {
     onClose: () => void
     selectedWorkspace: string
+    data2 : () => void;
 }
 
-export function SubworkspaceForm({ onClose ,selectedWorkspace}: SubworkspaceFormProps) {
+export function SubworkspaceForm({ onClose ,selectedWorkspace,data2}: SubworkspaceFormProps) {
     const [createSubWorkspace] = useCreateSubWorkspaceMutation()
     const [projectFields, setProjectFields] = useState({
         name: ''
@@ -34,6 +35,7 @@ export function SubworkspaceForm({ onClose ,selectedWorkspace}: SubworkspaceForm
             onClose()
         } catch (error) {
             console.log('Failed to create subworkspace service2 deployment:', error)
+            data2();
         }
     }
 
