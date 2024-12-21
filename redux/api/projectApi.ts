@@ -73,18 +73,12 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
-        deployZipService: builder.mutation<void, { file: File, name: string, workspaceName: string, token: string, type: string }>({
-            query: ({ file, name, workspaceName, token, type }) => {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('request', JSON.stringify({ name, workspaceName, token, type }));
-
-                return {
-                    url: 'api/v1/deploy-service/deploy-zip-service',
-                    method: 'POST',
-                    body: formData,
-                };
-            },
+        deployZipService : builder.mutation<Service, { name: string, gitUrl: string, workspaceName:string,token:string,type:string,branch:string}>({
+            query: ({ name,gitUrl,workspaceName,token,type,branch }) => ({
+                url: 'api/v1/deploy-service/deploy-zip-service',
+                method: 'POST',
+                body: { name,gitUrl,workspaceName,token,type,branch },
+            }),
         }),
 
         stopServiceDeployment: builder.mutation<Service, { name: string }>({
@@ -181,9 +175,16 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
+        getTest: builder.mutation<string, { name: string }>({
+            query: ({ name }) => ({
+                url: `/api/v1/deploy-service/test/${name}`, // Ensure the `/test` route matches the backend
+                method: 'POST', // Use POST as defined in the backend
+            }),
+        }),
+
 
     }),
 })
 
 
-export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation} = projectsApi
+export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation,useGetTestMutation} = projectsApi

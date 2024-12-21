@@ -4,30 +4,54 @@ import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useUploadZipMutation } from "@/redux/api/file"
+import { useDeployZipServiceMutation } from "@/redux/api/projectApi"
 
 interface ZipUploadFormProps {
-    onClose: () => void;
-    selectedWorkspace: string;
+    onClose: () => void
+    selectedWorkspace: string
 }
 
 export function ZipUploadForm({ onClose, selectedWorkspace }: ZipUploadFormProps) {
     const [file, setFile] = useState<File | null>(null)
     const [projectName, setProjectName] = useState('')
+    const [uploadZip, { isLoading }] = useUploadZipMutation()
+    const [deployZipService] = useDeployZipServiceMutation()
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files[0]) {
-            setFile(event.target.files[0])
-        }
+        const selectedFile = event.target.files?.[0] || null
+        setFile(selectedFile)
     }
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault()
-        // Here you would handle the file upload and project creation
-        console.log('Uploading file:', file)
-        console.log('Project Name:', projectName)
-        console.log('Selected Workspace:', selectedWorkspace)
-        // After handling the upload, you might want to close the dialog
-        onClose()
+
+        if (!file) {
+            alert('Please select a file.')
+            return
+        }
+
+        try {
+
+            const uploadResponse = await uploadZip({ file }).unwrap()
+            const deployResponse = await deployZipService({
+                name: projectName,
+                workspaceName: selectedWorkspace,
+                gitUrl: file.name,
+                type: 'frontend',
+                token: '',
+                branch: 'main',
+            }).unwrap()
+
+            console.log("Upload successful:", uploadResponse)
+            console.log("Project created:", deployResponse)
+
+            alert('Project created successfully!')
+            onClose()
+        } catch (err) {
+            console.log("Error during project creation:", err)
+            alert('An error occurred while creating the project.')
+        }
     }
 
     return (
@@ -51,8 +75,9 @@ export function ZipUploadForm({ onClose, selectedWorkspace }: ZipUploadFormProps
                     required
                 />
             </div>
-            <Button type="submit">Create Project</Button>
+            <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Processing..." : "Create Project"}
+            </Button>
         </form>
     )
 }
-
