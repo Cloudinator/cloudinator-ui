@@ -1,11 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
+import { useDropzone } from 'react-dropzone'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Progress } from "@/components/ui/progress"
 import { useUploadZipMutation } from "@/redux/api/file"
 import { useDeployZipServiceMutation } from "@/redux/api/projectApi"
+import { Upload, File, CheckCircle, AlertCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 interface ZipUploadFormProps {
     onClose: () => void
@@ -15,13 +19,23 @@ interface ZipUploadFormProps {
 export function ZipUploadForm({ onClose, selectedWorkspace }: ZipUploadFormProps) {
     const [file, setFile] = useState<File | null>(null)
     const [projectName, setProjectName] = useState('')
-    const [uploadZip, { isLoading }] = useUploadZipMutation()
+    const [uploadZip] = useUploadZipMutation()
     const [deployZipService] = useDeployZipServiceMutation()
+    const [isLoading, setIsLoading] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState(0)
+    const [step, setStep] = useState(1)
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = event.target.files?.[0] || null
-        setFile(selectedFile)
-    }
+    const onDrop = useCallback((acceptedFiles: File[]) => {
+        setFile(acceptedFiles[0])
+    }, [])
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: {
+            'application/zip': ['.zip']
+        },
+        multiple: false
+    })
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault()
@@ -31,53 +45,133 @@ export function ZipUploadForm({ onClose, selectedWorkspace }: ZipUploadFormProps
             return
         }
 
-        try {
+        setIsLoading(true)
+        setStep(2)
 
-            const uploadResponse = await uploadZip({ file }).unwrap()
-            const deployResponse = await deployZipService({
-                name: projectName,
-                workspaceName: selectedWorkspace,
-                gitUrl: file.name,
-                type: 'frontend',
-                token: '',
-                branch: 'main',
-            }).unwrap()
+        try {
+            const [uploadResponse, deployResponse] = await Promise.all([
+                uploadZip({
+                    file,
+                    onProgress: (progress: number) => setUploadProgress(progress)
+                }).unwrap(),
+                deployZipService({
+                    name: projectName,
+                    workspaceName: selectedWorkspace,
+                    gitUrl: file.name,
+                    type: 'frontend',
+                    token: '',
+                    branch: 'main',
+                }).unwrap()
+            ])
 
             console.log("Upload successful:", uploadResponse)
             console.log("Project created:", deployResponse)
 
-            alert('Project created successfully!')
-            onClose()
+            setStep(3)
         } catch (err) {
-            console.log("Error during project creation:", err)
-            alert('An error occurred while creating the project.')
+            console.error("Error during project creation and deployment:", err)
+            setStep(4)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const renderStep = () => {
+        switch (step) {
+            case 1:
+                return (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-4"
+                    >
+                        <div>
+                            <Label htmlFor="projectName">Project Name</Label>
+                            <Input
+                                id="projectName"
+                                value={projectName}
+                                onChange={(e) => setProjectName(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div
+                            {...getRootProps()}
+                            className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                                isDragActive ? 'border-primary bg-primary/10' : 'border-gray-300'
+                            }`}
+                        >
+                            <input {...getInputProps()} />
+                            {file ? (
+                                <div className="flex items-center justify-center space-x-2">
+                                    <File className="w-6 h-6 text-primary" />
+                                    <span>{file.name}</span>
+                                </div>
+                            ) : (
+                                <div>
+                                    <Upload className="w-12 h-12 mx-auto text-gray-400" />
+                                    <p>Drag & drop a ZIP file here, or click to select one</p>
+                                </div>
+                            )}
+                        </div>
+                        <Button
+                            type="submit"
+                            disabled={isLoading || !file || !projectName}
+                            className="w-full"
+                            onClick={handleSubmit}
+                        >
+                            Create and Deploy Project
+                        </Button>
+                    </motion.div>
+                )
+            case 2:
+                return (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-4"
+                    >
+                        <h3 className="text-lg font-semibold">Uploading and Deploying...</h3>
+                        <Progress value={uploadProgress} className="w-full" />
+                        <p className="text-sm text-gray-500">Please wait while we process your project.</p>
+                    </motion.div>
+                )
+            case 3:
+                return (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-4 text-center"
+                    >
+                        <CheckCircle className="w-16 h-16 mx-auto text-green-500" />
+                        <h3 className="text-xl font-semibold">Success!</h3>
+                        <p>Your project has been created and deployed successfully.</p>
+                        <Button onClick={onClose}>Close</Button>
+                    </motion.div>
+                )
+            case 4:
+                return (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-4 text-center"
+                    >
+                        <AlertCircle className="w-16 h-16 mx-auto text-red-500" />
+                        <h3 className="text-xl font-semibold">Error</h3>
+                        <p>An error occurred while creating and deploying the project.</p>
+                        <Button onClick={() => setStep(1)}>Try Again</Button>
+                    </motion.div>
+                )
         }
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <Label htmlFor="projectName">Project Name</Label>
-                <Input
-                    id="projectName"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                    required
-                />
-            </div>
-            <div>
-                <Label htmlFor="zipFile">Upload Zip File</Label>
-                <Input
-                    id="zipFile"
-                    type="file"
-                    accept=".zip"
-                    onChange={handleFileChange}
-                    required
-                />
-            </div>
-            <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Processing..." : "Create Project"}
-            </Button>
-        </form>
+        <div className="max-w-md mx-auto">
+            {renderStep()}
+        </div>
     )
 }
+
