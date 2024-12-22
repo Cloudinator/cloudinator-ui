@@ -20,6 +20,7 @@ const Base64Decoder: React.FC<Base64DecoderProps> = ({ base64String }) => {
             setDecodedText(decoded);
         } catch (error) {
             setDecodedText('Error decoding base64 string');
+            console.log(error)
         }
     };
 

@@ -74,9 +74,10 @@ type SpringInitializerProps = {
     onClose: () => void
     folder: string,
     springProjects: SpringProject[]
+    refetch: () => void
 }
 
-export function SpringInitializer({ isOpen, onClose,folder,springProjects }: SpringInitializerProps) {
+export function SpringInitializer({ isOpen, onClose,folder,springProjects,refetch }: SpringInitializerProps) {
     const [projectName, setProjectName] = useState('demo')
     const [groupId, setGroupId] = useState('com.example')
     const [selectedDependencies, setSelectedDependencies] = useState<Dependency[]>([])
@@ -124,9 +125,13 @@ export function SpringInitializer({ isOpen, onClose,folder,springProjects }: Spr
                 dependencies:selectedDependencies.map(dep => dep.id)
             });
             console.log(result);
+            refetch()
             onClose()
+
         }catch (e) {
             console.log(e);
+            refetch()
+            onClose()
         }
 
 

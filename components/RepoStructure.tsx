@@ -49,6 +49,7 @@ export default function RepoStructure() {
             })
             .catch(err => {
                 setError('Failed to load repository structure')
+                console.log(err)
                 setLoading(false)
             })
     }, [])
@@ -68,7 +69,7 @@ export default function RepoStructure() {
             </div>
             <div className="divide-y">
                 {structure.map((item, index) => (
-                    <FileNode key={item.sha} node={item} level={0} />
+                    <FileNode key={index} node={item} level={0} />
                 ))}
             </div>
         </div>

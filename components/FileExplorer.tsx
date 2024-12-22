@@ -11,6 +11,7 @@ interface FileNodeProps {
 }
 
 const FileNode: React.FC<FileNodeProps> = ({ node, currentPath }) => {
+    console.log(currentPath)
     const isDirectory = node.type === 'tree'
     const fileName = node.path.split('/').pop() || ''
     const href = `/${node.path}`

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Rocket, RotateCcw, StopCircle, ExternalLink, CheckCircle, Github, Code } from 'lucide-react'
 import {
     BuildNumber,
@@ -18,6 +17,8 @@ import {
 import WebsitePreview from "@/components/profiledashboard/deployment/WebsitePreview"
 import Link from "next/link"
 import RollbackModal from "@/components/profiledashboard/workspace/RollbackModal";
+import {StreamingLog} from "@/components/profiledashboard/workspace/StreamingLog";
+
 
 
 export type PropsParams = {
@@ -115,7 +116,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         return null
     }
 
-    const url = `https://${projects.subdomain}.psa-khmer.world`
+    const url = `https://${projects.subdomain}.cloudinator.cloud`
 
     return (
         <div className="container mx-auto px-4 py-6 max-w-6xl">
@@ -243,9 +244,9 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                                 <CardTitle>Build Logs</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-                                    {/* Add build logs here when available */}
-                                </ScrollArea>
+                                {buildNumber.length > 0 && (
+                                    <StreamingLog name={projectName} buildNumber={buildNumber[0].buildNumber} />
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>

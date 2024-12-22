@@ -5,7 +5,6 @@ import { useDropzone } from 'react-dropzone'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Progress } from "@/components/ui/progress"
 import { useUploadZipMutation } from "@/redux/api/file"
 import { useDeployZipServiceMutation } from "@/redux/api/projectApi"
 import { Upload, File, CheckCircle, AlertCircle } from 'lucide-react'
@@ -14,15 +13,15 @@ import { motion } from 'framer-motion'
 interface ZipUploadFormProps {
     onClose: () => void
     selectedWorkspace: string
+    data1 : () => void;
 }
 
-export function ZipUploadForm({ onClose, selectedWorkspace }: ZipUploadFormProps) {
+export function ZipUploadForm({ onClose, selectedWorkspace,data1 }: ZipUploadFormProps) {
     const [file, setFile] = useState<File | null>(null)
     const [projectName, setProjectName] = useState('')
     const [uploadZip] = useUploadZipMutation()
     const [deployZipService] = useDeployZipServiceMutation()
     const [isLoading, setIsLoading] = useState(false)
-    const [uploadProgress, setUploadProgress] = useState(0)
     const [step, setStep] = useState(1)
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -52,7 +51,6 @@ export function ZipUploadForm({ onClose, selectedWorkspace }: ZipUploadFormProps
             const [uploadResponse, deployResponse] = await Promise.all([
                 uploadZip({
                     file,
-                    onProgress: (progress: number) => setUploadProgress(progress)
                 }).unwrap(),
                 deployZipService({
                     name: projectName,
@@ -69,7 +67,8 @@ export function ZipUploadForm({ onClose, selectedWorkspace }: ZipUploadFormProps
 
             setStep(3)
         } catch (err) {
-            console.error("Error during project creation and deployment:", err)
+            console.log("Error during project creation and deployment:", err)
+            data1()
             setStep(4)
         } finally {
             setIsLoading(false)
@@ -133,7 +132,6 @@ export function ZipUploadForm({ onClose, selectedWorkspace }: ZipUploadFormProps
                         className="space-y-4"
                     >
                         <h3 className="text-lg font-semibold">Uploading and Deploying...</h3>
-                        <Progress value={uploadProgress} className="w-full" />
                         <p className="text-sm text-gray-500">Please wait while we process your project.</p>
                     </motion.div>
                 )

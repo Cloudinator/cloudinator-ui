@@ -45,6 +45,7 @@ const GitHubCodeViewer: React.FC<GitHubCodeViewerProps> = ({ owner, repo, path }
             const cleanStr = base64String.replace(/\n/g, '');
             return Buffer.from(cleanStr, 'base64').toString('utf-8');
         } catch (error) {
+            console.log(error)
             return 'Error decoding content';
         }
     };

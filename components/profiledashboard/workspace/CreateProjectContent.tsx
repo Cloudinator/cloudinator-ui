@@ -96,7 +96,7 @@ export default function CreateProjectContent({ onClose, selectedWorkspace, data1
                 case 'gitlab':
                     return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;
                 case 'zipUpload':
-                    return <ZipUploadForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;
+                    return <ZipUploadForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1}/>;
                 default:
                     return null;
             }
@@ -109,7 +109,7 @@ export default function CreateProjectContent({ onClose, selectedWorkspace, data1
                 case 'gitlab':
                     return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;;
                 case 'zipUpload':
-                    return <ZipUploadForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;
+                    return <ZipUploadForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1} />;
                 default:
                     return null;
             }

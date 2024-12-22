@@ -32,10 +32,10 @@ export function SubworkspaceForm({ onClose ,selectedWorkspace,data2}: Subworkspa
                 workspaceName: selectedWorkspace
             }).unwrap()
             console.log('Subworkspace service2 deployment created:', result)
-            onClose()
         } catch (error) {
             console.log('Failed to create subworkspace service2 deployment:', error)
             data2();
+            onClose()
         }
     }
 

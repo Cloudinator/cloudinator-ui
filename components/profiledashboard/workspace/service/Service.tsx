@@ -174,7 +174,7 @@ export default function Service() {
                 const result = await deleteSubWorkspace({ name: subWorkspaceToDelete.name}).unwrap();
                 console.log('Subworkspace deleted:', result);
             } catch (error) {
-                console.error('Failed to delete subworkspace:', error);
+                console.log('Failed to delete subworkspace:', error);
             } finally {
                 setIsDeleteModalOpen(false);
                 setSubWorkspaceToDelete(null);
@@ -184,8 +184,6 @@ export default function Service() {
             }
         }
     }
-
-
 
 
 
@@ -306,7 +304,7 @@ export default function Service() {
             <AnimatePresence>
                 <motion.div
                     layout
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mt-6"
                 >
                     {filteredServices.map((service, index) => (
                         <motion.div
@@ -317,7 +315,7 @@ export default function Service() {
                             transition={{duration: 0.3, delay: index * 0.1}}
                         >
                             <div
-                                className="p-6 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full cursor-pointer"
+                                className="p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between"
 
                             >
                                 <div className="flex items-center justify-between mb-4">
@@ -348,9 +346,9 @@ export default function Service() {
                                 </div>
                                 <div className="space-y-3 text-sm">
                                     <a href={service.gitUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
-                                        <GitBranch className="w-4 h-4 mr-2" />
-                                        {service.gitUrl}
-                                        <ExternalLink className="w-3 h-3 ml-1" />
+                                        <GitBranch className="w-4 h-4 mr-2 flex-shrink-0" />
+                                        <span className="truncate">{service.gitUrl}</span>
+                                        <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0" />
                                     </a>
                                     {service?.type === 'subworkspace' ? (
                                             <span className="text-gray-500">This is sub workspace where you can manage your microservices</span>
@@ -359,24 +357,25 @@ export default function Service() {
                                            rel="noopener noreferrer"
                                            className="flex items-center text-green-600 hover:underline"
                                            onClick={(e) => e.stopPropagation()}>
-                                            <Globe className="w-4 h-4 mr-2"/>
-                                            {service.subdomain}
-                                            <ExternalLink className="w-3 h-3 ml-1"/>
+                                            <Globe className="w-4 h-4 mr-2 flex-shrink-0"/>
+                                            <span className="truncate">{service.subdomain}</span>
+                                            <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0"/>
                                         </a>}
                                 </div>
-                                <div className="mt-4 flex justify-between items-center">
-                                    {service?.type === 'subworkspace' ? (
-                                            <span></span>
-                                        ):
+                                <div className="mt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                    {service?.type !== 'subworkspace' && (
                                         <Button variant="outline" size="sm"
-                                                className="text-purple-600 border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900"
+                                                className="text-purple-600 border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto"
                                                 onClick={(e) => e.preventDefault()}>
                                             <Share2 className="w-4 h-4 mr-2"/>
                                             Deploy
-                                        </Button>}
+                                        </Button>
+                                    )}
                                     <span className="text-xs text-gray-500 flex items-center">
-                                        <GitBranch className="w-3 h-3 mr-1" />
-                                        {service?.type === 'subworkspace' ? 'Sub Workspace' : service.branch}
+                                        <GitBranch className="w-3 h-3 mr-1 flex-shrink-0" />
+                                        <span className="truncate">
+                                            {service?.type === 'subworkspace' ? 'Sub Workspace' : service.branch}
+                                        </span>
                                     </span>
                                 </div>
                             </div>

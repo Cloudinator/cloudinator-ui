@@ -77,11 +77,11 @@ export default function SubWorkspacePage(props: PropsParams) {
         }
     }, [params]);
 
-    const { data } = useGetProjectsQuery({
+    const { data,refetch } = useGetProjectsQuery({
         subWorkspace: params?.name ?? '',
         page: 0,
         size: 10,
-    }) as unknown as { data: SpringProjectResponse };
+    }) as unknown as { data: SpringProjectResponse,refetch:()=>void };
 
     const springProjects = data?.results ?? [];
 
@@ -314,6 +314,7 @@ export default function SubWorkspacePage(props: PropsParams) {
                 onClose={() => setIsSpringInitializerOpen(false)}
                 folder={params?.name ?? ''}
                 springProjects={springProjects}
+                refetch={refetch}
             />
         </div>
     )
