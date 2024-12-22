@@ -2,7 +2,7 @@
 
 import {DatabaseBackup, Globe, Home, Package, Settings, Terminal} from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import {useParams, usePathname} from 'next/navigation'
 import { useState } from 'react';
 import {
     Sidebar,
@@ -16,24 +16,30 @@ import {
 } from '@/components/ui/sidebar'
 import Image from "next/image";
 import {useGetWorkspacesQuery} from "@/redux/api/projectApi";
-
-const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Workspace', href: '/workspace', icon: Terminal },
-    { name: 'Backup', href: '/backup', icon: DatabaseBackup },
-    { name: 'Domain', href: '/domain', icon: Globe },
-    { name: 'Deployment', href: '/deployment', icon: Package },
-    { name: 'Setting', href: '/setting/account', icon: Settings },
-]
+import {useGetMeQuery} from "@/redux/api/userApi";
 
 export function SidebarDashboardProfile() {
     const pathname = usePathname();
+    const { data: userData } = useGetMeQuery();
+
+    const params = useParams();
+    const username = params?.username || userData?.username;
+
     const [darkMode, setDarkMode] = useState(false); // State for dark mode
 
     const toggleDarkMode = () => {
         setDarkMode(prev => !prev);
         document.body.classList.toggle('dark', !darkMode); // Toggle dark class on body
     };
+
+    const navigation = [
+        { name: 'Dashboard', href: '/dashboard', icon: Home },
+        { name: 'Workspace', href: '/workspace', icon: Terminal },
+        { name: 'Backup', href: '/backup', icon: DatabaseBackup },
+        { name: 'Domain', href: '/domain', icon: Globe },
+        { name: 'Deployment', href: '/deployment', icon: Package },
+        { name: 'Setting', href: `/setting/${username}`, icon: Settings },
+    ]
 
     const {data} = useGetWorkspacesQuery();
 

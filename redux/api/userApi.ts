@@ -1,10 +1,11 @@
 import { createServiceApi } from './baseApi'
+import { UserUpdateRequest } from '@/types/user'
 
 interface User {
-    id: string
-    username: string
+    id: string,
+    username: string,
     email: string,
-    uuid: string
+    uuid: string,
 }
 
 const identityApi = createServiceApi('identity')
@@ -19,24 +20,23 @@ export const userApi = identityApi.injectEndpoints({
             query: ({ uuid }) => `api/v1/users/${uuid}`,
         }),
 
-        updateUser: builder.mutation<User, { id: string, body: Partial<User> }>({
-            query: ({ id, body }) => ({
+        updateUserByUuid: builder.mutation<User, { id: string, userUpdateRequest: UserUpdateRequest }>({
+            query: ({ id, userUpdateRequest }) => ({
                 url: `api/v1/users/${id}`,
-                method: 'PATCH',
-                body: { ...body },
+                method: 'PUT',
+                body: userUpdateRequest,
             }),
         }),
 
-
-        updateMe: builder.mutation<User, Partial<User>>({
-            query: (body) => ({
-                url: 'api/v1/users/me',
+        updateUserByUsername: builder.mutation<void, { username: string , userUpdateRequest: UserUpdateRequest }>({
+            query: ({ username, userUpdateRequest }) => ({
+                url: `api/v1/users/${username}`,
                 method: 'PATCH',
-                body,
+                body: {username, userUpdateRequest},
             }),
         }),
     }),
 })
 
-export const { useGetMeQuery, useUpdateMeMutation,useGetAllUsersByUuidQuery,useUpdateUserMutation } = userApi
+export const { useGetMeQuery, useUpdateUserByUuidMutation, useUpdateUserByUsernameMutation, useGetAllUsersByUuidQuery } = userApi
 

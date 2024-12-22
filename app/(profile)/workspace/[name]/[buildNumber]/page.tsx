@@ -32,7 +32,7 @@ const LogPage = (props: PropsParams) => {
         if (!params) return;
 
         const { name, buildNumber } = params;
-        const url = `http://localhost:8085/api/v1/jenkins/stream-log/${name}/${buildNumber}`
+        const url = `http://34.87.156.153:8085/api/v1/jenkins/stream-log/${name}/${buildNumber}`
         console.log(`Connecting to: ${url}`)
 
         eventSourceRef.current = new EventSource(url)

@@ -35,7 +35,7 @@ const NavBarHomePage = () => {
     const navItems = [
         { path: "/", label: "Home" },
         { path: "/service", label: "Service" },
-        { path: "https://cloudinator-doc-vercel.vercel.app/", label: "Document" },
+        { path: "https://cloudinator-document.soben.me", label: "Document" },
         { path: "/start-building", label: "Start Building" },
         { path: "/about", label: "About" },
     ];
@@ -51,12 +51,15 @@ const NavBarHomePage = () => {
 
         if (user && !error) {
             return (
-                <Button
+                <>
+                    <Button
                     asChild
                     className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
+                    >
                     <Link href="/dashboard">DASHBOARD</Link>
-                </Button>
+                    </Button>
+                </>
+            
             );
         }
 
@@ -66,14 +69,14 @@ const NavBarHomePage = () => {
                     asChild
                     className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
-                    <Link href="/sign-up">SIGN UP</Link>
+                    <Link href={"/sign-up"}>SIGN UP</Link>
                 </Button>
                 <Button
                     asChild
                     variant="outline"
                     className="border-purple-600 text-purple-600 hover:bg-purple-100 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900"
                 >
-                    <Link href={"/oauth2/authorization/devops"}>SIGN IN</Link>
+                    <Link href={"http://localhost:8080/"}>SIGN IN</Link>
                 </Button>
             </>
         );

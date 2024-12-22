@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
+import { AnimatedGradientText } from "../AnimatedGradientText"
 
 export default function JoinTeamSection() {
     return (
@@ -10,9 +11,9 @@ export default function JoinTeamSection() {
 
             <div className="container relative px-4 py-24 mx-auto">
                 <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-8">
-                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-purple-500">
+                    <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                         Join Our Team
-                    </h2>
+                    </AnimatedGradientText>
 
                     <p className="text-muted-foreground text-lg max-w-[600px]">
                         We are always looking for talented individuals who are passionate about DevOps and want to make a difference. Check out our open positions and join us in shaping the future of software deployment.

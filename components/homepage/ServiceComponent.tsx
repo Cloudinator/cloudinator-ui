@@ -4,15 +4,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Service from "@/components/animation/Service";
 import {cdAnimation, cloudAnimation, deployAnimation, fadeInUp, infraAnimation} from "@/components/animation/animate";
+import { AnimatedGradientText } from '../AnimatedGradientText';
 
 const ServiceComponent: React.FC = () => {
     return (
         <div className="container mx-auto px-4">
             <section className="py-12 md:py-24">
                 <motion.div className="text-center space-y-6 max-w-3xl mx-auto" {...fadeInUp}>
-                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <AnimatedGradientText className="text-4xl md:text-5xl font-extrabold mb-4 inline-block">
                         Explore Our Services
-                    </h1>
+                    </AnimatedGradientText>
                 </motion.div>
             </section>
 

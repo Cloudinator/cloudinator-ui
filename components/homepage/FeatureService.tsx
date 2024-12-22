@@ -4,6 +4,7 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Cloud, Code, GitBranch, Layers, Zap } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { AnimatedGradientText } from '../AnimatedGradientText'
 
 type Feature = {
     title: string;
@@ -46,10 +47,12 @@ export default function FeatureService() {
                     transition={{ duration: 0.6 }}
                     className="mb-16"
                 >
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text inline-block">
+                    <div className="text-center mb-16">                   
+
+                        <AnimatedGradientText className="text-4xl md:text-5xl font-extrabold mb-4 inline-block">
                             Explore The Benefits of Our Features
-                        </h2>
+                        </AnimatedGradientText>
+                        
                         <p className="text-muted-foreground max-w-3xl mx-auto text-lg dark:text-gray-400">
                             Unique and powerful suite of software to run your entire business, brought to you by a company with the long-term
                             vision to transform the way you work.

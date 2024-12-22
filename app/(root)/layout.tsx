@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import "../globals.css";
 
 import NavBarHomePage from "@/components/navbar/NavBarHomePage";
@@ -7,11 +8,11 @@ import ScrollProgressBar from "@/components/ScrollProgressBar";
 import TutorialPopup from "@/components/TutorialPopup";
 
 import { Poppins } from 'next/font/google';
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import StoreProvider from "@/app/StoreProvider";
 import Footer from "@/components/footer/Footer";
-import {ThemeProvider} from "next-themes";
-import {RouteTransition} from "@/components/RouteTransition";
+import { ThemeProvider } from "next-themes";
+import { RouteTransition } from "@/components/RouteTransition";
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -19,41 +20,44 @@ const poppins = Poppins({
     variable: '--font-poppins',
 });
 
-export const metadata: Metadata = {
-    title: "Cloudinator",
-    description: "Cloudinator Application",
-};
-
 export default function HomeLayout({
-                                       children,
-                                   }: Readonly<{
+    children,
+}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body
-                className={poppins.className}
-            >
+            <body className={poppins.className}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <StoreProvider>
-                        <AuthProvider>
-                            <NavBarHomePage/>
+                    <AuthProvider> {/* Move AuthProvider here */}
+                        <StoreProvider>
+                            <NavBarHomePage />
                             <ScrollProgressBar />
-                                <RouteTransition >
+                                <RouteTransition>
                                     {children}
                                 </RouteTransition>
                             <BackToTopButton />
                             <Footer />
-                            <TutorialPopup />
-                        </AuthProvider>
-                    </StoreProvider>
+                            <InnerContent /> 
+                        </StoreProvider>
+                    </AuthProvider>
                 </ThemeProvider>
             </body>
         </html>
     );
 }
+
+// Separate InnerContent component to access useAuth
+const InnerContent = () => {
+    const { user, loading } = useAuth();
+    return (
+        <>
+            {!loading && user && <TutorialPopup />}
+        </>
+    );
+};
