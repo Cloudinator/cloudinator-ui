@@ -6,7 +6,7 @@
     <img src="/public/logo.png" alt="Logo" width="100" height="100">
   </a>
 
-  <img src="/public/homepage.jpg" alt="Banner" width="1000" height="200">
+  <img src="/public/homepage.jpg" alt="Banner" width="1000" height="1000">
 
 
   <p align="center">
