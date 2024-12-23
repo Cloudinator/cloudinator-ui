@@ -6,7 +6,7 @@
     <img src="/public/logo.png" alt="Logo" width="100" height="100">
   </a>
 
-  <img src="/public/homepage.jpg" alt="Banner" width="1000" height="400">
+  <img src="/public/homepage.jpg" alt="Banner" width="1000" height="500">
 
 
   <p align="center">
@@ -34,6 +34,22 @@
 ---
 
 ## 🌐 Public Pages
+
+### Home Page
+Comprehensive overview of your website
+![Home Preview](/public/homepage.jpg)
+
+### Service Page
+Comprehensive overview of your website
+![Service Preview](/public/servicepage.jpg)
+
+### Documentation Page
+Comprehensive overview of your website
+![Documentation Preview](/public/docpage.jpg)
+
+### Start-Building Page
+Comprehensive overview of your website
+![Start-Building Preview](/public/start-building.jpg)
 
 | Page | Description | URL |
 |------|-------------|-----|
@@ -102,30 +118,39 @@ We’d love to hear from you! Feel free to reach out to any of the contributors:
 
 ## 👥 Our Team
 
-<div class="team-grid">
+<table>
+<tr>
+<td align="center">
+<a href="mailto:vannraruos@gmail.com">
+<img src="/public/sovanra.jpg" width="140px;" height="140px" alt="Developer"/><br />
+<sub><b>Ruos Sovanra</b></sub>
+</a>
+</td>
+<td align="center">
+<a href="mailto:sobenkh35@gmail.com">
+<img src="/public/ben.png" width="140px;" height="140px" alt="Developer"/><br />
+<sub><b>On Soben</b></sub>
+</a>
+</td>
+<td align="center">
+<a href="mailto:vathanaksol1605@gmail.com">
+<img src="/public/vathanak.jpg" width="140px;" height="140px" alt="Developer"/><br />
+<sub><b>Sol Vathanak</b></sub>
+</a>
+</td>
+<td align="center">
+<a href="mailto:povsokny2021@gmail.com">
+<img src="/public/sokny.jpg" width="140px;" height="140px" alt="Developer"/><br />
+<sub><b>Pov Sokny</b></sub>
+</a>
+</td>
+<td align="center">
+<a href="mailto:lajr182@gmail.com">
+<img src="/public/makara.jpg" width="140px;" height="140px" alt="Developer"/><br />
+<sub><b>Pov Sokny</b></sub>
+</a>
+</td>
+</tr>
+</table>
 
-### Core Team
-
-| <img src="/public/sovanra.jpg" alt="Profile" class="rounded-full" /> | **Ruos Sovanra** |
-|:---:|:---|
-| DevOps Engineer | [vannraruos@gmail.com](mailto:vannraruos@gmail.com) |
-
-| <img src="/public/ben.png" alt="Profile" class="rounded-full" /> | **On Soben** |
-|:---:|:---|
-| DevOps Engineer | [sobenkh35@gmail.com](mailto:sobenkh35@gmail.com) |
-
-| <img src="/public/vathanak.jpg" alt="Profile" class="rounded-full" /> | **Sol Vathanak** |
-|:---:|:---|
-| DevOps Engineer | [vathanaksol1605@gmail.com](mailto:vathanaksol1605@gmail.com) |
-
-| <img src="/public/sokny.jpg" alt="Profile" class="rounded-full" /> | **Pov Sokny** |
-|:---:|:---|
-| DevOps Engineer | [povsokny2021@gmail.com](mailto:povsokny2021@gmail.com) |
-
-| <img src="/public/makara.jpg" alt="Profile" class="rounded-full" /> | **Mom Makara** |
-|:---:|:---|
-| DevOps Engineer | [lajr182@gmail.com](mailto:lajr182@gmail.com) |
-
-</div>
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p> ```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
