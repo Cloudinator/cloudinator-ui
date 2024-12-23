@@ -43,6 +43,18 @@ Comprehensive overview of your website
 Comprehensive overview of your website
 ![Service Preview](/public/servicepage.jpg)
 
+### Documentation Page
+Comprehensive overview of your website
+![Home Preview](/public/docpage.jpg)
+
+### Start-Building Page
+Comprehensive overview of your website
+![Service Preview](/public/start-building.jpg)
+
+### About Page
+Comprehensive overview of your website
+![Service Preview](/public/aboutpage.jpg)
+
 | Page | Description | URL |
 |------|-------------|-----|
 | Home | Landing page | [Visit →](https://cloudinator-ui.cloudinator.cloud/) |
