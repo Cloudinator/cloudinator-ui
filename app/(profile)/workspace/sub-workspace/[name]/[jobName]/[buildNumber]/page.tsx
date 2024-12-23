@@ -32,7 +32,7 @@ const LogPage = (props: PropsParams) => {
         if (!params) return;
 
         const { name, buildNumber,jobName } = params;
-        const url = `http://34.87.156.153:8085/api/v1/jenkins/stream-log/folder/${name}/${jobName}/${buildNumber}`
+        const url = `https://stream.psa-khmer.world/api/v1/jenkins/stream-log/folder/${name}/${jobName}/${buildNumber}`
         console.log(`Connecting to: ${url}`)
 
         eventSourceRef.current = new EventSource(url)

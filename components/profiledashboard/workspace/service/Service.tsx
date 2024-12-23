@@ -353,7 +353,7 @@ export default function Service() {
                                     {service?.type === 'subworkspace' ? (
                                             <span className="text-gray-500">This is sub workspace where you can manage your microservices</span>
                                         ):
-                                        <a href={`https://${service.subdomain}`} target="_blank"
+                                        <a href={`https://${service.subdomain}.cloudinator.cloud`} target="_blank"
                                            rel="noopener noreferrer"
                                            className="flex items-center text-green-600 hover:underline"
                                            onClick={(e) => e.stopPropagation()}>
