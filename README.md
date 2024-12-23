@@ -3,7 +3,7 @@
 # 🚀 Cloudinator
 
   <a href="https://github.com/Cloudinator">
-    <img src="/public/logo.png" alt="Logo" width="200" height="100">
+    <img src="/public/logo.png" alt="Logo" width="100" height="100">
   </a>
 
   <p align="center">
@@ -103,25 +103,23 @@ We’d love to hear from you! Feel free to reach out to any of the contributors:
 
 ### Core Team
 
-| <img src="/sovanra.jpg" alt="Profile" class="rounded-full" /> | **Ruos Sovanra** |
+| <img src="/public/sovanra.jpg" alt="Profile" class="rounded-full" /> | **Ruos Sovanra** |
 |:---:|:---|
 | DevOps Engineer | [vannraruos@gmail.com](mailto:vannraruos@gmail.com) |
 
-| <img src="/ben.png" alt="Profile" class="rounded-full" /> | **On Soben** |
+| <img src="/public/ben.png" alt="Profile" class="rounded-full" /> | **On Soben** |
 |:---:|:---|
 | DevOps Engineer | [sobenkh35@gmail.com](mailto:sobenkh35@gmail.com) |
 
-### Development Team
-
-| <img src="/vathanak.jpg" alt="Profile" class="rounded-full" /> | **Sol Vathanak** |
+| <img src="/public/vathanak.jpg" alt="Profile" class="rounded-full" /> | **Sol Vathanak** |
 |:---:|:---|
 | DevOps Engineer | [vathanaksol1605@gmail.com](mailto:vathanaksol1605@gmail.com) |
 
-| <img src="/sokny.jpg" alt="Profile" class="rounded-full" /> | **Pov Sokny** |
+| <img src="/public/sokny.jpg" alt="Profile" class="rounded-full" /> | **Pov Sokny** |
 |:---:|:---|
 | DevOps Engineer | [povsokny2021@gmail.com](mailto:povsokny2021@gmail.com) |
 
-| <img src="/makara.jpg" alt="Profile" class="rounded-full" /> | **Mom Makara** |
+| <img src="/public/makara.jpg" alt="Profile" class="rounded-full" /> | **Mom Makara** |
 |:---:|:---|
 | DevOps Engineer | [lajr182@gmail.com](mailto:lajr182@gmail.com) |
 
