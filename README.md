@@ -123,75 +123,28 @@ We’d love to hear from you! Feel free to reach out to any of the contributors:
 
 ### Core Team
 
-| <img src="/placeholder.svg?height=100&width=100" alt="Profile" class="rounded-full" /> | **Ruos Sovanra** |
+| <img src="/sovanra.jpg" alt="Profile" class="rounded-full" /> | **Ruos Sovanra** |
 |:---:|:---|
-| Lead Developer | [vannraruos@gmail.com](mailto:vannraruos@gmail.com) |
+| DevOps Engineer | [vannraruos@gmail.com](mailto:vannraruos@gmail.com) |
 
-| <img src="/placeholder.svg?height=100&width=100" alt="Profile" class="rounded-full" /> | **On Soben** |
+| <img src="/ben.png" alt="Profile" class="rounded-full" /> | **On Soben** |
 |:---:|:---|
-| Frontend Developer | [sobenkh35@gmail.com](mailto:sobenkh35@gmail.com) |
+| DevOps Engineer | [sobenkh35@gmail.com](mailto:sobenkh35@gmail.com) |
 
 ### Development Team
 
-| <img src="/placeholder.svg?height=100&width=100" alt="Profile" class="rounded-full" /> | **Sol Vathanak** |
+| <img src="/vathanak.jpg" alt="Profile" class="rounded-full" /> | **Sol Vathanak** |
 |:---:|:---|
-| UI/UX Designer | [vathanaksol1605@gmail.com](mailto:vathanaksol1605@gmail.com) |
+| DevOps Engineer | [vathanaksol1605@gmail.com](mailto:vathanaksol1605@gmail.com) |
 
-| <img src="/placeholder.svg?height=100&width=100" alt="Profile" class="rounded-full" /> | **Pov Sokny** |
+| <img src="/sokny.jpg" alt="Profile" class="rounded-full" /> | **Pov Sokny** |
 |:---:|:---|
-| Full Stack Developer | [povsokny2021@gmail.com](mailto:povsokny2021@gmail.com) |
+| DevOps Engineer | [povsokny2021@gmail.com](mailto:povsokny2021@gmail.com) |
 
-| <img src="/placeholder.svg?height=100&width=100" alt="Profile" class="rounded-full" /> | **Mom Makara** |
+| <img src="/makara.jpg" alt="Profile" class="rounded-full" /> | **Mom Makara** |
 |:---:|:---|
-| Backend Developer | [lajr182@gmail.com](mailto:lajr182@gmail.com) |
+| DevOps Engineer | [lajr182@gmail.com](mailto:lajr182@gmail.com) |
 
 </div>
 
-<style>
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 2rem 0;
-}
-
-.team-grid table {
-  width: 100%;
-  margin-bottom: 2rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.team-grid td, .team-grid th {
-  padding: 1rem;
-  text-align: center;
-}
-
-.team-grid img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin: 0 auto;
-}
-
-.team-grid a {
-  color: #0366d6;
-  text-decoration: none;
-}
-
-.team-grid a:hover {
-  text-decoration: underline;
-}
-</style>
-
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p> ```
-
-Improvements Made:
-Added section breaks for clarity.
-Organized content using clean headings and bullet points.
-Updated links and email lists into proper tables and styled lists.
-Used markdown best practices for easy readability.
-You can copy-paste this directly into your README file for a polished look! 🚀
