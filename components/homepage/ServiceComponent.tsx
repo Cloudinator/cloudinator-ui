@@ -23,8 +23,8 @@ const ServiceComponent: React.FC = () => {
                         title="Full Service Deployment"
                         description="Say goodbye to manual and error-prone deployment processes. Our Service automates the deployment of frontend code, backend service, database, and all other components of your application stack."
                         animationOptions={deployAnimation}
-                        gradientFrom="blue-600"
-                        gradientTo="purple-600"
+                        gradientFrom="purple-600"
+                        gradientTo="pink-600"
                     />
 
                     <Service
@@ -40,16 +40,16 @@ const ServiceComponent: React.FC = () => {
                         title="Scalable Infrastructure"
                         description="Build and manage your applications on our cutting-edge cloud infrastructure. Designed for high performance and seamless scalability, our platform adapts to your needs, from startups to enterprise-level operations."
                         animationOptions={infraAnimation}
-                        gradientFrom="green-600"
-                        gradientTo="blue-600"
+                        gradientFrom="purple-600"
+                        gradientTo="pink-600"
                     />
 
                     <Service
                         title="24/7 Monitoring & Support"
                         description="Rest easy knowing your applications are in good hands. Our round-the-clock monitoring and expert support team ensure optimal performance, quick issue resolution, and proactive maintenance for your peace of mind."
                         animationOptions={cloudAnimation}
-                        gradientFrom="red-600"
-                        gradientTo="yellow-600"
+                        gradientFrom="purple-600"
+                        gradientTo="pink-600"
                         reverse
                     />
                 </div>
