@@ -35,6 +35,14 @@
 
 ## 🌐 Public Pages
 
+### Home Page
+Comprehensive overview of your website
+![Home Preview](/public/homepage.jpg)
+
+### Service Page
+Comprehensive overview of your website
+![Service Preview](/public/servicepage.jpg)
+
 | Page | Description | URL |
 |------|-------------|-----|
 | Home | Landing page | [Visit →](https://cloudinator-ui.cloudinator.cloud/) |
