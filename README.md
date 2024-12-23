@@ -3,7 +3,7 @@
 # 🚀 Cloudinator
 
   <a href="https://github.com/Cloudinator">
-    <img src="logo.png" alt="Logo" width="200" height="100">
+    <img src="/public/logo.png" alt="Logo" width="200" height="100">
   </a>
 
   <p align="center">
@@ -16,27 +16,19 @@
   </p>
 
   <div align="center">
+    <img src="https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js">
+    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React">
     <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+    <img src="https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E" alt="JavaScript">
+    <img src="https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white" alt="Redux">
+    <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
+    <img src="https://img.shields.io/badge/CSS-239120?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS">
     <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white" alt="Java">
-    <!-- Add more relevant tech stack badges -->
+    <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white" alt="Spring">
   </div>
 </div>
 
 ---
-
-## 📑 Table of Contents
-
-<details>
-<summary>Click to expand</summary>
-
-- [Public Pages](#public-pages)
-- [User Dashboard](#user-dashboard)
-- [About The Project](#about-the-project)
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Contact](#contact)
-
-</details>
 
 ## 🌐 Public Pages
 
