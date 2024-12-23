@@ -3,7 +3,7 @@
 # 🚀 Cloudinator
 
   <a href="https://github.com/Cloudinator">
-    <img src="/logo.png" alt="Logo" width="200" height="100">
+    <img src="logo.png" alt="Logo" width="200" height="100">
   </a>
 
   <p align="center">
@@ -13,10 +13,6 @@
     <br />
     <br />
     <a href="https://cloudinator-ui.cloudinator.cloud/">View Demo</a>
-    ·
-    <a href="https://github.com/Cloudinator/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/Cloudinator/issues">Request Feature</a>
   </p>
 
   <div align="center">
@@ -50,6 +46,7 @@
 | Service | Our offerings | [Visit →](https://cloudinator-ui.cloudinator.cloud/service) |
 | Documentation | User guides & API docs | [Visit →](https://cloudinator-document.soben.me/) |
 | Start Building | Quick start guide | [Visit →](https://cloudinator-ui.cloudinator.cloud/start-building) |
+| About | Core Developer | [Visit →](https://cloudinator-ui.cloudinator.cloud/about) |
 
 ## 🎯 User Dashboard
 
@@ -57,6 +54,8 @@
 |---------|-------------|-----|
 | Dashboard | Overview & analytics | [Visit →](https://dynamic.psa-khmer.world/dashboard) |
 | Workspace | Project management | [Visit →](https://dynamic.psa-khmer.world/workspace) |
+| Backup | Backup Management | [Visit →](https://dynamic.psa-khmer.world/backup) |
+| Domain | Deployment controls | [Visit →](https://dynamic.psa-khmer.world/domain) |
 | Deployment | Deployment controls | [Visit →](https://dynamic.psa-khmer.world/deployment) |
 | Settings | Account configuration | [Visit →](https://dynamic.psa-khmer.world/setting) |
 
@@ -99,20 +98,9 @@ Navigate to http://localhost:3000 to see the result.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-Deployment
+<a href="https://cloudinator-ui.cloudinator.cloud/">Cloudinator</a>
 Check out the live demo.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-Page URLs
-Here are the accessible pages:
-
-Home Page
-Service
-Document
-Start Building
-About
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 Contact Us
 We’d love to hear from you! Feel free to reach out to any of the contributors:
