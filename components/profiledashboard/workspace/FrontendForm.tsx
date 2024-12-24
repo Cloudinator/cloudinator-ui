@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import {AutomationToggle, FormField} from './FormField'
+import { AutomationToggle, FormField } from './FormField'
 
 import { Button } from "@/components/ui/button"
 import { useCreateServiceDeploymentMutation } from "@/redux/api/projectApi"
@@ -10,11 +10,12 @@ import { Code, GitBranch, Globe } from 'lucide-react'
 interface FrontendFormProps {
     onClose: () => void
     selectedWorkspace: string
-    data1 : () => void;
+    data1: () => void
 }
 
-export function FrontendForm({ onClose,selectedWorkspace ,data1}: FrontendFormProps) {
+export function FrontendForm({ onClose, selectedWorkspace, data1 }: FrontendFormProps) {
     const [createServiceDeployment] = useCreateServiceDeploymentMutation()
+
     const [projectFields, setProjectFields] = useState({
         name: '',
         branch: '',
@@ -22,16 +23,23 @@ export function FrontendForm({ onClose,selectedWorkspace ,data1}: FrontendFormPr
         subdomain: '',
         automate: false,
         token: '',
-        type: 'frontend'
+        type: 'frontend',
     })
 
-
+    // Helper function to sanitize input for all fields
+    const sanitizeInput = (value: string) => {
+        return value.replace(/\s+/g, '-').toLowerCase() // Replace spaces with hyphens and make lowercase
+    }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target
-        setProjectFields(prev => ({
+
+        // Apply sanitization to all fields
+        const sanitizedValue = sanitizeInput(value)
+
+        setProjectFields((prev) => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: type === 'checkbox' ? checked : sanitizedValue,
         }))
     }
 
@@ -40,37 +48,68 @@ export function FrontendForm({ onClose,selectedWorkspace ,data1}: FrontendFormPr
         try {
             const result = await createServiceDeployment({
                 name: projectFields.name,
-                gitUrl:projectFields.gitUrl,
-                branch:projectFields.branch,
-                subdomain:projectFields.subdomain,
+                gitUrl: projectFields.gitUrl,
+                branch: projectFields.branch,
+                subdomain: projectFields.subdomain,
                 workspaceName: selectedWorkspace,
                 token: projectFields.token,
-                type: 'frontend'
+                type: 'frontend',
             }).unwrap()
-            console.log('Frontend service2 deployment created:', result)
 
+            console.log('Frontend service deployment created:', result)
         } catch (error) {
-            console.log('Failed to create frontend service2 deployment:', error)
+            console.log('Failed to create frontend service deployment:', error)
             data1()
             onClose()
         }
     }
 
-
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField icon={Code} label="Project Name" name="name" value={projectFields.name} onChange={handleInputChange} />
-            <FormField icon={GitBranch} label="Branch" name="branch" value={projectFields.branch} onChange={handleInputChange} />
-            <FormField icon={Globe} label="Git URL" name="gitUrl" value={projectFields.gitUrl} onChange={handleInputChange} />
-            <FormField icon={Globe} label="Subdomain" name="subdomain" value={projectFields.subdomain} onChange={handleInputChange} />
+            <FormField
+                icon={Code}
+                label="Project Name"
+                name="name"
+                value={projectFields.name}
+                onChange={handleInputChange}
+            />
+
+            <FormField
+                icon={GitBranch}
+                label="Branch"
+                name="branch"
+                value={projectFields.branch}
+                onChange={handleInputChange}
+            />
+
+            <FormField
+                icon={Globe}
+                label="Git URL"
+                name="gitUrl"
+                value={projectFields.gitUrl}
+                onChange={handleInputChange}
+            />
+
+            <FormField
+                icon={Globe}
+                label="Subdomain"
+                name="subdomain"
+                value={projectFields.subdomain}
+                onChange={handleInputChange}
+            />
+
             <AutomationToggle
                 checked={projectFields.automate}
-                onCheckedChange={(checked) => setProjectFields(prev => ({ ...prev, automate: checked }))}
+                onCheckedChange={(checked) =>
+                    setProjectFields((prev) => ({ ...prev, automate: checked }))
+                }
                 token={projectFields.token}
                 onTokenChange={handleInputChange}
             />
-            <Button type="submit" className="w-full">Create Frontend Project</Button>
+
+            <Button type="submit" className="w-full">
+                Create Frontend Project
+            </Button>
         </form>
     )
 }
-

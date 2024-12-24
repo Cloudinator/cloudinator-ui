@@ -69,7 +69,7 @@ const NavBarHomePage = () => {
                     asChild
                     className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
-                    <Link href={"/sign-up"}>SIGN UP</Link>
+                    <Link href={"/identity/register"}>SIGN UP</Link>
                 </Button>
                 <Button
                     asChild

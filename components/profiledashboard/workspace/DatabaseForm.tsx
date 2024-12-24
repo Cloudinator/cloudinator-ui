@@ -5,7 +5,6 @@ import { FormField } from './FormField'
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-
 import { Database, User, Lock } from 'lucide-react'
 
 interface DatabaseFormProps {
@@ -13,7 +12,6 @@ interface DatabaseFormProps {
 }
 
 export function DatabaseForm({ onClose }: DatabaseFormProps) {
-    // const [createServiceDeployment] = useCreateServiceDeploymentMutation()
     const [projectFields, setProjectFields] = useState({
         dbname: '',
         dbuser: '',
@@ -21,29 +19,52 @@ export function DatabaseForm({ onClose }: DatabaseFormProps) {
         dbtype: ''
     })
 
+    // Helper function to sanitize input (replace spaces with hyphens)
+    const sanitizeInput = (value: string) => {
+        return value.replace(/\s+/g, '-').toLowerCase() // Replace spaces and convert to lowercase
+    }
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
-        setProjectFields(prev => ({ ...prev, [name]: value }))
+
+        // Sanitize the input for all fields
+        const sanitizedValue = sanitizeInput(value)
+
+        setProjectFields((prev) => ({ ...prev, [name]: sanitizedValue }))
     }
 
     const handleSelectChange = (value: string) => {
-        setProjectFields(prev => ({ ...prev, dbtype: value }))
+        // Sanitize the input for select field
+        const sanitizedValue = sanitizeInput(value)
+        setProjectFields((prev) => ({ ...prev, dbtype: sanitizedValue }))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            console.log('Database service2 deployment created:')
+            console.log('Database deployment created:', projectFields)
             onClose()
         } catch (error) {
-            console.error('Failed to create database service2 deployment:', error)
+            console.error('Failed to create database deployment:', error)
         }
     }
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField icon={Database} label="Database Name" name="dbname" value={projectFields.dbname} onChange={handleInputChange} />
-            <FormField icon={User} label="Database User" name="dbuser" value={projectFields.dbuser} onChange={handleInputChange} />
+            <FormField
+                icon={Database}
+                label="Database Name"
+                name="dbname"
+                value={projectFields.dbname}
+                onChange={handleInputChange}
+            />
+            <FormField
+                icon={User}
+                label="Database User"
+                name="dbuser"
+                value={projectFields.dbuser}
+                onChange={handleInputChange}
+            />
             <FormField
                 icon={Lock}
                 label="Database Password"
@@ -68,4 +89,3 @@ export function DatabaseForm({ onClose }: DatabaseFormProps) {
         </form>
     )
 }
-

@@ -282,23 +282,28 @@ export default function Service() {
                     </div>
                 </div>
                 <div className="mb-4">
-                    <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">Filter By:</h2>
+                    <h2 className="text-sm font-bold text-purple-500 dark:text-purple-500">Filter By:</h2>
                 </div>
                 <div className="flex flex-wrap gap-3">
                     {(['all', 'frontend', 'backend', 'database', 'subworkspace'] as const).map((type) => (
                         <Button
                             key={type}
                             variant={selectedType === type ? "default" : "outline"}
-                            className={`bg-white dark:bg-gray-800 capitalize ${
+                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:bg-gray-100 focus:ring-500 transition-all ease-in-out ${
                                 selectedType === type ? 'ring-2 ring-purple-500' : ''
                             }`}
                             onClick={() => setSelectedType(type)}
                         >
-                            {type !== 'all' && getServiceIcon(type)}
-                            <span className="ml-2">{type}</span>
+                            <div className="flex items-center">
+                                <span className="inline-block w-5 h-5">
+                                    {type !== 'all' && getServiceIcon(type)}
+                                </span>
+                                <span className="ml-2">{type}</span>
+                            </div>
                         </Button>
                     ))}
                 </div>
+
             </motion.div>
 
             <AnimatePresence>
@@ -351,7 +356,7 @@ export default function Service() {
                                         <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0" />
                                     </a>
                                     {service?.type === 'subworkspace' ? (
-                                            <span className="text-gray-500">This is sub workspace where you can manage your microservices</span>
+                                            <span className="text-gray-500 dark:text-gray-300">This is sub workspace where you can manage your microservices</span>
                                         ):
                                         <a href={`https://${service.subdomain}.cloudinator.cloud`} target="_blank"
                                            rel="noopener noreferrer"

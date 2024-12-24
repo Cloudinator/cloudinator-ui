@@ -11,95 +11,40 @@ import { Leaf, Search, X, Plus, Check } from 'lucide-react'
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import {SpringProject, useCreateProjectMutation} from "@/redux/api/projectApi";
+import {SpringProject, useCreateProjectMutation, useGetMetadataQuery} from "@/redux/api/projectApi"
 
-type Dependency = {
-    id: string
-    name: string
-    description: string
-    category: string
+interface Dependency {
+    name?: string
+    description?: string
+    artifactId: string
+    groupId: string
+    scope: string
 }
 
-const dependencies: Dependency[] = [
-    {
-        id: 'web',
-        name: 'Spring Web',
-        description: 'Build web, including RESTful, applications using Spring MVC',
-        category: 'Web'
-    },
-    {
-        id: 'data-jpa',
-        name: 'Spring Data JPA',
-        description: 'Persist data in SQL stores with Java Persistence API using Spring Data and Hibernate',
-        category: 'SQL'
-    },
-    {
-        id: 'security',
-        name: 'Spring Security',
-        description: 'Highly customizable authentication and access-control framework',
-        category: 'Security'
-    },
-    {
-        id: 'devtools',
-        name: 'Spring Boot DevTools',
-        description: 'Provides fast application restarts, LiveReload, and configurations for enhanced development experience',
-        category: 'Developer Tools'
-    },
-    {
-        id: 'actuator',
-        name: 'Spring Boot Actuator',
-        description: 'Supports built in (or custom) endpoints that let you monitor and manage your application',
-        category: 'Ops'
-    },
-    {
-        id: 'websocket',
-        name: 'WebSocket',
-        description: 'Build WebSocket applications with SockJS and STOMP',
-        category: 'Web'
-    },
-    { id: 'validation', name: 'Validation', description: 'Bean Validation with Hibernate validator', category: 'Web' },
-    { id: 'mongodb', name: 'MongoDB', description: 'Store data in flexible, JSON-like documents', category: 'NoSQL' },
-    { id: 'redis', name: 'Redis', description: 'Advanced key-value store', category: 'NoSQL' },
-    {
-        id: 'postgresql',
-        name: 'PostgreSQL Driver',
-        description: 'A JDBC and R2DBC driver that allows Java programs to connect to a PostgreSQL database',
-        category: 'SQL'
-    },
-]
-
-
-type SpringInitializerProps = {
+interface SpringInitializerProps {
     isOpen: boolean
     onClose: () => void
-    folder: string,
+    folder: string
     springProjects: SpringProject[]
     refetch: () => void
 }
 
-export function SpringInitializer({ isOpen, onClose,folder,springProjects,refetch }: SpringInitializerProps) {
+interface MetadataResponse {
+    dependencies: Record<string, Dependency>;
+}
+
+export function SpringInitializer({ isOpen, onClose, folder, springProjects, refetch }: SpringInitializerProps) {
     const [projectName, setProjectName] = useState('demo')
     const [groupId, setGroupId] = useState('com.example')
-    const [selectedDependencies, setSelectedDependencies] = useState<Dependency[]>([])
+    const [selectedDependencies, setSelectedDependencies] = useState<string[]>([])
     const [selectedProjectTypes, setSelectedProjectTypes] = useState<string[]>([])
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
-    const [creatProject] = useCreateProjectMutation();
+    const [createProject] = useCreateProjectMutation()
     const [openProjectTypes, setOpenProjectTypes] = useState(false)
+    const [dependencies, setDependencies] = useState<Record<string, Dependency>>({})
 
-    const filteredDependencies = dependencies.filter(dep =>
-        dep.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        dep.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        dep.category.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-
-    const groupedDependencies = filteredDependencies.reduce((acc, dep) => {
-        if (!acc[dep.category]) {
-            acc[dep.category] = []
-        }
-        acc[dep.category].push(dep)
-        return acc
-    }, {} as Record<string, Dependency[]>)
+    const { data } = useGetMetadataQuery() as { data: MetadataResponse | undefined };
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -112,37 +57,56 @@ export function SpringInitializer({ isOpen, onClose,folder,springProjects,refetc
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [])
 
+    useEffect(() => {
+        if (data){
+            setDependencies(data.dependencies)
+        }
+    }, [data])
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
-
         try {
-            const result = creatProject({
-                name:projectName,
-                group:groupId,
-                folder:folder,
-                servicesNames:selectedProjectTypes,
-                dependencies:selectedDependencies.map(dep => dep.id)
-            });
-            console.log(result);
-            refetch()
-            onClose()
+            const result = createProject({
+                name: projectName,
+                group: groupId,
+                folder: folder,
+                servicesNames: selectedProjectTypes,
+                dependencies: selectedDependencies
+            })
+            console.log(result)
+            result.unwrap().then(
+                () => {
+                    onClose()
+                    refetch()
+                },
+                (err) => {
+                    console.log(err)
+                    onClose()
+                    refetch()
+                }
+            )
 
-        }catch (e) {
-            console.log(e);
-            refetch()
+        } catch (e) {
+            console.log(e)
             onClose()
+            refetch()
         }
-
-
     }
 
-    const toggleDependency = (dependency: Dependency) => {
-        setSelectedDependencies(prev =>
-            prev.some(d => d.id === dependency.id)
-                ? prev.filter(d => d.id !== dependency.id)
-                : [...prev, dependency]
-        )
+    const toggleDependency = (dep: Dependency) => {
+        setSelectedDependencies(prev => {
+            let adjustedScope = dep.scope
+            if (dep.scope === 'runtime') {
+                adjustedScope = 'runtimeOnly'
+            } else if (dep.scope === 'compile') {
+                adjustedScope = 'compileOnly'
+            }
+            const depString = `${adjustedScope} '${dep.groupId}:${dep.artifactId}'`
+            return prev.includes(depString)
+                ? prev.filter(d => d !== depString)
+                : [...prev, depString]
+        })
     }
 
     const toggleProjectType = (value: string) => {
@@ -152,7 +116,21 @@ export function SpringInitializer({ isOpen, onClose,folder,springProjects,refetc
                 : [...prev, value]
         )
     }
-    console.log("spring init",springProjects)
+
+    const filteredDependencies = Object.entries(dependencies).filter(([name, dep]) =>
+        name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        dep.artifactId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        dep.groupId.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
+    const groupedDependencies = filteredDependencies.reduce((acc, [name, dep]) => {
+        const category = dep.scope.toUpperCase()
+        if (!acc[category]) {
+            acc[category] = []
+        }
+        acc[category].push({ name, ...dep })
+        return acc
+    }, {} as Record<string, (Dependency & { name: string })[]>)
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -253,16 +231,16 @@ export function SpringInitializer({ isOpen, onClose,folder,springProjects,refetc
                                     <div className="flex flex-wrap gap-2">
                                         {selectedDependencies.map((dep) => (
                                             <Badge
-                                                key={dep.id}
+                                                key={dep}
                                                 variant="secondary"
                                                 className="flex items-center gap-1 px-3 py-1"
                                             >
-                                                {dep.name}
+                                                {dep}
                                                 <button
                                                     type="button"
-                                                    onClick={() => toggleDependency(dep)}
+                                                    onClick={() => setSelectedDependencies(prev => prev.filter(d => d !== dep))}
                                                     className="ml-1 hover:text-red-500"
-                                                    aria-label={`Remove ${dep.name} dependency`}
+                                                    aria-label={`Remove ${dep} dependency`}
                                                 >
                                                     <X className="h-3 w-3" aria-hidden="true"/>
                                                 </button>
@@ -302,24 +280,24 @@ export function SpringInitializer({ isOpen, onClose,folder,springProjects,refetc
                             <div className="space-y-6">
                                 {Object.entries(groupedDependencies).map(([category, deps]) => (
                                     <div key={category}>
-                                        <h3 className="font-semibold text-sm text-gray-500 mb-2">{category}</h3>
+                                        <h3 className="text-sm font-semibold bg-green-500 text-white px-2 py-1 mb-2">{category}</h3>
                                         <div className="space-y-2">
-                                            {deps.map((dep) => {
-                                                const isSelected = selectedDependencies.some(d => d.id === dep.id)
+                                            {deps.map((dep, index) => {
+                                                const depString = `${dep.scope === 'runtime' ? 'runtimeOnly' : dep.scope === 'compile' ? 'compileOnly' : dep.scope} '${dep.groupId}:${dep.artifactId}'`
+                                                const isSelected = selectedDependencies.includes(depString)
                                                 return (
-                                                    <button
-                                                        key={dep.id}
-                                                        onClick={() => toggleDependency(dep)}
-                                                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                                                            isSelected
-                                                                ? 'border-green-500 bg-green-50'
-                                                                : 'border-gray-200 hover:border-gray-300'
+                                                    <div
+                                                        key={`${dep.scope}-${dep.groupId}-${dep.artifactId}-${index}`}
+                                                        className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                                                            isSelected ? 'bg-primary/10' : 'hover:bg-muted'
                                                         }`}
-                                                        type="button"
-                                                        aria-pressed={isSelected}
+                                                        onClick={() => toggleDependency(dep)}
+                                                        role="checkbox"
+                                                        aria-checked={isSelected}
+                                                        tabIndex={0}
                                                     >
                                                         <div className="flex items-center justify-between">
-                                                            <span className="font-medium">{dep.name}</span>
+                                                            <span className="font-medium">{dep.name || `${dep.groupId}:${dep.artifactId}`}</span>
                                                             <Plus
                                                                 className={`h-4 w-4 ${
                                                                     isSelected ? 'text-green-500 rotate-45' : 'text-gray-400'
@@ -328,7 +306,10 @@ export function SpringInitializer({ isOpen, onClose,folder,springProjects,refetc
                                                             />
                                                         </div>
                                                         <p className="text-sm text-gray-500 mt-1">{dep.description}</p>
-                                                    </button>
+                                                        <p className="text-xs text-muted-foreground mt-1 font-mono">
+                                                            {dep.scope === 'runtime' ? 'runtimeOnly' : dep.scope === 'compile' ? 'compileOnly' : dep.scope} &#39;{dep.groupId}:{dep.artifactId}&#39;
+                                                        </p>
+                                                    </div>
                                                 )
                                             })}
                                         </div>

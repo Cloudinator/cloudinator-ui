@@ -58,7 +58,6 @@ const LogPage = (props: PropsParams) => {
                 setProgress(100)
             } else {
                 setIsDeploying(false)
-                setError("Failed to connect to the log stream. The build may have completed successfully.")
             }
 
             eventSourceRef.current?.close()

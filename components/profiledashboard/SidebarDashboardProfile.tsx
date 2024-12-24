@@ -1,6 +1,6 @@
 "use client"
 
-import {DatabaseBackup, Globe, Home, Package, Settings, Terminal} from 'lucide-react'
+import { Home, Settings, Terminal} from 'lucide-react'
 import Link from 'next/link'
 import {useParams, usePathname} from 'next/navigation'
 import { useState } from 'react';
@@ -35,9 +35,6 @@ export function SidebarDashboardProfile() {
     const navigation = [
         { name: 'Dashboard', href: '/dashboard', icon: Home },
         { name: 'Workspace', href: '/workspace', icon: Terminal },
-        { name: 'Backup', href: '/backup', icon: DatabaseBackup },
-        { name: 'Domain', href: '/domain', icon: Globe },
-        { name: 'Deployment', href: '/deployment', icon: Package },
         { name: 'Setting', href: `/setting/${username}`, icon: Settings },
     ]
 

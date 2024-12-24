@@ -14,16 +14,16 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-type SpringProjectType = {
+type ProjectType = {
     uuid: string;
     name: string;
-    folder: string;
-    group: string;
-    dependencies: string[];
+    branch: string;
+    namespace: string;
+    git: string;
 }
 
 interface ERDDiagramProps {
-    projects: SpringProjectType[]
+    projects: ProjectType[]
 }
 
 const ERDDiagram: React.FC<ERDDiagramProps> = ({ projects }) => {
@@ -35,18 +35,14 @@ const ERDDiagram: React.FC<ERDDiagramProps> = ({ projects }) => {
     }))
 
     const initialEdges: Edge[] = []
-    projects.forEach((project) => {
-        if (project.dependencies?.includes('amqp')) {
-            projects.forEach((otherProject) => {
-                if (project.uuid !== otherProject.uuid && otherProject.dependencies?.includes('amqp')) {
-                    initialEdges.push({
-                        id: `${project.uuid}-${otherProject.uuid}`,
-                        source: project.uuid,
-                        target: otherProject.uuid,
-                        animated: true,
-                        label: 'AMQP',
-                    })
-                }
+    projects.forEach((project, index) => {
+        if (index < projects.length - 1) {
+            initialEdges.push({
+                id: `${project.uuid}-${projects[index + 1].uuid}`,
+                source: project.uuid,
+                target: projects[index + 1].uuid,
+                animated: true,
+                label: 'Connected',
             })
         }
     })
@@ -60,18 +56,20 @@ const ERDDiagram: React.FC<ERDDiagramProps> = ({ projects }) => {
     )
 
     return (
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            connectionMode={ConnectionMode.Loose}
-            fitView
-        >
-            <Background />
-            <Controls />
-        </ReactFlow>
+        <div style={{ width: '100%', height: '600px' }}>
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                connectionMode={ConnectionMode.Loose}
+                fitView
+            >
+                <Background />
+                <Controls />
+            </ReactFlow>
+        </div>
     )
 }
 

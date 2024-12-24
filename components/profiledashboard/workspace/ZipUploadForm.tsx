@@ -13,16 +13,25 @@ import { motion } from 'framer-motion'
 interface ZipUploadFormProps {
     onClose: () => void
     selectedWorkspace: string
-    data1 : () => void;
+    data1: () => void
 }
 
-export function ZipUploadForm({ onClose, selectedWorkspace,data1 }: ZipUploadFormProps) {
+export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFormProps) {
     const [file, setFile] = useState<File | null>(null)
     const [projectName, setProjectName] = useState('')
     const [uploadZip] = useUploadZipMutation()
     const [deployZipService] = useDeployZipServiceMutation()
     const [isLoading, setIsLoading] = useState(false)
     const [step, setStep] = useState(1)
+
+    const sanitizeInput = (value: string) => {
+        return value.replace(/\s+/g, '-').toLowerCase() // Converts spaces to hyphens and makes it lowercase
+    }
+
+    const handleProjectNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const sanitizedValue = sanitizeInput(event.target.value)
+        setProjectName(sanitizedValue) // Update state with sanitized project name
+    }
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         setFile(acceptedFiles[0])
@@ -31,9 +40,9 @@ export function ZipUploadForm({ onClose, selectedWorkspace,data1 }: ZipUploadFor
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: {
-            'application/zip': ['.zip']
+            'application/zip': ['.zip'],
         },
-        multiple: false
+        multiple: false,
     })
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -59,17 +68,15 @@ export function ZipUploadForm({ onClose, selectedWorkspace,data1 }: ZipUploadFor
                     type: 'frontend',
                     token: '',
                     branch: 'main',
-                }).unwrap()
+                }).unwrap(),
             ])
 
-            console.log("Upload successful:", uploadResponse)
-            console.log("Project created:", deployResponse)
-
-            setStep(3)
+            console.log('Upload successful:', uploadResponse)
+            console.log('Project created:', deployResponse)
         } catch (err) {
-            console.log("Error during project creation and deployment:", err)
+            console.log('Error during project creation and deployment:', err)
+            setStep(3)
             data1()
-            setStep(4)
         } finally {
             setIsLoading(false)
         }
@@ -90,7 +97,7 @@ export function ZipUploadForm({ onClose, selectedWorkspace,data1 }: ZipUploadFor
                             <Input
                                 id="projectName"
                                 value={projectName}
-                                onChange={(e) => setProjectName(e.target.value)}
+                                onChange={handleProjectNameChange}
                                 required
                             />
                         </div>
@@ -172,4 +179,3 @@ export function ZipUploadForm({ onClose, selectedWorkspace,data1 }: ZipUploadFor
         </div>
     )
 }
-

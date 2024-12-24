@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ChevronRight, Plus, FileText, ChevronDown } from 'lucide-react'
+import { ChevronRight, Plus, FileText, ChevronDown, MoreVertical } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+
 import {
     Collapsible,
     CollapsibleContent,
@@ -26,11 +26,18 @@ import { Checkbox } from "@/components/ui/checkbox"
 import ERDDiagram from "@/components/profiledashboard/workspace/service/ERDDiagram"
 import { SpringInitializer } from "@/components/profiledashboard/workspace/service/SpringInitializer"
 import {
-    useBuildSpringServiceMutation,
+    useBuildSpringServiceMutation, useDeleteSpringProjectMutation,
     useGetBuildNumberInFolderQuery,
     useGetProjectsQuery
 } from "@/redux/api/projectApi"
 import Link from "next/link";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 export type PropsParams = {
     params: Promise<{ name: string }>;
@@ -66,6 +73,12 @@ export default function SubWorkspacePage(props: PropsParams) {
     const [selectedProjects, setSelectedProjects] = useState<string[]>([])
     const [isDeployDialogOpen, setIsDeployDialogOpen] = useState(false)
     const [buildSpringService] = useBuildSpringServiceMutation()
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+    const [projectToDelete, setProjectToDelete] = useState<SpringProjectType | null>(null)
+    const [deleteConfirmationName, setDeleteConfirmationName] = useState("");
+    const [deleteConfirmationError, setDeleteConfirmationError] = useState("");
+
+    const [deleteSpringProject] = useDeleteSpringProjectMutation()
 
     useEffect(() => {
         props.params.then(setParams);
@@ -77,24 +90,22 @@ export default function SubWorkspacePage(props: PropsParams) {
         }
     }, [params]);
 
-    const { data,refetch } = useGetProjectsQuery({
+    const { data, refetch } = useGetProjectsQuery({
         subWorkspace: params?.name ?? '',
         page: 0,
         size: 10,
-    }) as unknown as { data: SpringProjectResponse,refetch:()=>void };
+    }) as unknown as { data: SpringProjectResponse, refetch: () => void };
 
     const springProjects = data?.results ?? [];
 
-    const {data:buildNumber} = useGetBuildNumberInFolderQuery({
+    const { data: buildNumber, refetch: build } = useGetBuildNumberInFolderQuery({
         folder: params?.name ?? '',
-        name : params?.name ?? ''
+        name: params?.name ?? ''
     });
-
 
     const handleDeployProject = () => {
         console.log("Deploying projects:", selectedProjects)
         setIsDeployDialogOpen(false)
-        // Implement deployment logic here
     }
 
     const handleBuildProject = () => {
@@ -107,10 +118,48 @@ export default function SubWorkspacePage(props: PropsParams) {
             setIsDeployDialogOpen(false)
         } catch (error) {
             console.log(error);
+            build();
         }
     }
 
+    const handleDeleteSpringProject = async (project: SpringProjectType) => {
+        try {
+            const result = await deleteSpringProject({
+                folder: params?.name ?? '',
+                name: project.name
+            })
 
+            console.log(
+                result)
+
+        }catch (error) {
+            console.log(error);
+        }finally {
+            refetch();
+            setIsDeleteDialogOpen(false);
+        }
+    }
+
+    const handleDeleteProject = (project: SpringProjectType) => {
+        setProjectToDelete(project)
+        setIsDeleteDialogOpen(true)
+    }
+
+    const handleDeleteConfirmationNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDeleteConfirmationName(e.target.value);
+        setDeleteConfirmationError("");
+    };
+
+    const confirmDeleteProject = () => {
+        if (projectToDelete && projectToDelete.name === deleteConfirmationName) {
+            handleDeleteSpringProject(projectToDelete);
+            setProjectToDelete(null);
+            setDeleteConfirmationName("");
+            setDeleteConfirmationError("");
+        } else if (projectToDelete && projectToDelete.name !== deleteConfirmationName) {
+            setDeleteConfirmationError("Project name does not match");
+        }
+    };
 
     return (
         <div className="flex-1 space-y-6 p-8">
@@ -219,34 +268,49 @@ export default function SubWorkspacePage(props: PropsParams) {
                 <TabsContent value="spring-projects" className="space-y-4">
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {springProjects.map((project) => (
-                                <Card key={project.uuid}>
-                                    <Link href={`/workspace/sub-workspace/${params?.name}/${project.name}`}>
-                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                            <CardTitle className="text-sm font-medium">
-                                                {project.name}
-                                            </CardTitle>
-                                            <Avatar className="h-9 w-9">
-                                                <AvatarFallback>{project.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                            </Avatar>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="space-y-2 text-sm">
-                                                <div className="flex justify-between">
-                                                    <span className="text-muted-foreground">Branch:</span>
-                                                    <span>{project.branch}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-muted-foreground">Namespace:</span>
-                                                    <span>{project.namespace}</span>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <span className="text-muted-foreground">Git:</span>
-                                                    <span className="truncate max-w-[150px]">{project.git}</span>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Link>
-                                </Card>
+                            <Card key={project.uuid}>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">
+                                        {project.name}
+                                    </CardTitle>
+                                    <div className="flex items-center space-x-2">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem>
+                                                    <Link href={`/workspace/sub-workspace/${params?.name}/${project.name}`}>
+                                                        Go to Detail
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onSelect={() => handleDeleteProject(project)}>
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Branch:</span>
+                                            <span>{project.branch}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Namespace:</span>
+                                            <span>{project.namespace}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Git:</span>
+                                            <span className="truncate max-w-[150px]">{project.git}</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         ))}
                     </div>
                 </TabsContent>
@@ -296,7 +360,7 @@ export default function SubWorkspacePage(props: PropsParams) {
                                                 >
                                                     <FileText className="h-4 w-4 mr-2" />
                                                     <Link href={`/workspace/sub-workspace/${params?.name}/${params?.name}/${build?.buildNumber}`}>
-                                                    View Log
+                                                        View Log
                                                     </Link>
                                                 </Button>
                                             </TableCell>
@@ -316,6 +380,40 @@ export default function SubWorkspacePage(props: PropsParams) {
                 springProjects={springProjects}
                 refetch={refetch}
             />
+
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure you want to delete this project?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the project
+                            &#34;{projectToDelete?.name}&#34; and remove all of its data.
+                            To confirm, please enter the project name below.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="my-4">
+                        <input
+                            type="text"
+                            value={deleteConfirmationName}
+                            onChange={handleDeleteConfirmationNameChange}
+                            placeholder="Enter project name to confirm"
+                            className="w-full p-2 border rounded"
+                        />
+                        {deleteConfirmationError && (
+                            <p className="text-red-500 text-sm mt-1">{deleteConfirmationError}</p>
+                        )}
+                    </div>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => {
+                            setDeleteConfirmationName("");
+                            setDeleteConfirmationError("");
+                        }}>
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDeleteProject}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

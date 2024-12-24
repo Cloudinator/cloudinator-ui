@@ -155,6 +155,10 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
+        getMetadata: builder.query<string, void>({
+            query: () => 'api/v1/dependency/metadata', // Matches the backend endpoint path
+        }),
+
         getProjectByName: builder.query<SpringProject, { name: string }>({
             query: ({ name }) => `api/v1/spring/project/${name}`,
         }),
@@ -182,9 +186,15 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
+        deleteSpringProject: builder.mutation<void, { folder: string, name: string }>({
+            query: ({ folder, name }) => ({
+                url: `api/v1/spring/delete-service/${folder}/${name}`,
+                method: 'DELETE',
+            }),
+        }),
 
     }),
 })
 
 
-export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation,useGetTestMutation} = projectsApi
+export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation,useGetTestMutation,useGetMetadataQuery,useDeleteSpringProjectMutation} = projectsApi
