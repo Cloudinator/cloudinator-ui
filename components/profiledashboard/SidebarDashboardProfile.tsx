@@ -3,12 +3,12 @@
 import { Home, Settings, Terminal} from 'lucide-react'
 import Link from 'next/link'
 import {useParams, usePathname} from 'next/navigation'
-import { useState } from 'react';
 import {
     Sidebar,
     SidebarContent,
     SidebarGroup,
     SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
@@ -17,6 +17,7 @@ import {
 import Image from "next/image";
 import {useGetWorkspacesQuery} from "@/redux/api/projectApi";
 import {useGetMeQuery} from "@/redux/api/userApi";
+import { ModeToggle } from '../ModeToggle';
 
 export function SidebarDashboardProfile() {
     const pathname = usePathname();
@@ -24,13 +25,6 @@ export function SidebarDashboardProfile() {
 
     const params = useParams();
     const username = params?.username || userData?.username;
-
-    const [darkMode, setDarkMode] = useState(false); // State for dark mode
-
-    const toggleDarkMode = () => {
-        setDarkMode(prev => !prev);
-        document.body.classList.toggle('dark', !darkMode); // Toggle dark class on body
-    };
 
     const navigation = [
         { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -43,7 +37,7 @@ export function SidebarDashboardProfile() {
     console.log(data);
 
     return (
-        <Sidebar className={`flex flex-col h-full ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+        <Sidebar className={`flex flex-col h-full w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700`}>
             <SidebarHeader className="border-b p-3">
                 <Link href="/" className="flex items-center gap-2 font-semibold text-purple-500">
                     <Image
@@ -57,6 +51,7 @@ export function SidebarDashboardProfile() {
             </SidebarHeader>
             <SidebarContent className="flex-grow justify-between p-2">
                 <SidebarGroup>
+                    <SidebarGroupLabel>Dashboard Features</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {navigation.map((item) => (
@@ -88,10 +83,7 @@ export function SidebarDashboardProfile() {
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
-                {/* Dark Mode Toggle Button */}
-                <button onClick={toggleDarkMode} className="p-2 mt-auto">
-                    Switch Theme
-                </button>
+                <ModeToggle />
             </SidebarContent>
         </Sidebar>
     );
