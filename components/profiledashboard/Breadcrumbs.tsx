@@ -33,7 +33,7 @@ export function Breadcrumbs({
       <Breadcrumb className="text-sm text-muted-foreground bg-primary-500 text-primary-600">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/" className="hover:text-foreground">
+            <BreadcrumbLink href="/dashboard" className="hover:text-foreground">
               <Home className="h-4 w-4 text-primary-600" />
             </BreadcrumbLink>
           </BreadcrumbItem>

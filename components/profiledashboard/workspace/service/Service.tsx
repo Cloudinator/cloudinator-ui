@@ -187,13 +187,13 @@ export default function Service() {
 
 
 
-    if (!workspacesData) {
-        return (
-            <div className="text-purple-500 grid place-content-center h-screen w-full text-3xl">
-                Data Not Found!
-            </div>
-        );
-    }
+    // if (!workspacesData) {
+    //     return (
+    //         <div className="text-purple-500 grid place-content-center h-screen w-full text-3xl">
+    //             Data Not Found!
+    //         </div>
+    //     );
+    // }
 
     return (
         <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -289,7 +289,7 @@ export default function Service() {
                         <Button
                             key={type}
                             variant={selectedType === type ? "default" : "outline"}
-                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:bg-gray-100 focus:ring-500 transition-all ease-in-out ${
+                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 border border-1 hover:bg-gray-100 focus:ring-500 transition-all ease-in-out ${
                                 selectedType === type ? 'ring-2 ring-purple-500' : ''
                             }`}
                             onClick={() => setSelectedType(type)}
