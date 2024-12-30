@@ -65,7 +65,7 @@ export function FrontendForm({ onClose, selectedWorkspace, data1 }: FrontendForm
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-purple-600">
             <FormField
                 icon={Code}
                 label="Project Name"
@@ -107,7 +107,7 @@ export function FrontendForm({ onClose, selectedWorkspace, data1 }: FrontendForm
                 onTokenChange={handleInputChange}
             />
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-purple-500 hover:bg-purple-700">
                 Create Frontend Project
             </Button>
         </form>

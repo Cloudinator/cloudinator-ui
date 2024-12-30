@@ -16,11 +16,11 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Cloudinator: Start Building Your Cloud Project Today",
         description: "Jumpstart your cloud development with Cloudinator. Our intuitive platform helps you initialize, configure, and deploy your project in minutes.",
-        url: "https://dynamic.psa-khmer.world/service/start-building",
+        url: "https://cloudinator.istad.co/start-building",
         siteName: "Cloudinator",
         images: [
             {
-                url: "https://dynamic.psa-khmer.world/media/api/v1/medias/view/4a2a1572-3c7f-4b20-bf81-caa094e08d4b.png",
+                url: "https://cloudinator.istad.co/media/api/v1/medias/view/4a2a1572-3c7f-4b20-bf81-caa094e08d4b.png",
                 width: 1200,
                 height: 630,
                 alt: "Start Building with Cloudinator",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         type: "website",
     },
     alternates: {
-        canonical: "https://dynamic.psa-khmer.world/service/start-building",
+        canonical: "https://cloudinator.istad.co/start-building",
     },
 };
 

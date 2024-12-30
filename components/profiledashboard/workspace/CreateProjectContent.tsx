@@ -94,7 +94,7 @@ export default function CreateProjectContent({ onClose, selectedWorkspace, data1
                 case 'github':
                     return <FrontendForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1}/>;
                 case 'gitlab':
-                    return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;
+                    return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1} />;
                 case 'zipUpload':
                     return <ZipUploadForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1}/>;
                 default:
@@ -107,7 +107,7 @@ export default function CreateProjectContent({ onClose, selectedWorkspace, data1
                 case 'github':
                     return <BackendForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1}/>;
                 case 'gitlab':
-                    return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;;
+                    return <GitlabImportForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1}/>;
                 case 'zipUpload':
                     return <ZipUploadForm onClose={onClose} selectedWorkspace={selectedWorkspace} data1={data1} />;
                 default:
@@ -147,7 +147,7 @@ export default function CreateProjectContent({ onClose, selectedWorkspace, data1
                                 exit={{ opacity: 0, y: -20 }}
                                 transition={{ duration: 0.3 }}
                             >
-                                <h2 className="text-2xl font-semibold mb-4">Select a project type:</h2>
+                                <h2 className="text-2xl font-semibold mb-4 text-purple-500">Select a project type:</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                     {projectTypes.map((projectType) => (
                                         <ProjectTypeCard

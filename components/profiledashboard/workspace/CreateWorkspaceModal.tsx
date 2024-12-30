@@ -48,14 +48,14 @@ export function CreateWorkspaceModal() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button className="bg-purple-500 text-primary-foreground hover:bg-purple-700">
                     <Zap className="mr-2 h-4 w-4" />
                     Create Workspace
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold">Create Workspace</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold text-purple-500">Create Workspace</DialogTitle>
                     <DialogDescription>
                         Enter a name for your new workspace and bring your ideas to life.
                     </DialogDescription>
@@ -89,7 +89,7 @@ export function CreateWorkspaceModal() {
                 <DialogFooter>
                     <Button
                         onClick={handleCreateWorkspace}
-                        className="w-full"
+                        className="w-full bg-purple-500 hover:bg-purple-800"
                         disabled={!workspaceName.trim() || isCreating}
                     >
                         {isCreating ? (
