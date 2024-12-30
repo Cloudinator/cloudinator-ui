@@ -1,42 +1,22 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowUpRight, Cloud, GitBranch, Globe, Home, Zap } from 'lucide-react'
 import DeploymentOverview from "@/components/profiledashboard/dashboard/DeploymentOverview"
 import RecentDeployments from "@/components/profiledashboard/dashboard/RecentDeployments"
 import { CreateWorkspaceModal } from "@/components/profiledashboard/workspace/CreateWorkspaceModal"
 import { Breadcrumbs } from "@/components/profiledashboard/Breadcrumbs"
-
-export const metadata = {
-    title: "Deployments Dashboard",
-    description: "Track and manage project deployments efficiently.",
-    keywords: ["Deployments", "Dashboard", "Project Management", "Status Tracker"],
-    openGraph: {
-        title: "Deployments Dashboard",
-        description: "Track and manage project deployments efficiently.",
-        url: "https://yourwebsite.com/deployments",
-        images: [
-            {
-                url: "https://yourwebsite.com/assets/deployments-preview.png",
-                width: 800,
-                height: 600,
-                alt: "Deployments Dashboard Preview",
-            },
-        ],
-    },
-}
-
 export default function DashboardPage() {
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
-            <Breadcrumbs />
-            <div className="flex items-center justify-between space-y-2">
-                <div className="flex items-center space-x-2">
-                    <Home className="h-8 w-8 text-purple-500" />
-                    <h2 className="text-3xl font-bold tracking-tight text-purple-500">
-                        Deployment Dashboard
-                    </h2>
-                </div>
-                <div className="flex items-center space-x-2">
-                    <CreateWorkspaceModal />
+            <div className="flex justify-between w-full items-center">
+                <Breadcrumbs 
+                    title="Dashboard Page" 
+                    titleIcon={Home} 
+                />
+                <div className="flex items-center justify-between space-y-2">
+                    <div className="flex items-center space-x-2">
+                        <CreateWorkspaceModal />
+                    </div>
                 </div>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -120,4 +100,5 @@ export default function DashboardPage() {
         </div>
     )
 }
+
 

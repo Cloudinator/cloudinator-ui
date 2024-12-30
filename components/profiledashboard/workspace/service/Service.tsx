@@ -22,8 +22,7 @@ import {
     DialogTrigger,
     DialogTitle
 } from "@/components/ui/dialog";
-import { ArrowLeft, Database, Layout, MoreVertical, Server, Share2, User2, Plus, Search, GitBranch, Globe, ExternalLink } from 'lucide-react';
-import Link from "next/link";
+import { Database, Layout, MoreVertical, Server, Share2, User2, Plus, Search, GitBranch, Globe, ExternalLink, Folder, Terminal } from 'lucide-react';
 import {motion, AnimatePresence} from "framer-motion";
 import {
     useDeleteServiceDeploymentMutation, useDeleteSubWorkSpaceMutation,
@@ -32,6 +31,7 @@ import {
     useGetWorkspacesQuery
 } from "@/redux/api/projectApi";
 import {useRouter} from "next/navigation";
+import { Breadcrumbs } from "../../Breadcrumbs";
 
 const CreateProjectContent = lazy(() => import('@/components/profiledashboard/workspace/CreateProjectContent'));
 
@@ -40,7 +40,7 @@ type ServiceType = {
     gitUrl: string;
     branch: string;
     subdomain: string;
-    type: 'frontend' | 'backend' | 'database' | 'subworkspace';
+    type: 'all' | 'frontend' | 'backend' | 'database' | 'subworkspace';
 };
 
 type ServiceDeploymentResponse = {
@@ -67,12 +67,12 @@ type SubWorkSpaceResponse = {
     total: number;
     totalElements: number;
     results: SubWorkspaceType[];
-
 };
-
 
 function getServiceIcon(type: ServiceType['type']) {
     switch (type) {
+        case 'all': 
+            return <Folder className="w-5 h-5 text-yellow-500"/>
         case 'frontend':
             return <Layout className="w-5 h-5 text-purple-600"/>;
         case 'backend':
@@ -111,8 +111,6 @@ export default function Service() {
         size: 10,
         page: 0,
     }) as unknown as { data: SubWorkSpaceResponse, refetch: () => void };
-
-
 
 
     const combinedResults = useMemo(() => {
@@ -196,28 +194,27 @@ export default function Service() {
     // }
 
     return (
-        <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="py-6 px-4 sm:px-6 lg:px-8">
+            
             <motion.div
                 initial={{opacity: 0, y: -20}}
                 animate={{opacity: 1, y: 0}}
                 transition={{duration: 0.5}}
                 className="flex flex-col sm:flex-row items-center justify-between pb-6 space-y-4 sm:space-y-0"
             >
-                <div className="flex items-center space-x-2">
-                    <Link href="/workspace">
-                        <ArrowLeft className="h-8 w-8 text-purple-500"/>
-                    </Link>
-                    <h1 className="text-3xl font-bold tracking-tight text-purple-500">
-                        Workspace
-                    </h1>
-                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="bg-purple-500 hover:bg-purple-600 text-lg px-6 py-3">
-                            <Plus className="mr-2 h-5 w-5"/>
-                            Create Project
-                        </Button>
-                    </DialogTrigger>
+                    <div className="flex justify-between items-center w-full">
+                        <Breadcrumbs
+                            title="Workspace Page"
+                            titleIcon={Terminal}
+                        />
+                        <DialogTrigger asChild>
+                            <Button className="bg-purple-500 dark:text-white hover:bg-purple-600 text-lg px-6 py-3">
+                                <Plus className="mr-2 h-5 w-5"/>
+                                Create Project
+                            </Button>
+                        </DialogTrigger>
+                    </div>
                     <DialogContent
                         className="p-0 bg-white dark:bg-gray-950 max-w-[90vw] sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px] w-full h-[90vh] sm:h-auto"
                     >
@@ -258,11 +255,11 @@ export default function Service() {
                             setSelectedWorkspace(value);
                         }}
                     >
-                        <SelectTrigger className="w-full sm:w-[200px]">
+                        <SelectTrigger className="w-full sm:w-[200px] text-purple-500 focus:ring-purple-500">
                             <User2 className="mr-2 h-4 w-4"/>
                             <SelectValue placeholder="Select Workspace"/>
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="text-purple-500">
                             {workspaces.map((workspace) => (
                                 <SelectItem key={workspace.uuid} value={workspace.name}>
                                     {workspace.name}
@@ -271,10 +268,10 @@ export default function Service() {
                         </SelectContent>
                     </Select>
                     <div className="relative w-full sm:w-auto flex-grow">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"/>
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500"/>
                         <Input
                             type="text"
-                            placeholder="Search projects..."
+                            placeholder="Search Projects..."
                             className="pl-10 w-full"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -289,14 +286,14 @@ export default function Service() {
                         <Button
                             key={type}
                             variant={selectedType === type ? "default" : "outline"}
-                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 border border-1 hover:bg-gray-100 focus:ring-500 transition-all ease-in-out ${
+                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${
                                 selectedType === type ? 'ring-2 ring-purple-500' : ''
                             }`}
                             onClick={() => setSelectedType(type)}
                         >
                             <div className="flex items-center">
                                 <span className="inline-block w-5 h-5">
-                                    {type !== 'all' && getServiceIcon(type)}
+                                    {getServiceIcon(type)}
                                 </span>
                                 <span className="ml-2">{type}</span>
                             </div>
@@ -326,7 +323,7 @@ export default function Service() {
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         {getServiceIcon(service.type)}
-                                        <h3 className="font-semibold text-lg">{service.name}</h3>
+                                        <h3 className="font-semibold text-lg text-purple-500">{service.name}</h3>
                                     </div>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -351,9 +348,9 @@ export default function Service() {
                                 </div>
                                 <div className="space-y-3 text-sm">
                                     <a href={service.gitUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:underline" onClick={(e) => e.stopPropagation()}>
-                                        <GitBranch className="w-4 h-4 mr-2 flex-shrink-0" />
+                                        <GitBranch className="w-4 h-4 mr-2 flex-shrink-0 text-purple-500" />
                                         <span className="truncate">{service.gitUrl}</span>
-                                        <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0" />
+                                        <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0 text-purple-500" />
                                     </a>
                                     {service?.type === 'subworkspace' ? (
                                             <span className="text-gray-500 dark:text-gray-300">This is sub workspace where you can manage your microservices</span>
@@ -377,7 +374,7 @@ export default function Service() {
                                         </Button>
                                     )}
                                     <span className="text-xs text-gray-500 flex items-center">
-                                        <GitBranch className="w-3 h-3 mr-1 flex-shrink-0" />
+                                        <GitBranch className="w-3 h-3 mr-1 flex-shrink-0 text-purple-500" />
                                         <span className="truncate">
                                             {service?.type === 'subworkspace' ? 'Sub Workspace' : service.branch}
                                         </span>

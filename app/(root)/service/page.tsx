@@ -17,11 +17,11 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Cloudinator Services: Your Complete Cloud Deployment Toolkit",
         description: "Discover how Cloudinator's comprehensive services can revolutionize your cloud infrastructure. From backend to frontend, databases to microservices - we've got you covered.",
-        url: "https://dynamic.psa-khmer.world/service",
+        url: "https://cloudinator.istad.co/service",
         siteName: "Cloudinator",
         images: [
             {
-                url: "https://dynamic.psa-khmer.world/media/api/v1/medias/view/4a2a1572-3c7f-4b20-bf81-caa094e08d4b.png",
+                url: "https://cloudinator.istad.co/media/api/v1/medias/view/4a2a1572-3c7f-4b20-bf81-caa094e08d4b.png",
                 width: 1200,
                 height: 630,
                 alt: "Cloudinator Services Overview",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
         type: "website",
     },
     alternates: {
-        canonical: "https://dynamic.psa-khmer.world/service",
+        canonical: "https://cloudinator.istad.co/service",
     },
 };
 

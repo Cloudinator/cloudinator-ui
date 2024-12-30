@@ -10,6 +10,7 @@ interface FormFieldProps {
     name: string
     type?: string
     value: string
+    className: string
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
@@ -67,6 +68,7 @@ function AutomationToggle({ checked, onCheckedChange, token, onTokenChange }: Au
                             type="password"
                             value={token}
                             onChange={onTokenChange}
+                            className="border-purple-600 focus:border-purple-700"
                         />
                     </motion.div>
                 )}

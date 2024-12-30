@@ -20,15 +20,15 @@ const FeatureCard = ({ feature }: { feature: Feature; index: number }) => (
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                     {React.createElement(feature.icon, { className: "h-6 w-6 text-primary" })}
                 </div>
-                <CardTitle className="text-xl mb-2 text-gray-900 dark:text-gray-100">{feature.title}</CardTitle>
-                <CardDescription className="text-muted-foreground dark:text-gray-400">{feature.description}</CardDescription>
+                <CardTitle className="text-[18px] font-bold mb-2 text-gray-900 dark:text-gray-100">{feature.title}</CardTitle>
+                <CardDescription className="text-muted-foreground dark:text-gray-400 text-[18px]">{feature.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
                 <ul className="space-y-2">
                     {feature.benefits.map((benefit: string, i: number) => (
                         <li key={i} className="flex items-center">
-                            <CheckCircle className="mr-2 h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">{benefit}</span>
+                            <CheckCircle className="mr-2 h-6 w-6 text-green-500 flex-shrink-0" />
+                            <span className="text-[18px] text-gray-700 dark:text-gray-300">{benefit}</span>
                         </li>
                     ))}
                 </ul>

@@ -6,7 +6,7 @@ import { AnimatedGradientText } from "../AnimatedGradientText";
 
 export default function WhyUs() {
     return (
-        <section className="container mx-auto px-4 py-16 md:py-24">
+        <section className="container mx-auto px-4 pb-24">
             <div className="grid gap-8 lg:grid-cols-[1fr,1.5fr] items-center justify-center">
                 <div className="space-y-4 text-center">
                     

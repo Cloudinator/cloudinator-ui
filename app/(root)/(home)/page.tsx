@@ -32,11 +32,11 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Cloudinator: Revolutionize Your Cloud Development Workflow",
         description: "Unify your cloud deployment process. Create, deploy, and manage backend, frontend, databases, and microservices with the efficiency of Spring Initializer and the power of a comprehensive cloud platform.",
-        url: "https://dynamic.psa-khmer.world",
+        url: "https://cloudinator.istad.co",
         siteName: "Cloudinator",
         images: [
             {
-                url: "https://dynamic.psa-khmer.world/media/api/v1/medias/view/4a2a1572-3c7f-4b20-bf81-caa094e08d4b.png",
+                url: "https://cloudinator.istad.co/media/api/v1/medias/view/4a2a1572-3c7f-4b20-bf81-caa094e08d4b.png",
                 width: 1200,
                 height: 630,
                 alt: "Cloudinator Platform - Unified Cloud Deployment",

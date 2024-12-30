@@ -34,7 +34,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     const [stopServiceDeployment] = useStopServiceDeploymentMutation()
     const [startServiceDeployment] = useStartServiceDeploymentMutation()
 
-    const { data: projects } = useGetServiceByNameQuery(
+    const { data: projects ,refetch} = useGetServiceByNameQuery(
         { name: projectName },
         {
             skip: !projectName,
@@ -84,9 +84,13 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
     const handleStopService = async () => {
         try {
-            await stopServiceDeployment({ name: projectName }).unwrap()
+           const result = await stopServiceDeployment({ name: projectName }).unwrap()
+
+            console.log(result)
+
         } catch (error) {
-            console.error('Failed to stop service:', error)
+            console.log('Failed to stop service:', error)
+            refetch();
         }
     }
 
@@ -94,7 +98,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         try {
             await startServiceDeployment({ name: projectName }).unwrap()
         } catch (error) {
-            console.error('Failed to restart service:', error)
+            console.log('Failed to restart service:', error)
+            refetch();
         }
     }
 

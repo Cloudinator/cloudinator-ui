@@ -65,13 +65,14 @@ export function FrontendForm({ onClose, selectedWorkspace, data1 }: FrontendForm
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 px-2 py-2 text-purple-600">
             <FormField
                 icon={Code}
                 label="Project Name"
                 name="name"
                 value={projectFields.name}
                 onChange={handleInputChange}
+                className="border-purple-600 focus:border-purple-700"
             />
 
             <FormField
@@ -80,6 +81,7 @@ export function FrontendForm({ onClose, selectedWorkspace, data1 }: FrontendForm
                 name="branch"
                 value={projectFields.branch}
                 onChange={handleInputChange}
+                className="border-purple-600 focus:border-purple-700"
             />
 
             <FormField
@@ -88,6 +90,7 @@ export function FrontendForm({ onClose, selectedWorkspace, data1 }: FrontendForm
                 name="gitUrl"
                 value={projectFields.gitUrl}
                 onChange={handleInputChange}
+                className="border-purple-600 focus:border-purple-700"
             />
 
             <FormField
@@ -96,6 +99,7 @@ export function FrontendForm({ onClose, selectedWorkspace, data1 }: FrontendForm
                 name="subdomain"
                 value={projectFields.subdomain}
                 onChange={handleInputChange}
+                className="border-purple-600 focus:border-purple-700"
             />
 
             <AutomationToggle
@@ -107,7 +111,7 @@ export function FrontendForm({ onClose, selectedWorkspace, data1 }: FrontendForm
                 onTokenChange={handleInputChange}
             />
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-purple-500 hover:bg-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2">
                 Create Frontend Project
             </Button>
         </form>

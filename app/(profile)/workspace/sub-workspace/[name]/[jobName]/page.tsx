@@ -1,24 +1,22 @@
 'use client'
 import {useEffect, useState} from "react";
-import {
-    Activity,
-    AlertCircle, BarChart,
-    CheckCircle,
-    ChevronRight, Clock,
-    Code,
-    GitBranch,
-    Package,
-    Settings,
-    XCircle
-} from "lucide-react";
+import { Activity, AlertCircle, CheckCircle, ChevronRight, Clock, Code, GitBranch, Package, Rocket, XCircle } from 'lucide-react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
-import {useGetBuildNumberInFolderQuery, useGetProjectByNameQuery} from "@/redux/api/projectApi";
+import {
+    useDeploySpringServiceMutation,
+    useGetBuildNumberInFolderQuery,
+    useGetProjectByNameQuery,
+    useGetProjectsQuery
+} from "@/redux/api/projectApi";
 
 import Link from "next/link";
+import {ConfigureProjectModal} from "@/components/profiledashboard/workspace/service/ConfigureProjectModal";
+import {SpringProjectResponse} from "@/app/(profile)/workspace/sub-workspace/[name]/page";
+
 
 
 export type PropsParams = {
@@ -28,24 +26,39 @@ export type PropsParams = {
 
 type BuildHistory = {
     status: string;
-    buildNumber:number
+    buildNumber?: number;
 };
 
 const ProjectDetailPage = (props: PropsParams) =>{
     const [params, setParams] = useState<{ jobName: string } | null>(null);
+    const [deploySpringService] = useDeploySpringServiceMutation();
 
     const jobName = params?.jobName + '-pipeline'
 
     console.log(jobName)
 
-    const {data:projects} = useGetProjectByNameQuery({
+
+
+    const {data:projects,refetch:getdata} = useGetProjectByNameQuery({
         name:params?.jobName || ''
     })
 
-    const {data:buildNumber} = useGetBuildNumberInFolderQuery({
+    const {data:buildNumber,refetch} = useGetBuildNumberInFolderQuery({
         folder: projects?.namespace ?? '' ,
         name : jobName ?? ''
-    });
+    }) as { data: BuildHistory[] | undefined,refetch: () => void };
+
+    const { data } = useGetProjectsQuery({
+        subWorkspace: projects?.namespace ?? '',
+        page: 0,
+        size: 10,
+    }) as unknown as { data: SpringProjectResponse };
+
+
+    const service = data?.results || [];
+
+    console.log(service);
+
 
 
 
@@ -58,6 +71,26 @@ const ProjectDetailPage = (props: PropsParams) =>{
             console.log(params.jobName);
         }
     }, [params]);
+
+    const handleBuildService = async () => {
+
+        try {
+
+            const res = await deploySpringService({
+                folder: projects?.namespace ?? '' ,
+                name : jobName ?? ''
+            })
+
+            console.log(res)
+
+        }catch (error) {
+            console.log(error);
+        }finally {
+            refetch();
+            getdata();
+        }
+
+    }
 
 
 
@@ -93,7 +126,6 @@ const ProjectDetailPage = (props: PropsParams) =>{
                 <Card className="md:col-span-2">
                     <CardHeader>
                         <CardTitle className="text-3xl font-bold">{projects.name}</CardTitle>
-                        {/*<CardDescription className="text-lg">{projects.description}</CardDescription>*/}
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4">
@@ -122,14 +154,15 @@ const ProjectDetailPage = (props: PropsParams) =>{
                         <CardTitle className="text-xl font-semibold">Quick Actions</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4">
-                        <Button className="w-full bg-blue-500 hover:bg-blue-600">
-                            <Settings className="mr-2 h-4 w-4"/> Configure Project
-                        </Button>
-                        <Button className="w-full bg-green-500 hover:bg-green-600">
-                            <Activity className="mr-2 h-4 w-4"/> View Logs
-                        </Button>
-                        <Button className="w-full bg-purple-500 hover:bg-purple-600">
-                            <BarChart className="mr-2 h-4 w-4"/> Performance Metrics
+                        <ConfigureProjectModal services={service} folder={projects.namespace} name={projects.name} />
+                        <Link href={`/workspace/sub-workspace/${projects.namespace}/${params?.jobName}/${buildNumber && buildNumber[0]?.buildNumber ? buildNumber[0].buildNumber : ''}`}>
+                            <Button className="w-full bg-green-500 hover:bg-green-600">
+                                <Activity className="mr-2 h-4 w-4"/> View Logs
+                            </Button>
+                        </Link>
+
+                        <Button onClick={()=>handleBuildService()} className="w-full bg-purple-500 hover:bg-purple-600">
+                            <Rocket className="mr-2 h-4 w-4"/> Deploy now
                         </Button>
                     </CardContent>
                 </Card>
@@ -219,3 +252,4 @@ const ProjectDetailPage = (props: PropsParams) =>{
 }
 
 export default ProjectDetailPage;
+

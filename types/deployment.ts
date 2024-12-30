@@ -10,3 +10,12 @@ export interface DeploymentState {
     accessToken?: string
 }
 
+
+export type BuildHistory = {
+    status: string;
+    buildNumber: number;
+};
+
+export type BuildNumberResponse = BuildHistory[];
+
+

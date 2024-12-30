@@ -1,11 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ChevronRight, Plus, FileText, ChevronDown, MoreVertical } from 'lucide-react'
+import { ChevronRight, Plus, FileText, ChevronDown, MoreVertical, Sparkles, Code, ArrowRight, GripVertical, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-
 import {
     Collapsible,
     CollapsibleContent,
@@ -23,10 +22,12 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import ERDDiagram from "@/components/profiledashboard/workspace/service/ERDDiagram"
 import { SpringInitializer } from "@/components/profiledashboard/workspace/service/SpringInitializer"
 import {
-    useBuildSpringServiceMutation, useDeleteSpringProjectMutation,
+    useBuildSpringServiceMutation, useCreateExistingProjectMutation, useDeleteSpringProjectMutation,
     useGetBuildNumberInFolderQuery,
     useGetProjectsQuery
 } from "@/redux/api/projectApi"
@@ -38,6 +39,21 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent
+} from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { motion, AnimatePresence } from "framer-motion";
+import {GitCommandModal} from "@/components/profiledashboard/workspace/GitCommandModal";
+import {useGetMeQuery} from "@/redux/api/userApi";
+
 
 export type PropsParams = {
     params: Promise<{ name: string }>;
@@ -54,7 +70,7 @@ type SpringProjectType = {
     git: string;
 }
 
-type SpringProjectResponse = {
+export type SpringProjectResponse = {
     next: boolean;
     previous: boolean;
     total: number;
@@ -69,7 +85,8 @@ type BuildHistoryItem = {
 
 export default function SubWorkspacePage(props: PropsParams) {
     const [params, setParams] = useState<{ name: string } | null>(null);
-    const [isSpringInitializerOpen, setIsSpringInitializerOpen] = useState(false)
+    const [isCreateProjectDialogOpen, setIsCreateProjectDialogOpen] = useState(false);
+    const [isSpringInitializerOpen, setIsSpringInitializerOpen] = useState(false);
     const [selectedProjects, setSelectedProjects] = useState<string[]>([])
     const [isDeployDialogOpen, setIsDeployDialogOpen] = useState(false)
     const [buildSpringService] = useBuildSpringServiceMutation()
@@ -77,8 +94,19 @@ export default function SubWorkspacePage(props: PropsParams) {
     const [projectToDelete, setProjectToDelete] = useState<SpringProjectType | null>(null)
     const [deleteConfirmationName, setDeleteConfirmationName] = useState("");
     const [deleteConfirmationError, setDeleteConfirmationError] = useState("");
+    const [existingProjectName, setExistingProjectName] = useState<string | null>(null);
+    const [selectedServices, setSelectedServices] = useState<string[]>([]);
+    const [createExistingProject] = useCreateExistingProjectMutation();
+
 
     const [deleteSpringProject] = useDeleteSpringProjectMutation()
+    const [isGitCommandModalOpen, setIsGitCommandModalOpen] = useState(false);
+
+
+    const {data:profile} = useGetMeQuery();
+
+
+    console.log(profile)
 
     useEffect(() => {
         props.params.then(setParams);
@@ -160,6 +188,112 @@ export default function SubWorkspacePage(props: PropsParams) {
             setDeleteConfirmationError("Project name does not match");
         }
     };
+
+    const handleCreateProject = (option: 'new' | 'existing') => {
+        if (option === 'new') {
+            setIsSpringInitializerOpen(true);
+            setIsCreateProjectDialogOpen(false);
+        } else if (option === 'existing') {
+            setExistingProjectName(""); // Reset the name
+        }
+    };
+
+    const handleCreateExistingProject = (name: string) => {
+
+        try {
+            const result = createExistingProject({
+                folder: params?.name ?? '',
+                name: name,
+                servicesNames: selectedServices,
+            })
+
+            console.log(result)
+            result.unwrap().then(
+                () => {
+                    console.log(
+                        "Project created successfully")
+                },
+                (err) => {
+                    console.log(err)
+                    setIsCreateProjectDialogOpen(false);
+                    setSelectedServices([]);
+                    setIsGitCommandModalOpen(true);
+                    refetch();
+                }
+            )
+        }catch (error) {
+            console.log(error);
+        }
+    }
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setSelectedServices((items) => {
+                const oldIndex = items.indexOf(active.id.toString());
+                const newIndex = items.indexOf(over.id.toString());
+
+                return arrayMove(items, oldIndex, newIndex);
+            });
+        }
+    };
+
+    function SortableItem(props: {id: string}) {
+        const {
+            attributes,
+            listeners,
+            setNodeRef,
+            transform,
+            transition,
+        } = useSortable({id: props.id});
+
+        const style = {
+            transform: CSS.Transform.toString(transform),
+            transition,
+        };
+
+        return (
+            <motion.li
+                ref={setNodeRef}
+                style={style}
+                {...attributes}
+                {...listeners}
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex justify-between items-center mb-2 cursor-move"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.2 }}
+            >
+          <span className="flex items-center">
+            <GripVertical className="mr-2 h-4 w-4" />
+              {props.id}
+          </span>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedServices(selectedServices.filter(s => s !== props.id))}
+                    className="text-primary-foreground hover:text-primary-foreground/80"
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+            </motion.li>
+        );
+    }
+
+    if (!profile){
+        return null;
+    }
+
+    const gitCommands = ["git init --initial-branch=main",`git remote add origin https://git.cloudinator.cloud/group-${profile.username}/${existingProjectName}.git`,"git add .", "git commit -m \"message\"", "git push --set-upstream origin main"];
+
 
     return (
         <div className="flex-1 space-y-6 p-8">
@@ -252,10 +386,106 @@ export default function SubWorkspacePage(props: PropsParams) {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <Button onClick={() => setIsSpringInitializerOpen(true)}>
-                        <Plus className="mr-2 h-4 w-4"/>
-                        Create Spring Project
-                    </Button>
+                    <Dialog open={isCreateProjectDialogOpen} onOpenChange={setIsCreateProjectDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button onClick={() => setIsCreateProjectDialogOpen(true)}>
+                                <Plus className="mr-2 h-4 w-4"/>
+                                Create Spring Project
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[700px]">
+                            <DialogHeader>
+                                <DialogTitle className="text-2xl font-bold text-center">Create Your Spring Project</DialogTitle>
+                                <DialogDescription className="text-center">
+                                    Choose your preferred method to kickstart your Spring project
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex flex-col space-y-6 mt-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <Card className="cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-md"
+                                          onClick={() => handleCreateProject('new')}>
+                                        <CardHeader className="flex flex-col items-center">
+                                            <Sparkles className="h-12 w-12 text-primary mb-2" />
+                                            <CardTitle>Create New Project</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-center text-sm text-muted-foreground">Start fresh with a new Spring project using our initializer</p>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-md"
+                                          onClick={() => handleCreateProject('existing')}>
+                                        <CardHeader className="flex flex-col items-center">
+                                            <Code className="h-12 w-12 text-primary mb-2" />
+                                            <CardTitle>Use Existing Code</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-center text-sm text-muted-foreground">Import your existing Spring project code</p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                                {existingProjectName !== null && (
+                                    <div className="space-y-4 p-6 bg-muted rounded-lg">
+                                        <Label htmlFor="existing-project-name" className="text-lg font-semibold">Project Name</Label>
+                                        <Input
+                                            id="existing-project-name"
+                                            value={existingProjectName}
+                                            onChange={(e) => setExistingProjectName(e.target.value)}
+                                            placeholder="Enter your project name"
+                                            className="w-full"
+                                        />
+                                        <div className="space-y-2">
+                                            <Label htmlFor="service-select" className="text-lg font-semibold">Select Services</Label>
+                                            <div className="flex space-x-2 flex-wrap">
+                                                {springProjects.map((project) => (
+                                                    <Button
+                                                        key={project.uuid}
+                                                        variant={selectedServices.includes(project.name) ? "secondary" : "outline"}
+                                                        className="mb-2"
+                                                        onClick={() => {
+                                                            setSelectedServices(prevSelected =>
+                                                                prevSelected.includes(project.name)
+                                                                    ? prevSelected.filter(item => item !== project.name)
+                                                                    : [...prevSelected, project.name]
+                                                            );
+                                                        }}
+                                                    >
+                                                        {project.name}
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="mt-4">
+                                            <Label className="text-lg font-semibold mb-2 block">Selected Services (Drag to reorder)</Label>
+                                            <DndContext
+                                                sensors={sensors}
+                                                collisionDetection={closestCenter}
+                                                onDragEnd={handleDragEnd}
+                                            >
+                                                <SortableContext
+                                                    items={selectedServices}
+                                                    strategy={verticalListSortingStrategy}
+                                                >
+                                                    <AnimatePresence>
+                                                        {selectedServices.map((service) => (
+                                                            <SortableItem key={service} id={service} />
+                                                        ))}
+                                                    </AnimatePresence>
+                                                </SortableContext>
+                                            </DndContext>
+                                        </div>
+                                        <Button
+                                            onClick={() => handleCreateExistingProject(existingProjectName)}
+                                            className="w-full bg-primary hover:bg-primary/90"
+                                        >
+                                            Create Project
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
 
@@ -375,7 +605,10 @@ export default function SubWorkspacePage(props: PropsParams) {
 
             <SpringInitializer
                 isOpen={isSpringInitializerOpen}
-                onClose={() => setIsSpringInitializerOpen(false)}
+                onClose={() => {
+                    setIsSpringInitializerOpen(false);
+                    setExistingProjectName("");
+                }}
                 folder={params?.name ?? ''}
                 springProjects={springProjects}
                 refetch={refetch}
@@ -414,6 +647,12 @@ export default function SubWorkspacePage(props: PropsParams) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <GitCommandModal
+                isOpen={isGitCommandModalOpen}
+                onClose={() => setIsGitCommandModalOpen(false)}
+                commands={gitCommands}
+                clear={()=> setExistingProjectName(null)}
+            />
         </div>
     )
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from 'lucide-react';
 import Image from "next/image";
-import logo from "@/public/logo.png";
+import logo from "@/public/cloudinator-v2.1.png";
 
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ModeToggle";
@@ -35,14 +35,10 @@ const NavBarHomePage = () => {
     const navItems = [
         { path: "/", label: "Home" },
         { path: "/service", label: "Service" },
-        { path: "https://cloudinator-document.soben.me", label: "Document" },
+        { path: "https://cloudinator-doc.cloudinator.cloud/", label: "Document", target: "_blank", rel: "noopener noreferrer" },
         { path: "/start-building", label: "Start Building" },
         { path: "/about", label: "About" },
     ];
-
-    const handleLinkClick = () => {
-        setIsMenuOpen(false); // Close the menu when a link is clicked
-    };
 
     const renderAuthButtons = () => {
         if (loading) {
@@ -98,10 +94,10 @@ const NavBarHomePage = () => {
                                 alt="Cloudinator"
                                 width={100}
                                 height={100}
-                                className="w-16 h-16"
+                                className="w-16 h-22"
                             />
                         </Link>
-                        <nav className="hidden md:flex space-x-2">
+                        <nav className="hidden md:flex space-x-2 py-4">
                             {navItems.map((item) => (
                                 <Button
                                     key={item.path}
@@ -109,10 +105,21 @@ const NavBarHomePage = () => {
                                     asChild
                                     className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200 ease-in-out"
                                 >
-                                    <Link href={item.path} onClick={handleLinkClick}>{item.label}</Link>
+                                    {item.target ? (
+                                        <a
+                                            href={item.path}
+                                            target={item.target}
+                                            rel={item.rel}
+                                        >
+                                            {item.label}
+                                        </a>
+                                    ) : (
+                                        <Link href={item.path}>{item.label}</Link>
+                                    )}
                                 </Button>
                             ))}
                         </nav>
+
                         <div className="hidden md:flex items-center space-x-4">
                             <ModeToggle />
                             {renderAuthButtons()}
@@ -141,10 +148,21 @@ const NavBarHomePage = () => {
                                         asChild
                                         className="justify-start text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200 ease-in-out"
                                     >
-                                        <Link href={item.path} onClick={handleLinkClick}>{item.label}</Link>
+                                        {item.target ? (
+                                            <a
+                                                href={item.path}
+                                                target={item.target}
+                                                rel={item.rel}
+                                            >
+                                                {item.label}
+                                            </a>
+                                        ) : (
+                                            <Link href={item.path}>{item.label}</Link>
+                                        )}
                                     </Button>
                                 ))}
                             </nav>
+
                             <div className="mt-4 flex flex-col space-y-4 p-4">
                                 <ModeToggle />
                                 {renderAuthButtons()}
