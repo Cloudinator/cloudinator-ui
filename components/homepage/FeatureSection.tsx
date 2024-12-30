@@ -39,7 +39,7 @@ const features: Feature[] = [
   {
     title: "Microservices Deployment",
     description:
-      "Scale your application effortlessly with our microservices architecture.",
+      "Deploy your microservices independently and manage distributed systems with our advanced deployment tools.",
     icon: NetworkIcon,
   },
 ];
