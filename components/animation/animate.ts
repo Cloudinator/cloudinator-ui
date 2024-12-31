@@ -19,9 +19,6 @@ type AnimationData = {
 };
 
 
-
-
-
 const createAnimation = (animationData: AnimationData): LottieOptions => ({
     loop: true,
     autoplay: true,

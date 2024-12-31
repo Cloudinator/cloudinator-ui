@@ -91,7 +91,7 @@ export default function StorageSection() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-16 space-y-24">
+        <div className="container mx-auto px-4 py-8 space-y-16">
             <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
                 Cloud Storage
             </AnimatedGradientText>
@@ -144,7 +144,7 @@ export default function StorageSection() {
                 >
                     {deploymentFeatures.map((feature, index) => (
                         <motion.div key={index} variants={itemVariants}>
-                            <Card className="border-2 h-full">
+                            <Card className="border-2 h-full hover:shadow-xl border-gray-100 hover:border-purple-500 transition duration-200 ease-in-out hover:cursor-pointer">
                                 <CardHeader>
                                     <motion.div
                                         className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4"

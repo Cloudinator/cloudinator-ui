@@ -36,14 +36,19 @@ const NotificationBar: React.FC = () => {
         >
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 shadow-lg">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
-              <div className="flex-1" />
-              <Link href="/service" className="flex-1 group">
-                <span className="text-sm font-medium group-hover:underline shimmer-text relative">
-                  <span className="relative z-10">
-                    🚀 New Feature is here! Click for more info
+              <div className="flex-1">
+                <Link href="/service" className="flex-1 group">
+                  <span className="text-sm md:text-base lg:text-lg font-medium group-hover:underline shimmer-text relative block w-full">
+                    <span className="relative z-10 sm:text-sm text-center ">
+                      {typeof window !== "undefined" && window.innerWidth < 768 ? (
+                        <span className="block sm:hidden">New Feature is available!</span>
+                      ) : (
+                        <span className="hidden sm:block">🚀 New Feature is available! Click here now for more info</span>
+                      )}
+                    </span>
                   </span>
-                </span>
-              </Link>
+                </Link>
+              </div>
               <div className="flex-1 flex justify-end">
                 <button
                   onClick={handleClose}
@@ -55,6 +60,7 @@ const NotificationBar: React.FC = () => {
               </div>
             </div>
           </div>
+
         </motion.div>
       )}
       <style jsx global>{`

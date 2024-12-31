@@ -17,10 +17,9 @@ const navigation = {
 };
 
 const contact = {
-  phone: "+855978443615",
-  email: "cloudinator@gmail.com",
-  address:
-    "No. 24, Street 562 ,Sangkat Boeung Kok, Toul Kork, Phnom Penh City.",
+  phone: "+855967241583",
+  email: "vathanaksol1605@gmail.com",
+  address: "No. 24, Street 562 ,Sangkat Boeung Kok, Toul Kork, Phnom Penh City.",
   mapUrl: "https://maps.app.goo.gl/HRN4hrCyrAqTdZzP6",
 };
 
@@ -28,20 +27,20 @@ const partners = [
   {
     name: "CBRD",
     src: "/cbrd.png",
-    height: 150,
-    width: 150,
+    height: 200,
+    width: 200,
   },
   {
     name: "MPTC",
     src: "/mptc.png",
-    height: 150,
-    width: 150,
+    height: 200,
+    width: 200,
   },
   {
     name: "ISTAD",
     src: "/istad-logo.png",
-    height: 140,
-    width: 140,
+    height: 200,
+    width: 200,
   },
 ];
 
@@ -49,32 +48,34 @@ export default function Footer() {
   return (
     <footer className="bg-gray-50 dark:bg-gray-900 border-t py-10">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Logo & Description */}
-          <div>
-            <Image
-              src="/cloudinator-v2.1.png"
-              alt="Cloudinator Logo"
-              width={150}
-              height={150}
-              className="mb-4 ml-6 h-100 w-100"
-            />
-            <p className="text-purple-500 font-semibold text-sm w-[200px] text-center">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+          {/* Logo & Description - Centered on mobile */}
+          <div className="flex flex-col items-center text-center md:items-start md:text-left">
+            <div className="w-48 h-48 relative mb-4">
+              <Image
+                src="/cloudinator-v2.1.png"
+                alt="Cloudinator Logo"
+                layout="fill"
+                objectFit="contain"
+                className="transition-transform hover:scale-105"
+              />
+            </div>
+            <p className="text-purple-500 font-semibold text-sm max-w-[200px]">
               Empowering your cloud journey with simplicity and innovation
             </p>
           </div>
 
-          {/* Navigation Links */}
-          <div>
+          {/* Navigation Links - Centered on mobile */}
+          <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-purple-500 mb-4">
               Quick Links
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {navigation.links.map((item) => (
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-gray-600 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 transition-colors"
+                    className="text-gray-600 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 transition-colors inline-block"
                   >
                     {item.name}
                   </Link>
@@ -83,14 +84,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div>
+          {/* Contact Info - Centered on mobile */}
+          <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-purple-500 mb-4">
               Contact Us
             </h3>
             <ul className="space-y-4">
-              <li className="flex items-start space-x-3">
-                <Phone className="h-5 w-5 text-purple-500" />
+              <li className="flex items-center justify-center md:justify-start space-x-3">
+                <Phone className="h-5 w-5 text-purple-500 flex-shrink-0" />
                 <a
                   href={`tel:${contact.phone}`}
                   className="text-gray-600 dark:text-gray-400 text-sm hover:text-purple-500 dark:hover:text-purple-400 transition-colors"
@@ -98,10 +99,10 @@ export default function Footer() {
                   {contact.phone}
                 </a>
               </li>
-              <li className="flex items-start space-x-3">
-                <Mail className="h-5 w-5 text-purple-500" />
+              <li className="flex items-center justify-center md:justify-start space-x-3">
+                <Mail className="h-5 w-5 text-purple-500 flex-shrink-0" />
                 <a
-                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}&su=Inquiry%20from%20Website&body=Hello%20Cloudinator%20Team,%0D%0A%0D%0AI%20am%20reaching%20out%20regarding...`}
+                  href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 dark:text-gray-400 text-sm hover:text-purple-500 dark:hover:text-purple-400 transition-colors"
@@ -109,8 +110,8 @@ export default function Footer() {
                   {contact.email}
                 </a>
               </li>
-              <li className="flex items-start space-x-3">
-                <MapPin className="h-8 w-8 text-purple-500" />
+              <li className="flex items-start justify-center md:justify-start space-x-3">
+                <MapPin className="h-5 w-5 text-purple-500 flex-shrink-0 mt-1" />
                 <a
                   href={contact.mapUrl}
                   target="_blank"
@@ -123,21 +124,22 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Partners */}
-          <div className="space-y-4 md:mx-auto md:w-full lg:mx-0">
+          {/* Partners - Centered grid */}
+          <div className="space-y-4 grid place-content-center">
             <h3 className="text-lg font-semibold text-purple-500 mb-4 text-center">
               Sponsor
             </h3>
-            <div className="grid gap-4 sm:gap-6 justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-4 place-items-center">
               {partners.map((partner) => (
-                <Image
-                  key={partner.name}
-                  src={partner.src}
-                  alt={partner.name}
-                  width={partner.width}
-                  height={partner.height}
-                  className="rounded-lg"
-                />
+                <div key={partner.name} className="w-26 h-26 relative">
+                  <Image
+                    src={partner.src}
+                    alt={partner.name}
+                    width={partner.width}
+                    height={partner.height}
+                    className="rounded-lg transition-transform hover:scale-105"
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -145,7 +147,7 @@ export default function Footer() {
 
         <Separator className="my-8" />
 
-        {/* Footer Bottom */}
+        {/* Footer Bottom - Always centered */}
         <div className="text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             © {new Date().getFullYear()}{" "}

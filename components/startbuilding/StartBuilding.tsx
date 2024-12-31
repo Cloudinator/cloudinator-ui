@@ -26,6 +26,8 @@ import octopus from "@/public/Octopus.json";
 import pirate from "@/public/Pirateship.json";
 import dynamic from "next/dynamic";
 import { AnimatedGradientText } from "../AnimatedGradientText";
+import { useGetMeQuery } from "@/redux/api/userApi";
+import Link from "next/link";
 const Lottie = dynamic(() => import("react-lottie"), { ssr: false });
 
 const octopusAnimation = {
@@ -68,7 +70,7 @@ const processCards = [
   {
     title: "Languages",
     description:
-      "We use a variety of programming languages to build robust and scalable systems, including Java, JavaScript, and Python.",
+      "We use a variety of programming languages to build robust and scalable systems, including Java, JavaScript, and Python, etc.",
     icon: Code2,
   },
   {
@@ -95,8 +97,11 @@ const timelineSteps = [
   {
     icon: Settings,
     title: "INITIAL SETUP",
-    description:
-      "Configure your project environment and set up the necessary tools.",
+    description: (
+      <span style={{ fontSize: "16px" }}>
+        Configure your project environment and set up the necessary tools.
+      </span>
+    ),
     color: "#9333EA",
     arrowColor: "#A855F7",
     iconBg: "#F3E8FF",
@@ -104,8 +109,11 @@ const timelineSteps = [
   {
     icon: Wrench,
     title: "DEVELOPMENT",
-    description:
-      "Build your application with cutting-edge technologies and best practices.",
+    description: (
+      <span style={{ fontSize: "16px" }}>
+        Build your application with cutting-edge technologies and best practices.
+      </span>
+    ),
     color: "#2979FF",
     arrowColor: "#60A5FA",
     iconBg: "#E6F2FF",
@@ -113,8 +121,11 @@ const timelineSteps = [
   {
     icon: Lightbulb,
     title: "OPTIMIZATION",
-    description:
-      "Refine and enhance your project for peak performance and user experience.",
+    description: (
+      <span style={{ fontSize: "16px" }}>
+        Refine and enhance your project for peak performance and user experience.
+      </span>
+    ),
     color: "#9333EA",
     arrowColor: "#A855F7",
     iconBg: "#F3E8FF",
@@ -122,8 +133,11 @@ const timelineSteps = [
   {
     icon: Globe,
     title: "DEPLOYMENT",
-    description:
-      "Launch your application to the world with robust hosting and distribution.",
+    description: (
+      <span style={{ fontSize: "16px" }}>
+        Launch your application to the world with robust hosting and distribution.
+      </span>
+    ),
     color: "#2979FF",
     arrowColor: "#60A5FA",
     iconBg: "#E6F2FF",
@@ -276,6 +290,8 @@ const FloatingCard: React.FC<FloatingCardProps> = ({ card, index }) => {
 };
 
 export default function StartBuildingPage() {
+  const { data } = useGetMeQuery();
+  const href = data ? "/dashboard" : "/oauth2/authorization/devops";
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-black">
       {/* Hero Section */}
@@ -307,12 +323,14 @@ export default function StartBuildingPage() {
                 Building a superior runtime product that streamlines automation,
                 enhances performance, and offers seamless integration.
               </p>
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 dark:from-purple-400 dark:to-blue-400"
-              >
-                Get Started
-              </Button>
+              <Link href={href}>
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 dark:from-purple-400 dark:to-blue-400"
+                >
+                  Get Started
+                </Button>
+              </Link>
             </motion.div>
 
             <motion.div
@@ -385,7 +403,7 @@ export default function StartBuildingPage() {
       </section>
 
       {/* Process Section */}
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-20 overflow-hidden">
         <WaveBackground />
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
@@ -412,14 +430,14 @@ export default function StartBuildingPage() {
       </section>
 
       {/* Timeline Section */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-black">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-black">
         <div className="container mx-auto px-4">
-          <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-4 inline-block">
+          <AnimatedGradientText className="text-4xl text-center md:text-5xl w-full font-extrabold mb-16 inline-block">
             Our Process
           </AnimatedGradientText>
 
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row gap-6 md:gap-0">
+            <div className="flex flex-col md:flex-row gap-8 md:gap-4">
               {timelineSteps.map((step, index) => (
                 <ProcessStep
                   key={index}
@@ -444,13 +462,15 @@ export default function StartBuildingPage() {
               Join us in revolutionizing the way you build and deploy
               applications.
             </p>
-            <Button
-              size="lg"
-              variant="secondary"
-              className="bg-white text-purple-600 dark:bg-gray-700 dark:text-white hover:bg-purple-100 dark:hover:bg-gray-600"
-            >
-              Get Started Now
-            </Button>
+            <Link href={href}>
+                <Button
+                    size="lg"
+                    variant="secondary"
+                    className="bg-white text-purple-600 dark:bg-gray-700 dark:text-white hover:bg-purple-100 dark:hover:bg-gray-600"
+                >
+                    Get Started Now
+                </Button>
+            </Link>
           </div>
         </div>
       </section>

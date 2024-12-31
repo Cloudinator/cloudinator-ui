@@ -84,9 +84,11 @@ export default function TerminalPage() {
         <section className="bg-gray-50 py-8 md:py-8">
             <div className="container mx-auto px-4">
             
-                <AnimatedGradientText className="text-4xl md:text-5xl font-extrabold mb-4 inline-block text-center">
-                    Work with the Tools You Already Love
-                </AnimatedGradientText>
+                <div className="text-center">
+                    <AnimatedGradientText className="text-4xl md:text-5xl font-extrabold mb-16 inline-block text-center">
+                        Work with the Tools You Already Love
+                    </AnimatedGradientText>
+                </div>
                 <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         {/* Responsive Tabs List */}
@@ -96,7 +98,7 @@ export default function TerminalPage() {
                                     <TabsTrigger
                                         key={tab.id}
                                         value={tab.id}
-                                        className="flex-1 min-w-[120px] max-w-full text-center px-2 py-1 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                                        className="flex-1 text-purple-700 min-w-[120px] max-w-full text-center px-2 py-1 data-[state=active]:bg-white data-[state=active]:bg-purple-500 data-[state=active]:text-white data-[state=active]:shadow-sm"
                                     >
                                         {tab.label}
                                     </TabsTrigger>
