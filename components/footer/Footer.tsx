@@ -17,8 +17,8 @@ const navigation = {
 };
 
 const contact = {
-  phone: "+855967241583",
-  email: "vathanaksol1605@gmail.com",
+  phone: "+85595990910",
+  email: "info.istad@gmail.com",
   address: "No. 24, Street 562 ,Sangkat Boeung Kok, Toul Kork, Phnom Penh City.",
   mapUrl: "https://maps.app.goo.gl/HRN4hrCyrAqTdZzP6",
 };
