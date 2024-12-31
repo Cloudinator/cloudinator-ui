@@ -1,39 +1,134 @@
 "use client"
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import { TrendingUp } from "lucide-react"
+import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts"
 
-const data = [
-    { name: "Mon", successful: 40, failed: 2 },
-    { name: "Tue", successful: 45, failed: 3 },
-    { name: "Wed", successful: 50, failed: 1 },
-    { name: "Thu", successful: 55, failed: 2 },
-    { name: "Fri", successful: 60, failed: 0 },
-    { name: "Sat", successful: 30, failed: 1 },
-    { name: "Sun", successful: 25, failed: 0 },
-]
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import {
+    ChartConfig,
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from "@/components/ui/chart"
 
-export default function DeploymentOverview() {
+
+
+const chartConfig = {
+    desktop: {
+        label: "failure",
+        color: "hsl(var(--chart-1))",
+    },
+    mobile: {
+        label: "success",
+        color: "hsl(var(--chart-2))",
+    },
+} satisfies ChartConfig
+
+type PropsType = {
+    success: number,
+    failure: number,
+}
+
+export default function DeploymentOverview({success, failure}: PropsType) {
+    const totalVisitors = success + failure
+
+    const chartData = [
+        {
+            month: "january",
+            success: success,
+            failure: failure,
+        }
+    ]
+
+    const date = Date.now()
+
+    const formattedDate = new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+    }).format(date);
+
+    console.log(formattedDate);
+
     return (
-        <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={data}>
-                <XAxis
-                    dataKey="name"
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                />
-                <YAxis
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) => `${value}`}
-                />
-                <Tooltip />
-                <Bar dataKey="successful" fill="#4ade80" radius={[4, 4, 0, 0]} stackId="stack" />
-                <Bar dataKey="failed" fill="#f87171" radius={[4, 4, 0, 0]} stackId="stack" />
-            </BarChart>
-        </ResponsiveContainer>
+        <Card className="flex flex-col">
+            <CardHeader className="items-center pb-0">
+                <CardTitle>Overall Static Build</CardTitle>
+                <CardDescription>{formattedDate}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-1 items-center pb-0">
+                <ChartContainer
+                    config={chartConfig}
+                    className="mx-auto aspect-square w-full max-w-[250px]"
+                >
+                    <RadialBarChart
+                        data={chartData}
+                        endAngle={180}
+                        innerRadius={80}
+                        outerRadius={130}
+                    >
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                        />
+                        <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                            <Label
+                                content={({ viewBox }) => {
+                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                        return (
+                                            <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
+                                                <tspan
+                                                    x={viewBox.cx}
+                                                    y={(viewBox.cy || 0) - 16}
+                                                    className="fill-foreground text-2xl font-bold"
+                                                >
+                                                    {totalVisitors.toLocaleString()}
+                                                </tspan>
+                                                <tspan
+                                                    x={viewBox.cx}
+                                                    y={(viewBox.cy || 0) + 4}
+                                                    className="fill-muted-foreground"
+                                                >
+                                                    Total Build
+                                                </tspan>
+                                            </text>
+                                        )
+                                    }
+                                }}
+                            />
+                        </PolarRadiusAxis>
+                        <RadialBar
+                            dataKey="failure"
+                            stackId="a"
+                            cornerRadius={5}
+                            fill="var(--color-desktop)"
+                            className="stroke-transparent stroke-2"
+                        />
+                        <RadialBar
+                            dataKey="success"
+                            fill="var(--color-mobile)"
+                            stackId="a"
+                            cornerRadius={5}
+                            className="stroke-transparent stroke-2"
+                        />
+                    </RadialBarChart>
+                </ChartContainer>
+            </CardContent>
+            <CardFooter className="flex-col gap-2 text-sm">
+                <div className="flex items-center gap-2 font-medium leading-none">
+                    Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                </div>
+                <div className="leading-none text-muted-foreground">
+                    Showing total visitors for the last 6 months
+                </div>
+            </CardFooter>
+        </Card>
     )
 }

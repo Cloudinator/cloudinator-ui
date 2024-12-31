@@ -8,7 +8,7 @@ export function ErrorTerminal() {
     const [input, setInput] = useState('')
     const [output, setOutput] = useState<string[]>([
         'Cloudinator!',
-        'Error: Unspecified page cannot be found!',
+        'Error: Unspecified test-profile cannot be found!',
         'Type "help" to see available commands.',
     ])
     const [suggestions, setSuggestions] = useState<string[]>([])

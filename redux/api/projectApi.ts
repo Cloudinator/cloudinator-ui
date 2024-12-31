@@ -46,6 +46,12 @@ type Repository = {
 
 }
 
+export type BuildAnalytic = {
+    date: string,
+    fail: number,
+    success: number
+}
+
 const projectApi = createServiceApi('project')
 
 export const projectsApi = projectApi.injectEndpoints({
@@ -236,11 +242,32 @@ export const projectsApi = projectApi.injectEndpoints({
                 url: `/api/v1/spring/build-service/${folder}/${name}`,
                 method: 'POST'
             }),
-        })
+        }),
+
+        countWorkspace: builder.query<number, void>({
+            query: () => 'api/v1/workspace/count-workspaces',
+        }),
+
+        countSubworkspaces: builder.query<SubWorkspace, {name:string}>({
+            query: ({name}) => `api/v1/sub-workspace/count-sub/${name}`,
+        }),
+
+        countService: builder.query<SubWorkspace, {name:string}>({
+            query: ({name}) => `api/v1/deploy-service/count-deploy-service/${name}`,
+        }),
+
+        getBuildAnalytic: builder.query<BuildAnalytic, void>({
+            query: () => 'api/v1/deploy-service/get-build-analytics',
+        }),
+
+
+
+
 
 
     }),
 })
 
 
-export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation,useGetTestMutation,useGetMetadataQuery,useDeleteSpringProjectMutation,useGetRepositoryQuery,useCreateGitlabServiceMutation,useCreateExistingProjectMutation,useUpdateExistingServiceMutation,useDeploySpringServiceMutation} = projectsApi
+export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation,useGetTestMutation,useGetMetadataQuery,useDeleteSpringProjectMutation,useGetRepositoryQuery,useCreateGitlabServiceMutation,useCreateExistingProjectMutation,useUpdateExistingServiceMutation,useDeploySpringServiceMutation,useCountWorkspaceQuery,
+useCountSubworkspacesQuery,useCountServiceQuery,useGetBuildAnalyticQuery} = projectsApi

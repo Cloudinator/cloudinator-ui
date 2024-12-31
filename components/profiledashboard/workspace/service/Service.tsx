@@ -40,11 +40,13 @@ type ServiceType = {
     name: string;
     gitUrl: string;
     branch: string;
-    subdomain: string;
+    subDomain: string;
+    status: boolean;
+
     type: 'all' | 'frontend' | 'backend' | 'database' | 'subworkspace';
 };
 
-type ServiceDeploymentResponse = {
+export type ServiceDeploymentResponse = {
     next: boolean;
     previous: boolean;
     total: number;
@@ -58,7 +60,7 @@ type SubWorkspaceType = {
     uuid: string;
     gitUrl: string;
     branch: string;
-    subdomain: string;
+    subDomain: string;
     status: boolean;
 }
 
@@ -95,6 +97,7 @@ export default function Service() {
     const [selectedType, setSelectedType] = useState<ServiceType['type'] | 'all'>('all');
     const [deleteServiceDeployment] = useDeleteServiceDeploymentMutation();
     const [deleteSubWorkspace] = useDeleteSubWorkSpaceMutation();
+
 
     const {data: workspacesData} = useGetWorkspacesQuery();
     const workspaces = workspacesData || [];
@@ -195,6 +198,7 @@ export default function Service() {
             </div>
         );
     }
+
 
     return (
         <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -359,12 +363,12 @@ export default function Service() {
                                     {service?.type === 'subworkspace' ? (
                                             <span className="text-gray-500 dark:text-gray-300">This is sub workspace where you can manage your microservices</span>
                                         ):
-                                        <a href={`https://${service.subdomain}.cloudinator.cloud`} target="_blank"
+                                        <a href={`https://${service.subDomain}.cloudinator.cloud`} target="_blank"
                                            rel="noopener noreferrer"
                                            className="flex items-center text-green-600 hover:underline"
                                            onClick={(e) => e.stopPropagation()}>
                                             <Globe className="w-4 h-4 mr-2 flex-shrink-0"/>
-                                            <span className="truncate">{service.subdomain}</span>
+                                            <span className="truncate">{service.subDomain}</span>
                                             <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0"/>
                                         </a>}
                                 </div>

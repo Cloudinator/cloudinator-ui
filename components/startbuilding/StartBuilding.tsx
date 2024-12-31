@@ -10,6 +10,8 @@ import octopus from '@/public/Octopus.json'
 import pirate from '@/public/Pirateship.json'
 import dynamic from "next/dynamic";
 import { AnimatedGradientText } from '../AnimatedGradientText'
+import {useGetMeQuery} from "@/redux/api/userApi";
+import Link from "next/link";
 const Lottie = dynamic(() => import('react-lottie'), {ssr: false});
 
 const octopusAnimation = {
@@ -111,6 +113,8 @@ const timelineSteps = [
 
 const ProcessStep = ({ step, index, isLast }: { step: typeof timelineSteps[0]; index: number; isLast: boolean }) => {
     const Icon = step.icon;
+
+
 
     return (
         <div className="flex-1 flex flex-col items-center">
@@ -240,6 +244,10 @@ const FloatingCard: React.FC<FloatingCardProps> = ({ card, index }) => {
 }
 
 export default function StartBuildingPage() {
+
+    const {data} = useGetMeQuery();
+
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-black">
             {/* Hero Section */}
@@ -272,12 +280,21 @@ export default function StartBuildingPage() {
                                 Building a superior runtime product that streamlines automation, enhances performance,
                                 and offers seamless integration.
                             </p>
-                            <Button
-                                size="lg"
-                                className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 dark:from-purple-400 dark:to-blue-400"
-                            >
-                                Get Started
-                            </Button>
+                            {!data ? <Link href={`/oauth2/authorization/devops`}>
+                                <Button
+                                    size="lg"
+                                    className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 dark:from-purple-400 dark:to-blue-400"
+                                >
+                                    Get Started
+                                </Button>
+                            </Link> :<Link href={`/dashboard`}>
+                                <Button
+                                    size="lg"
+                                    className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 dark:from-purple-400 dark:to-blue-400"
+                                >
+                                    Get Started
+                                </Button>
+                            </Link>}
                         </motion.div>
 
                         <motion.div

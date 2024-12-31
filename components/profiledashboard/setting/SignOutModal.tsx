@@ -37,7 +37,7 @@ const SignOutModal: React.FC<SignOutModalProps> = ({
                 variant: "default"
             });
 
-            // Redirect to home page after a short delay
+            // Redirect to home test-profile after a short delay
             setTimeout(() => {
                 router.push('http://localhost:8081/');
             }, 2000); // Adjust delay as needed

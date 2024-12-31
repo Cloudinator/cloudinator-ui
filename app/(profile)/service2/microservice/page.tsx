@@ -10,7 +10,7 @@ import { ServiceCreationFlow } from "@/components/profiledashboard/workspace/ser
 const services = [
     {
         name: "User Service",
-        description: "Handles user registration, authentication, and profile management.",
+        description: "Handles user registration, authentication, and test-profile management.",
         version: "1.0.0",
         dependencies: 2,
         technologies: ["Spring Boot", "Spring Security", "PostgreSQL"],
