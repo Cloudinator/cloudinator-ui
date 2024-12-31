@@ -9,7 +9,7 @@ import { AnimatedGradientText } from '../AnimatedGradientText';
 const ServiceComponent: React.FC = () => {
     return (
         <div className="container mx-auto px-4">
-            <section className="py-12 md:py-24">
+            <section className="py-10">
                 <motion.div className="text-center space-y-6 max-w-3xl mx-auto" {...fadeInUp}>
                     <AnimatedGradientText className="text-4xl md:text-5xl font-extrabold mb-4 inline-block">
                         Explore Our Services
@@ -17,8 +17,8 @@ const ServiceComponent: React.FC = () => {
                 </motion.div>
             </section>
 
-            <section className="py-12 md:py-24">
-                <div className="space-y-24">
+            <section className="py-4">
+                <div className="space-y-12">
                     <Service
                         title="Full Service Deployment"
                         description="Say goodbye to manual and error-prone deployment processes. Our Service automates the deployment of frontend code, backend service, database, and all other components of your application stack."

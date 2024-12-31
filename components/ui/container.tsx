@@ -10,7 +10,7 @@ export function Container({ className, fullWidth = false, ...props }: ContainerP
         <div
             className={cn(
                 "mx-auto w-full",
-                !fullWidth && "max-w-7xl px-4 sm:px-6 lg:px-8",
+                !fullWidth && "container mx-auto ",
                 className
             )}
             {...props}

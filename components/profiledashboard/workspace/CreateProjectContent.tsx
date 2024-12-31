@@ -129,8 +129,8 @@ export default function CreateProjectContent({ onClose, selectedWorkspace, data1
         <div className="flex flex-col h-full max-h-[80vh]">
             <DialogHeader className="px-6 py-4 border-b">
                 <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Create New Project</DialogTitle>
-                <DialogDescription className="text-lg">
-                    Choose a project type and enter the required information.
+                <DialogDescription className="text-lg dark:text-white">
+                    Choose a project type and enter the required information
                 </DialogDescription>
             </DialogHeader>
 

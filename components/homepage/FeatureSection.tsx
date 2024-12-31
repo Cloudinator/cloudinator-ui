@@ -5,8 +5,8 @@ import { motion, useAnimation } from "framer-motion";
 import {
   CuboidIcon,
   LayoutDashboardIcon,
-  ScanIcon,
   NetworkIcon,
+  SearchCode,
 } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { AnimatedGradientText } from "../AnimatedGradientText";
@@ -31,15 +31,15 @@ const features: Feature[] = [
     icon: LayoutDashboardIcon,
   },
   {
-    title: "Scanning Technology",
+    title: "Scanning Vulnerability",
     description:
-      "Utilize cutting-edge scanning technology to digitize documents and automate data entry.",
-    icon: ScanIcon,
+      "Identify potential security risks and vulnerabilities through continuous code scanning.",
+    icon: SearchCode,
   },
   {
     title: "Microservices Deployment",
     description:
-      "Scale your application effortlessly with our microservices architecture.",
+      "Deploy your microservices independently and manage distributed systems with our advanced deployment tools.",
     icon: NetworkIcon,
   },
 ];

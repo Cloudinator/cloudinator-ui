@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {useCreateGitlabServiceMutation, useGetRepositoryQuery} from "@/redux/api/projectApi"
+import Loading from '@/components/Loading'
 
 interface EnhancedGitImportFormProps {
     onClose: () => void
@@ -65,8 +66,8 @@ export default function GitlabImportForm({ onClose, selectedWorkspace,data1 }: E
         );
     }, [data, searchQuery]);
 
-    if (isLoading) return <div className="text-center p-4">Loading repositories...</div>
-    if (error) return <div className="text-center p-4 text-red-500">Error loading repositories</div>
+    if (isLoading) return <div className="text-center p-4 w-full h-[500px] text-purple-500 flex items-center justify-center"><Loading /></div>
+    if (error) return <div className="text-center font-semibold p-4 w-full h-[500px] text-purple-500 flex items-center justify-center">Error loading repositories</div>
     if (!data) return null
 
     return (

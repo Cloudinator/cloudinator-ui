@@ -75,7 +75,7 @@ export default function ProfilePage() {
     }
 
     if (isLoading) return <div className="w-full h-full grid place-content-center"><Loading /></div>
-    if (error) return <div className="w-full h-full text-purple-500 text-3xl grid place-content-center">Error loading user data.</div>
+    if (error) return <div className="w-full h-full text-purple-500 text-3xl grid place-content-center">User Must Login First</div>
 
     return (
         <div className="flex flex-col bg-background min-h-screen w-full p-6 md:p-10">

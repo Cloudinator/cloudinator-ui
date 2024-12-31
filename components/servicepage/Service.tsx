@@ -91,7 +91,7 @@ export default function ServicesPage() {
             </section>
 
             {/* Rest of the sections remain unchanged */}
-            <section className="py-16 md:py-24">
+            <section className="py-16">
                 <div className="container mx-auto px-4 flex justify-center">
                     <IconCloudDemo />
                 </div>
@@ -103,13 +103,7 @@ export default function ServicesPage() {
                 </div>
             </section>
 
-            <section className="py-16 md:py-24">
-                {/* <div className="container mx-auto px-4">
-          <DevOpsFlow />
-        </div> */}
-            </section>
-
-            <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800">
+            <section className="py-16 bg-gray-50 dark:bg-gray-800">
                 <div className="container mx-auto px-4">
                     <StorageSection />
                 </div>
@@ -120,7 +114,7 @@ export default function ServicesPage() {
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg max-w-3xl w-full">
                         <div className="aspect-w-16 aspect-h-9">
                             <iframe
-                                src="https://cloudinator-ui.naktech.pro"
+                                src="https://www.youtube.com/embed/kIpW8ZkfsYs"
                                 frameBorder="0"
                                 allow="autoplay; encrypted-media"
                                 allowFullScreen

@@ -50,13 +50,14 @@ export function DatabaseForm({ onClose }: DatabaseFormProps) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 px-2 text-purple-600 py-2">
             <FormField
                 icon={Database}
                 label="Database Name"
                 name="dbname"
                 value={projectFields.dbname}
                 onChange={handleInputChange}
+                className="border-purple-600 focus:border-purple-700"
             />
             <FormField
                 icon={User}
@@ -64,6 +65,7 @@ export function DatabaseForm({ onClose }: DatabaseFormProps) {
                 name="dbuser"
                 value={projectFields.dbuser}
                 onChange={handleInputChange}
+                className="border-purple-600 focus:border-purple-700"
             />
             <FormField
                 icon={Lock}
@@ -72,20 +74,22 @@ export function DatabaseForm({ onClose }: DatabaseFormProps) {
                 type="password"
                 value={projectFields.dbpassword}
                 onChange={handleInputChange}
+                className="border-purple-600 focus:border-purple-700"
             />
             <div className="space-y-2">
                 <Label htmlFor="dbtype" className="text-sm font-medium">Database Type</Label>
                 <Select value={projectFields.dbtype} onValueChange={handleSelectChange}>
                     <SelectTrigger id="dbtype">
-                        <SelectValue placeholder="Select database type" />
+                        <SelectValue placeholder="Select database type" className="border-purple-600 focus:border-purple-700" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="postgres">PostgreSQL</SelectItem>
                         <SelectItem value="mongodb">MongoDB</SelectItem>
+                        <SelectItem value="mysql">MySQL</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
-            <Button type="submit" className="w-full">Create Database Project</Button>
+            <Button type="submit" className="w-full bg-purple-500 hover:bg-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2">Create Database Project</Button>
         </form>
     )
 }

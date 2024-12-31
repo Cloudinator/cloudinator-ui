@@ -22,8 +22,7 @@ import {
     DialogTrigger,
     DialogTitle
 } from "@/components/ui/dialog";
-import { ArrowLeft, Database, Layout, MoreVertical, Server, Share2, User2, Plus, Search, GitBranch, Globe, ExternalLink, Folder } from 'lucide-react';
-import Link from "next/link";
+import { Database, Layout, MoreVertical, Server, Share2, User2, Plus, Search, GitBranch, Globe, ExternalLink, Folder, Terminal } from 'lucide-react';
 import {motion, AnimatePresence} from "framer-motion";
 import {
     useDeleteServiceDeploymentMutation, useDeleteSubWorkSpaceMutation,
@@ -32,7 +31,7 @@ import {
     useGetWorkspacesQuery
 } from "@/redux/api/projectApi";
 import {useRouter} from "next/navigation";
-import Loading from "@/components/Loading";
+import { Breadcrumbs } from "../../Breadcrumbs";
 
 const CreateProjectContent = lazy(() => import('@/components/profiledashboard/workspace/CreateProjectContent'));
 
@@ -70,14 +69,12 @@ type SubWorkSpaceResponse = {
     total: number;
     totalElements: number;
     results: SubWorkspaceType[];
-
 };
-
 
 function getServiceIcon(type: ServiceType['type']) {
     switch (type) {
         case 'all': 
-            return <Folder className="w-5 h-5 text-gray-800"/>
+            return <Folder className="w-5 h-5 text-yellow-500"/>
         case 'frontend':
             return <Layout className="w-5 h-5 text-purple-600"/>;
         case 'backend':
@@ -191,38 +188,37 @@ export default function Service() {
 
 
 
-    if (!workspacesData) {
-        return (
-            <div className="text-purple-500 grid place-content-center h-screen w-full text-3xl">
-                <Loading />
-            </div>
-        );
-    }
+    // if (!workspacesData) {
+    //     return (
+    //         <div className="text-purple-500 grid place-content-center h-screen w-full text-3xl">
+    //             Data Not Found!
+    //         </div>
+    //     );
+    // }
 
 
     return (
-        <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="py-6 px-4 sm:px-6 lg:px-8">
+            
             <motion.div
                 initial={{opacity: 0, y: -20}}
                 animate={{opacity: 1, y: 0}}
                 transition={{duration: 0.5}}
                 className="flex flex-col sm:flex-row items-center justify-between pb-6 space-y-4 sm:space-y-0"
             >
-                <div className="flex items-center space-x-2">
-                    <Link href="/workspace">
-                        <ArrowLeft className="h-8 w-8 text-purple-500"/>
-                    </Link>
-                    <h1 className="text-3xl font-bold tracking-tight text-purple-500">
-                        Workspace
-                    </h1>
-                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="bg-purple-500 hover:bg-purple-600 text-lg px-6 py-3">
-                            <Plus className="mr-2 h-5 w-5"/>
-                            Create Project
-                        </Button>
-                    </DialogTrigger>
+                    <div className="flex justify-between items-center w-full">
+                        <Breadcrumbs
+                            title="Workspace Page"
+                            titleIcon={Terminal}
+                        />
+                        <DialogTrigger asChild>
+                            <Button className="bg-purple-500 dark:text-white hover:bg-purple-600 text-lg px-6 py-3">
+                                <Plus className="mr-2 h-5 w-5"/>
+                                Create Project
+                            </Button>
+                        </DialogTrigger>
+                    </div>
                     <DialogContent
                         className="p-0 bg-white dark:bg-gray-950 max-w-[90vw] sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px] w-full h-[90vh] sm:h-auto"
                     >
@@ -294,7 +290,7 @@ export default function Service() {
                         <Button
                             key={type}
                             variant={selectedType === type ? "default" : "outline"}
-                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${
+                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${
                                 selectedType === type ? 'ring-2 ring-purple-500' : ''
                             }`}
                             onClick={() => setSelectedType(type)}
