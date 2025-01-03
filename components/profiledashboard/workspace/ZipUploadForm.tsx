@@ -93,7 +93,7 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                         className="space-y-4"
                     >
                         <div>
-                            <Label htmlFor="projectName">Project Name</Label>
+                            <Label htmlFor="projectName" className={"text-purple-500"}>Project Name</Label>
                             <Input
                                 id="projectName"
                                 value={projectName}
@@ -115,15 +115,15 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                                 </div>
                             ) : (
                                 <div>
-                                    <Upload className="w-12 h-12 mx-auto text-gray-400" />
-                                    <p>Drag & drop a ZIP file here, or click to select one</p>
+                                    <Upload className="w-12 h-12 mx-auto text-purple-500" />
+                                    <p className={"text-purple-500"}>Drag & drop a ZIP file here, or click to select one</p>
                                 </div>
                             )}
                         </div>
                         <Button
                             type="submit"
                             disabled={isLoading || !file || !projectName}
-                            className="w-full"
+                            className="w-full c"
                             onClick={handleSubmit}
                         >
                             Create and Deploy Project
@@ -174,7 +174,7 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
     }
 
     return (
-        <div className="max-w-md mx-auto">
+        <div className="w-full px-2 py-2">
             {renderStep()}
         </div>
     )

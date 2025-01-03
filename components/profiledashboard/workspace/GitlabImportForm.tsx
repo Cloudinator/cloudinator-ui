@@ -1,13 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { Search, GitBranch, ChevronDown, ChevronRight } from 'lucide-react'
+import { Search, GitBranch, ChevronDown, ChevronRight, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {useCreateGitlabServiceMutation, useGetRepositoryQuery} from "@/redux/api/projectApi"
+import { useCreateGitlabServiceMutation, useGetRepositoryQuery } from "@/redux/api/projectApi"
 import Loading from '@/components/Loading'
+import { useToast } from "@/hooks/use-toast"
 
 interface EnhancedGitImportFormProps {
     onClose: () => void
@@ -22,49 +23,50 @@ interface Repository {
     default_branch: string
 }
 
-export default function GitlabImportForm({ onClose, selectedWorkspace,data1 }: EnhancedGitImportFormProps) {
+export default function GitlabImportForm({ onClose, selectedWorkspace, data1 }: EnhancedGitImportFormProps) {
     const [searchQuery, setSearchQuery] = React.useState('')
     const [expandedRepo, setExpandedRepo] = React.useState<string | null>(null)
-    const [createGitlabService] = useCreateGitlabServiceMutation();
+    const [createGitlabService, { isLoading: isImporting }] = useCreateGitlabServiceMutation()
+    const { toast } = useToast()
 
     const { data, isLoading, error } = useGetRepositoryQuery()
 
-    const handleImport = (repo: Repository) => {
-        try{
-
-            const response = createGitlabService({
+    const handleImport = async (repo: Repository) => {
+        try {
+            await createGitlabService({
                 name: repo.name,
                 workspaceName: selectedWorkspace,
                 token: '',
                 branch: repo.default_branch,
+            }).unwrap()
+
+            toast({
+                title: "Success",
+                description: `Repository "${repo.name}" imported successfully!`,
+                variant: "success",
+                duration: 3000,
             })
 
-            response.unwrap().then(
-                () => {
-                    onClose();
-                    data1();
-                },
-                (error) => {
-                    console.log(error)
-                    onClose();
-                    data1();
-                }
-            )
-
-            console.log(response)
-
-        }catch (error){
-            console.log(error)
+            onClose()
+            data1()
+        } catch (error) {
+            console.error(error)
+            toast({
+                title: "Error",
+                description: `Failed to import repository "${repo.name}". Please try again.`,
+                variant: "error",
+                duration: 5000,
+            })
         }
     }
 
     const filteredRepos = React.useMemo(() => {
-        if (!data || !Array.isArray(data)) return []; // Ensure it's an array
-        const search = searchQuery.toLowerCase();
+        if (!data || !Array.isArray(data)) return []
+        const search = searchQuery.toLowerCase()
         return (data as Repository[]).filter((repo: Repository) =>
             repo.name.toLowerCase().includes(search)
-        );
-    }, [data, searchQuery]);
+        )
+    }, [data, searchQuery])
 
     if (isLoading) return <div className="text-center p-4 w-full h-[500px] text-purple-500 flex items-center justify-center"><Loading /></div>
     if (error) return <div className="text-center font-semibold p-4 w-full h-[500px] text-purple-500 flex items-center justify-center">Error loading repositories</div>
@@ -144,8 +146,16 @@ export default function GitlabImportForm({ onClose, selectedWorkspace,data1 }: E
                                                 variant="default"
                                                 className="bg-blue-500 text-white hover:bg-blue-600"
                                                 onClick={() => handleImport(repo)}
+                                                disabled={isImporting}
                                             >
-                                                Import
+                                                {isImporting ? (
+                                                    <>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Importing...
+                                                    </>
+                                                ) : (
+                                                    'Import'
+                                                )}
                                             </Button>
                                         </div>
                                     </motion.div>

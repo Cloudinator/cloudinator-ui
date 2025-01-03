@@ -15,16 +15,22 @@ import {
 import { Input } from "@/components/ui/input"
 import { Zap, Loader2 } from 'lucide-react'
 import {useCreateWorkspaceMutation} from "@/redux/api/projectApi";
+import {useToast} from "@/hooks/use-toast";
+
+interface ErrorResponse {
+    data?: {
+        message?: string;
+    };
+}
 
 export function CreateWorkspaceModal() {
+    const {toast} = useToast();
     const [open, setOpen] = useState(false)
     const [workspaceName, setWorkspaceName] = useState("")
     const [isCreating, setIsCreating] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
 
     const [createWorkspace] = useCreateWorkspaceMutation()
-
-
 
     useEffect(() => {
         if (open && inputRef.current) {
@@ -33,17 +39,38 @@ export function CreateWorkspaceModal() {
     }, [open])
 
     const handleCreateWorkspace = async () => {
-        setIsCreating(true)
+        setIsCreating(true);
         try {
-            await createWorkspace({ name: workspaceName })
-            setWorkspaceName("")
-            setOpen(false)
+            await createWorkspace({ name: workspaceName });
+
+            // Success notification
+            toast({
+                title: "Success",
+                description: `Workspace "${workspaceName}" created successfully!`,
+                variant: "success",
+                duration: 3000,
+            });
+
+            setWorkspaceName("");
+            setOpen(false);
+
         } catch (err) {
-            console.error(err)
+
+            const error = err as ErrorResponse;
+            console.error(error);
+
+            // Error notification
+            toast({
+                title: "Error",
+                description: error?.data?.message || "Failed to create workspace. Please try again.",
+                variant: "error",
+                duration: 5000,
+            });
         } finally {
-            setIsCreating(false)
+            setIsCreating(false);
         }
-    }
+    };
+
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

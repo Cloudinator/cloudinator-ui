@@ -101,7 +101,7 @@ export default function DashboardPage() {
                         <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{successRate} %</div>
+                        <div className="text-2xl font-bold">{successRate ? successRate : 0} %</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -110,7 +110,7 @@ export default function DashboardPage() {
                         <Globe className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{buildAnalytic?.success} </div>
+                        <div className="text-2xl font-bold">{buildAnalytic?.success ? buildAnalytic?.success : 0} </div>
                     </CardContent>
                 </Card>
             </div>
