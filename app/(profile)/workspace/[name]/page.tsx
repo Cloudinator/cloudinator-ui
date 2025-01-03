@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Rocket, RotateCcw, StopCircle, ExternalLink, CheckCircle, Github, Code } from 'lucide-react'
+import { Rocket, RotateCcw, StopCircle, ExternalLink, CheckCircle, Github, Code, Loader2 } from 'lucide-react'
 import {
     BuildNumber,
     useBuildServiceMutation,
@@ -18,7 +18,7 @@ import WebsitePreview from "@/components/profiledashboard/deployment/WebsitePrev
 import Link from "next/link"
 import RollbackModal from "@/components/profiledashboard/workspace/RollbackModal";
 import {StreamingLog} from "@/components/profiledashboard/workspace/StreamingLog";
-
+import Loading from '@/components/Loading'
 
 
 export type PropsParams = {
@@ -34,7 +34,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     const [stopServiceDeployment] = useStopServiceDeploymentMutation()
     const [startServiceDeployment] = useStartServiceDeploymentMutation()
 
-    const { data: projects ,refetch} = useGetServiceByNameQuery(
+    const { data: projects, refetch, isLoading: isProjectsLoading } = useGetServiceByNameQuery(
         { name: projectName },
         {
             skip: !projectName,
@@ -42,7 +42,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         }
     )
 
-    const { data: builds } = useGetBuildInfoByNameQuery(
+    const { data: builds, isLoading: isBuildsLoading } = useGetBuildInfoByNameQuery(
         { name: projectName },
         {
             skip: !projectName,
@@ -117,6 +117,17 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
     const successfulBuilds = buildNumber.filter(build => build.status === "SUCCESS");
 
+    if (isProjectsLoading || isBuildsLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                    <p className="text-sm text-gray-500"><Loading /></p>
+                </div>
+            </div>
+        );
+    }
+
     if (!projectName || !projects || !builds) {
         return null
     }
@@ -124,20 +135,19 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     const url = `https://${projects.subdomain}.cloudinator.cloud`
 
     return (
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
+        <div className="px-12 py-6 w-full ">
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold">{projects.name}</h1>
-                        <div className="flex flex-wrap items-center gap-2 mt-2">
-                            <Badge variant="outline" className="text-green-500 border-green-500">
-                                <CheckCircle className="w-4 h-4 mr-1" />
-                                {projects.status ? 'Running' : 'Stopped'}
-                            </Badge>
-                        </div>
+                    {/* Header section */}
+                    <div className="flex items-center gap-8">
+                        <h1 className="text-3xl font-bold text-purple-500">{projects.name}</h1>
+                        <Badge variant="outline" className="text-green-500 border-green-500">
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            {projects.status ? 'Running' : 'Stopped'}
+                        </Badge>
                     </div>
                     <div className="flex flex-wrap gap-3 mt-4 lg:mt-0">
-                        <Button onClick={handleBuildService} className="flex items-center gap-2">
+                        <Button onClick={handleBuildService} className="flex items-center gap-2 bg-purple-500 hover:bg-purple-700 text-white focus:ring-2 focus:ring-purple-700 focus:ring-offset-2">
                             <Rocket className="w-4 h-4" />
                             Deploy
                         </Button>
