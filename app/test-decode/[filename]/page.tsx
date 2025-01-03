@@ -1,4 +1,4 @@
-// app/test-github/[filename]/page.tsx
+// app/test-github/[filename]/test-profile.tsx
 'use client';
 
 import { useParams } from 'next/navigation';

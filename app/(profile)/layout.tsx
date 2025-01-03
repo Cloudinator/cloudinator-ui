@@ -6,6 +6,7 @@ import {SidebarDashboardProfile} from "@/components/profiledashboard/SidebarDash
 import { ThemeProvider } from "next-themes";
 import { Poppins } from 'next/font/google';
 import StoreProvider from "@/app/StoreProvider";
+import { Toaster } from "@/components/ui/toaster"
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -59,7 +60,8 @@ export default function DashboardLayout({
                           </svg>
                         </SidebarTrigger>
                       </div>
-                      {children}
+                        {children}
+                        <Toaster />
                     </main>                                     
               </SidebarProvider>
           </StoreProvider>

@@ -32,6 +32,8 @@ import {
 } from "@/redux/api/projectApi";
 import {useRouter} from "next/navigation";
 import { Breadcrumbs } from "../../Breadcrumbs";
+import {useToast} from "@/hooks/use-toast";
+import Loading from "@/components/Loading";
 
 const CreateProjectContent = lazy(() => import('@/components/profiledashboard/workspace/CreateProjectContent'));
 
@@ -39,11 +41,13 @@ type ServiceType = {
     name: string;
     gitUrl: string;
     branch: string;
-    subdomain: string;
+    subDomain: string;
+    status: boolean;
+
     type: 'all' | 'frontend' | 'backend' | 'database' | 'subworkspace';
 };
 
-type ServiceDeploymentResponse = {
+export type ServiceDeploymentResponse = {
     next: boolean;
     previous: boolean;
     total: number;
@@ -57,7 +61,7 @@ type SubWorkspaceType = {
     uuid: string;
     gitUrl: string;
     branch: string;
-    subdomain: string;
+    subDomain: string;
     status: boolean;
 }
 
@@ -68,6 +72,15 @@ type SubWorkSpaceResponse = {
     totalElements: number;
     results: SubWorkspaceType[];
 };
+
+
+interface ErrorResponse {
+    status?: string;
+    originalStatus?: number;
+    data?: {
+        message?: string;
+    };
+}
 
 function getServiceIcon(type: ServiceType['type']) {
     switch (type) {
@@ -92,6 +105,7 @@ export default function Service() {
     const [selectedType, setSelectedType] = useState<ServiceType['type'] | 'all'>('all');
     const [deleteServiceDeployment] = useDeleteServiceDeploymentMutation();
     const [deleteSubWorkspace] = useDeleteSubWorkSpaceMutation();
+    const {toast} = useToast();
 
     const {data: workspacesData} = useGetWorkspacesQuery();
     const workspaces = workspacesData || [];
@@ -147,21 +161,48 @@ export default function Service() {
         setDeleteConfirmationName('');
     };
 
-
-
     const confirmDelete = async () => {
         if (serviceToDelete && deleteConfirmationName === serviceToDelete.name) {
             try {
-                const result = await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
-                console.log('Service deleted:', result);
-            } catch (error) {
-                console.log('Failed to delete service:', error);
+                await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
+
+                toast({
+                    title: "Success",
+                    description: `Service "${serviceToDelete.name}" has been deleted successfully.`,
+                    variant: "success",
+                    duration: 3000,
+                });
+
+                data1();
+                data2();
+
+            } catch (err) {
+
+                const error = err as ErrorResponse;
+
+                if (error?.status === 'PARSING_ERROR' && error?.originalStatus === 200) {
+                    toast({
+                        title: "Success",
+                        description: error?.data?.message || `Service "${serviceToDelete.name}" has been deleted successfully.`,
+                        variant: "success",
+                        duration: 3000,
+                    });
+
+                    data1();
+                    data2();
+                } else {
+                    toast({
+                        title: "Error",
+                        description: error?.data?.message || "Failed to delete service. Please try again.",
+                        variant: "error",
+                        duration: 5000,
+                    });
+                }
+                console.log('Delete service response:', error);
             } finally {
                 setIsDeleteModalOpen(false);
                 setServiceToDelete(null);
                 setDeleteConfirmationName('');
-                data1();
-                data2();
             }
         }
     };
@@ -169,29 +210,64 @@ export default function Service() {
     const confirmDeleteSubWorkspace = async () => {
         if (subWorkspaceToDelete && deleteConfirmationName === subWorkspaceToDelete.name) {
             try {
-                const result = await deleteSubWorkspace({ name: subWorkspaceToDelete.name}).unwrap();
-                console.log('Subworkspace deleted:', result);
-            } catch (error) {
-                console.log('Failed to delete subworkspace:', error);
+                await deleteSubWorkspace({ name: subWorkspaceToDelete.name}).unwrap();
+
+                // Success toast - this will show for successful deletion (status 200)
+                toast({
+                    title: "Success",
+                    description: `Subworkspace "${subWorkspaceToDelete.name}" has been deleted successfully.`,
+                    variant: "default",
+                    duration: 3000,
+                });
+
+                // Refresh data and close modal
+                data1();
+                data2();
+
+            } catch (err) {
+
+                const error = err as ErrorResponse;
+
+                // Handle different error cases
+                if (error?.status === 'PARSING_ERROR' && error?.originalStatus === 200) {
+                    // This is actually a success case with non-JSON response
+                    toast({
+                        title: "Success",
+                        description: error?.data?.message || `Subworkspace "${subWorkspaceToDelete.name}" has been deleted successfully.`,
+                        variant: "success",
+                        duration: 3000,
+                    });
+
+                    // Refresh data since deletion was successful
+                    data1();
+                    data2();
+                } else {
+                    // Real error case
+                    toast({
+                        title: "Error",
+                        description: error?.data?.message || "Failed to delete subworkspace. Please try again.",
+                        variant: "destructive",
+                        duration: 5000,
+                    });
+                }
+                console.log('Delete subworkspace response:', error);
             } finally {
+                // Clean up state
                 setIsDeleteModalOpen(false);
                 setSubWorkspaceToDelete(null);
                 setDeleteConfirmationName('');
-                data1();
-                data2();
             }
         }
+    };
+
+    if (!workspacesData) {
+        return (
+            <div className="text-purple-500 grid place-content-center h-screen w-full text-3xl">
+                <Loading />
+            </div>
+        );
     }
 
-
-
-    // if (!workspacesData) {
-    //     return (
-    //         <div className="text-purple-500 grid place-content-center h-screen w-full text-3xl">
-    //             Data Not Found!
-    //         </div>
-    //     );
-    // }
 
     return (
         <div className="py-6 px-4 sm:px-6 lg:px-8">
@@ -209,7 +285,7 @@ export default function Service() {
                             titleIcon={Terminal}
                         />
                         <DialogTrigger asChild>
-                            <Button className="bg-purple-500 dark:text-white hover:bg-purple-600 text-lg px-6 py-3">
+                            <Button className=" bg-purple-500 hover:bg-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2">
                                 <Plus className="mr-2 h-5 w-5"/>
                                 Create Project
                             </Button>
@@ -355,12 +431,12 @@ export default function Service() {
                                     {service?.type === 'subworkspace' ? (
                                             <span className="text-gray-500 dark:text-gray-300">This is sub workspace where you can manage your microservices</span>
                                         ):
-                                        <a href={`https://${service.subdomain}.cloudinator.cloud`} target="_blank"
+                                        <a href={`https://${service.subDomain}.cloudinator.cloud`} target="_blank"
                                            rel="noopener noreferrer"
                                            className="flex items-center text-green-600 hover:underline"
                                            onClick={(e) => e.stopPropagation()}>
                                             <Globe className="w-4 h-4 mr-2 flex-shrink-0"/>
-                                            <span className="truncate">{service.subdomain}</span>
+                                            <span className="truncate">{service.subDomain}</span>
                                             <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0"/>
                                         </a>}
                                 </div>

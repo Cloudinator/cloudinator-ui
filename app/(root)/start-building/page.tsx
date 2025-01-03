@@ -3,7 +3,7 @@ import StartBuildingPage from "@/components/startbuilding/StartBuilding";
 
 export const metadata: Metadata = {
     title: "Start Building with Cloudinator | Launch Your Cloud Project",
-    description: "Begin your cloud journey with Cloudinator. Our Start Building page guides you through initializing your project, selecting services, and deploying your first application with ease.",
+    description: "Begin your cloud journey with Cloudinator. Our Start Building test-profile guides you through initializing your project, selecting services, and deploying your first application with ease.",
     keywords: [
         "start building",
         "cloud project initialization",

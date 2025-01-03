@@ -74,7 +74,7 @@ const DashboardHeaderProfile = () => {
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>User Account</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            {/* Uncomment if you want to add a profile link */}
+                            {/* Uncomment if you want to add a test-profile link */}
                             {/*<DropdownMenuItem>*/}
                             {/*    <User className="mr-2 h-4 w-4" />*/}
                             {/*    Profile*/}

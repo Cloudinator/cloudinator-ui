@@ -27,8 +27,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                                                                  onConfirm,
                                                                  title = "Are you sure you want to update?", // Default title
                                                                  description = "This action will change your information", // Default description
-                                                                 successMessage = "Update profile successful", // Default success message
-                                                                 errorMessage = "Update profile failed", // Default error message
+                                                                 successMessage = "Update test-profile successful", // Default success message
+                                                                 errorMessage = "Update test-profile failed", // Default error message
                                                              }) => {
     const handleConfirm = async () => {
         try {
