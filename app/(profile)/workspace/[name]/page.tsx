@@ -19,10 +19,19 @@ import Link from "next/link"
 import RollbackModal from "@/components/profiledashboard/workspace/RollbackModal";
 import {StreamingLog} from "@/components/profiledashboard/workspace/StreamingLog";
 import Loading from '@/components/Loading'
+import { useToast } from '@/hooks/use-toast'
 
 
 export type PropsParams = {
     params: Promise<{ name: string }>
+}
+
+interface ErrorResponse {
+    status?: string;
+    originalStatus?: number;
+    data?: {
+        message?: string;
+    };
 }
 
 export default function ProjectDetailPage({ params }: PropsParams) {
@@ -33,6 +42,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     const [buildService] = useBuildServiceMutation()
     const [stopServiceDeployment] = useStopServiceDeploymentMutation()
     const [startServiceDeployment] = useStartServiceDeploymentMutation()
+    const {toast} = useToast();
 
     const { data: projects, refetch, isLoading: isProjectsLoading } = useGetServiceByNameQuery(
         { name: projectName },
@@ -65,11 +75,12 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             buildNumber: buildNumber.length + 1,
             status: "BUILDING"
         };
-
+    
         setBuildNumber(prevBuilds => [newBuild, ...prevBuilds]);
-
+    
         try {
             const result = await buildService({ name: projectName }).unwrap();
+            
             setBuildNumber(prevBuilds =>
                 prevBuilds.map(build =>
                     build.buildNumber === newBuild.buildNumber
@@ -77,7 +88,33 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                         : build
                 )
             );
-        } catch (error) {
+    
+            toast({
+                title: "Success",
+                description: `Service "${projectName}" build initiated successfully.`,
+                variant: "success",
+                duration: 3000,
+            });
+    
+        } catch (err) {
+            const error = err as ErrorResponse;
+    
+            if (error?.status === 'PARSING_ERROR' && error?.originalStatus === 200) {
+                toast({
+                    title: "Success",
+                    description: error?.data?.message || `Service "${projectName}" build initiated successfully.`,
+                    variant: "success",
+                    duration: 3000,
+                });
+            } else {
+                toast({
+                    title: "Error",
+                    description: error?.data?.message || "Failed to initiate service build. Please try again.",
+                    variant: "error",
+                    duration: 5000,
+                });
+            }
+            
             console.error('Failed to initiate service build:', error);
         }
     }
@@ -135,7 +172,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     const url = `https://${projects.subdomain}.cloudinator.cloud`
 
     return (
-        <div className="px-12 py-6 w-full ">
+        <div className="px-12 py-6 w-full">
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                     {/* Header section */}
@@ -154,7 +191,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                         <Button
                             onClick={() => setIsRollbackModalOpen(true)}
                             variant="outline"
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 bg-white border-purple-200 border text-purple-500 hover:bg-purple-100 hover:text-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
                             disabled={successfulBuilds.length === 0}
                         >
                             <RotateCcw className="w-4 h-4" />
@@ -178,15 +215,15 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                     </div>
                 </div>
 
-                <Tabs defaultValue="overview" className="mt-6">
-                    <TabsList className="mb-4">
-                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                        <TabsTrigger value="builds">Build History</TabsTrigger>
-                        <TabsTrigger value="logs">Build Logs</TabsTrigger>
+                <Tabs defaultValue="overview" className="mt-6 w-full">
+                    <TabsList className="mb-4 w-full">
+                        <TabsTrigger value="overview" className="w-full text-purple-500 bg-white bg-opacity-20 py-2 px-4 data-[state=active]:bg-purple-500 data-[state=active]:text-white">Overview</TabsTrigger>
+                        <TabsTrigger value="builds" className="w-full text-purple-500 bg-white bg-opacity-20 py-2 px-4 data-[state=active]:bg-purple-500 data-[state=active]:text-white">Build History</TabsTrigger>
+                        <TabsTrigger value="logs" className="w-full text-purple-500 bg-white bg-opacity-20 py-2 px-4 data-[state=active]:bg-purple-500 data-[state=active]:text-white">Build Logs</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="overview">
+                    <TabsContent value="overview" className="w-full">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Card>
+                            <Card className="w-full">
                                 <CardHeader>
                                     <CardTitle>Project Details</CardTitle>
                                 </CardHeader>
@@ -216,7 +253,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                                     </dl>
                                 </CardContent>
                             </Card>
-                            <Card>
+                            <Card className="w-full">
                                 <CardHeader>
                                     <CardTitle>Project Preview</CardTitle>
                                 </CardHeader>
@@ -226,8 +263,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                             </Card>
                         </div>
                     </TabsContent>
-                    <TabsContent value="builds">
-                        <Card>
+                    <TabsContent value="builds" className="w-full">
+                        <Card className="w-full">
                             <CardHeader>
                                 <CardTitle>Build History</CardTitle>
                             </CardHeader>
@@ -253,8 +290,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                             </CardContent>
                         </Card>
                     </TabsContent>
-                    <TabsContent value="logs">
-                        <Card>
+                    <TabsContent value="logs" className="w-full">
+                        <Card className="w-full">
                             <CardHeader>
                                 <CardTitle>Build Logs</CardTitle>
                             </CardHeader>
