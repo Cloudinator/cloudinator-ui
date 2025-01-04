@@ -68,7 +68,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
   const {
     data: projects,
-    refetch,
+    refetch: refetchProjects,
     isLoading: isProjectsLoading,
   } = useGetServiceByNameQuery(
     { name: projectName },
@@ -78,14 +78,17 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     },
   );
 
-  const { data: builds, isLoading: isBuildsLoading } =
-    useGetBuildInfoByNameQuery(
-      { name: projectName },
-      {
-        skip: !projectName,
-        refetchOnMountOrArgChange: true,
-      },
-    );
+  const {
+    data: builds,
+    refetch: refetchBuilds,
+    isLoading: isBuildsLoading,
+  } = useGetBuildInfoByNameQuery(
+    { name: projectName },
+    {
+      skip: !projectName,
+      refetchOnMountOrArgChange: true,
+    },
+  );
 
   useEffect(() => {
     params.then(({ name }) => setProjectName(name));
@@ -96,6 +99,43 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       setBuildNumber(builds);
     }
   }, [builds]);
+
+  // Real-time build status updates
+  useEffect(() => {
+    if (!projectName) return;
+
+    const eventSource = new EventSource(
+      `https://stream.psa-khmer.world/api/v1/jenkins/stream-log/${projectName}`,
+    );
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Received build status update:", data);
+
+      // Update the build status in the state
+      setBuildNumber((prevBuilds) =>
+        prevBuilds.map((build) =>
+          build.buildNumber === data.buildNumber
+            ? { ...build, status: data.status }
+            : build,
+        ),
+      );
+
+      // Refetch build data if the status changes to SUCCESS
+      if (data.status === "SUCCESS") {
+        refetchBuilds();
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("EventSource error:", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [projectName, refetchBuilds]);
 
   const handleBuildService = async () => {
     setIsDeployDialogOpen(false);
@@ -167,7 +207,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         variant: "success",
         duration: 3000,
       });
-      refetch();
+      refetchProjects();
     } catch (err) {
       const error = err as ErrorResponse;
 
@@ -180,7 +220,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           variant: "success",
           duration: 3000,
         });
-        refetch();
+        refetchProjects();
       } else {
         toast({
           title: "Error",
@@ -204,7 +244,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         variant: "success",
         duration: 3000,
       });
-      refetch();
+      refetchProjects();
     } catch (err) {
       const error = err as ErrorResponse;
 
@@ -217,7 +257,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           variant: "success",
           duration: 3000,
         });
-        refetch();
+        refetchProjects();
       } else {
         toast({
           title: "Error",
@@ -238,7 +278,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       // Implement your rollback logic here
       // await rollbackService({ name: projectName, version });
       // After successful rollback, you may want to refresh the build history
-      // await refetch();
+      // await refetchBuilds();
     } catch (error) {
       console.error("Failed to rollback:", error);
     }
@@ -368,7 +408,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                       </dt>
                       <dd className="font-medium text-lg flex items-center gap-2">
                         {buildNumber.length > 0 ? (
-                          buildNumber[0].status === "BUILDING" ? ( // Use the first build in the array (most recent)
+                          buildNumber[0].status === "BUILDING" ? (
                             <>
                               <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
                               <span className="text-blue-500">Building...</span>
@@ -500,6 +540,11 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                                 ? "secondary"
                                 : "destructive"
                           }
+                          style={
+                            build.status === "SUCCESS"
+                              ? { backgroundColor: "green", color: "white" }
+                              : {}
+                          }
                         >
                           {build.status}
                         </Badge>
@@ -510,7 +555,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 text-purple-500 hover:text-purple-700 bg-gray-100 hover:bg-gray-200"
                       >
                         <Code className="w-4 h-4" />
                         <Link
@@ -528,7 +573,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           <TabsContent value="logs" className="w-full">
             <Card className="w-full">
               <CardHeader>
-                <CardTitle>Build Logs</CardTitle>
+                <CardTitle className="text-purple-500">Build Logs</CardTitle>
               </CardHeader>
               <CardContent>
                 {buildNumber.length > 0 && (
