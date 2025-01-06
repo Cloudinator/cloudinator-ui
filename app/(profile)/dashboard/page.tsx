@@ -55,9 +55,6 @@ export default function DashboardPage() {
 
     const services: ServiceDeployment[] = servicesData?.results;
 
-
-
-
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
             <Breadcrumbs />

@@ -3,7 +3,7 @@ import { CheckCircle2, XCircle } from 'lucide-react'
 export type ServiceDeployment = {
     name: string;
     status?: boolean;
-    subDomain: string;
+    subdomain: string;
     gitUrl: string;
     branch: string;
     type: string;
@@ -27,7 +27,7 @@ export default function RecentDeployments({ services }: RecentDeploymentsProps) 
                     <div className="ml-4 space-y-1 flex-1 min-w-0">
                         <p className="text-sm font-medium leading-none truncate">{deployment.name}</p>
                         <p className="text-sm text-muted-foreground">
-                            {deployment.branch} • {deployment.subDomain}
+                            {deployment.branch} • {deployment.subdomain}
                         </p>
                     </div>
                     {deployment.status ? (
