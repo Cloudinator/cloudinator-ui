@@ -92,11 +92,13 @@ const LogPage = (props: PropsParams) => {
     }
 
     if (!params) {
-        return <div><Loading /></div>;
+        return <div className="w-full h-screen grid place-content-center">
+                <Loading />
+            </div>;
     }
 
     return (
-        <div className="container mx-auto px-4 py-8 bg-gray-50 min-h-screen">
+        <div className="px-8 py-8 bg-gray-50 w-full h-screen">
             <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
                 <h1 className="text-3xl font-bold mb-2 text-gray-800">{params.name} Logs</h1>
                 <p className="text-gray-600">

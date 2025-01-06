@@ -40,6 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { motion } from "framer-motion";
 
 export type PropsParams = {
   params: Promise<{ name: string }>;
@@ -60,10 +61,15 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   const [isStopDialogOpen, setIsStopDialogOpen] = useState(false);
   const [isRestartDialogOpen, setIsRestartDialogOpen] = useState(false);
   const [isDeployDialogOpen, setIsDeployDialogOpen] = useState(false);
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [isStopping, setIsStopping] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   const [buildService] = useBuildServiceMutation();
   const [stopServiceDeployment] = useStopServiceDeploymentMutation();
   const [startServiceDeployment] = useStartServiceDeploymentMutation();
+  const [buildStartTime, setBuildStartTime] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
   const { toast } = useToast();
 
   const {
@@ -103,15 +109,15 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   // Real-time build status updates
   useEffect(() => {
     if (!projectName) return;
-
+  
     const eventSource = new EventSource(
       `https://stream.psa-khmer.world/api/v1/jenkins/stream-log/${projectName}`,
     );
-
+  
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log("Received build status update:", data);
-
+  
       // Update the build status in the state
       setBuildNumber((prevBuilds) =>
         prevBuilds.map((build) =>
@@ -120,36 +126,56 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             : build,
         ),
       );
-
-      // Refetch build data if the status changes to SUCCESS
-      if (data.status === "SUCCESS") {
-        refetchBuilds();
+  
+      // If the build status is "BUILDING", set the start time
+      if (data.status === "BUILDING") {
+        setBuildStartTime(Date.now());
+        setElapsedTime(0); // Reset elapsed time
+      }
+  
+      // If the build status is "SUCCESS" or "FAILED", reset the timer
+      if (data.status === "SUCCESS" || data.status === "FAILED") {
+        setBuildStartTime(null);
+        setElapsedTime(0);
       }
     };
-
-    eventSource.onerror = (error) => {
-      console.error("EventSource error:", error);
+  
+    eventSource.onerror = () => {
       eventSource.close();
     };
-
+  
     return () => {
       eventSource.close();
     };
   }, [projectName, refetchBuilds]);
+  
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+  
+    if (buildStartTime !== null) {
+      interval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - buildStartTime) / 1000)); // Calculate elapsed time in seconds
+      }, 1000);
+    }
+  
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [buildStartTime]);
 
   const handleBuildService = async () => {
-    setIsDeployDialogOpen(false);
-
+    setIsDeploying(true); // Start loading
+  
     const newBuild = {
       buildNumber: buildNumber.length + 1,
       status: "BUILDING",
     };
-
+  
     setBuildNumber((prevBuilds) => [newBuild, ...prevBuilds]);
-
+  
     try {
       const result = await buildService({ name: projectName }).unwrap();
-
+  
       setBuildNumber((prevBuilds) =>
         prevBuilds.map((build) =>
           build.buildNumber === newBuild.buildNumber
@@ -163,16 +189,16 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             : build,
         ),
       );
-
+  
       toast({
         title: "Success",
-        description: `Service "${projectName}" build initiated successfully.`,
+        description: `Service "${projectName}" is starting to build, be patient`,
         variant: "success",
         duration: 3000,
       });
     } catch (err) {
       const error = err as ErrorResponse;
-
+  
       if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
         toast({
           title: "Success",
@@ -192,10 +218,15 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           duration: 5000,
         });
       }
+    } finally {
+      setIsDeploying(false); // Stop loading
+      setIsDeployDialogOpen(false); // Close the dialog
     }
   };
 
   const handleStopService = async () => {
+    setIsStopping(true); // Start loading
+  
     try {
       await stopServiceDeployment({
         name: projectName,
@@ -210,7 +241,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       refetchProjects();
     } catch (err) {
       const error = err as ErrorResponse;
-
+  
       if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
         toast({
           title: "Success",
@@ -231,10 +262,14 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         });
       }
       console.log("Failed to stop service:", error);
+    } finally {
+      setIsStopping(false); // Stop loading
     }
   };
 
   const handleRestartService = async () => {
+    setIsStarting(true); // Start loading
+  
     try {
       await startServiceDeployment({ name: projectName }).unwrap();
       setIsRestartDialogOpen(false);
@@ -247,7 +282,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       refetchProjects();
     } catch (err) {
       const error = err as ErrorResponse;
-
+  
       if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
         toast({
           title: "Success",
@@ -269,6 +304,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         });
       }
       console.log("Failed to restart service:", error);
+    } finally {
+      setIsStarting(false); // Stop loading
     }
   };
 
@@ -305,6 +342,10 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
   const url = `https://${projects.subdomain}.cloudinator.cloud`;
 
+  const isDeploymentRunning = buildNumber.some(
+    (build) => build.status === "BUILDING",
+  );
+
   return (
     <div className="px-12 py-6 w-full">
       <div className="flex flex-col gap-4">
@@ -315,20 +356,40 @@ export default function ProjectDetailPage({ params }: PropsParams) {
               {projects.name}
             </h1>
             <Badge
-              variant="outline"
-              className="text-green-500 border-green-500"
-            >
-              <CheckCircle className="w-4 h-4 mr-1" />
-              {projects.status ? "Running" : "Stopped"}
+                variant="outline"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${
+                    projects.status
+                    ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
+                    : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
+                }`}
+                >
+                {projects.status ? (
+                    <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                    <CheckCircle className="w-4 h-4" />
+                    </motion.div>
+                ) : (
+                    <StopCircle className="w-4 h-4" />
+                )}
+                <span className="text-sm font-medium">
+                    {projects.status ? "Running" : "Stopped"}
+                </span>
             </Badge>
           </div>
           <div className="flex flex-wrap gap-3 mt-4 lg:mt-0">
             <Button
               onClick={() => setIsDeployDialogOpen(true)}
               className="flex items-center gap-2 bg-purple-500 hover:bg-purple-700 text-white focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
+              disabled={isDeploymentRunning || isDeploying}
             >
-              <Rocket className="w-4 h-4" />
-              Deploy
+              {isDeploying ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                    <Rocket className="w-4 h-4" />
+                )}
+                {isDeploying ? "Deploying..." : "Deploy"}
             </Button>
             <Button
               onClick={() => setIsRollbackModalOpen(true)}
@@ -344,17 +405,27 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                 onClick={() => setIsStopDialogOpen(true)}
                 variant="destructive"
                 className="flex items-center gap-2 focus:ring-2 focus:ring-red-700 focus:ring-offset-2"
+                disabled={isStopping}
               >
-                <StopCircle className="w-4 h-4" />
-                Stop
+                {isStopping ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                        <StopCircle className="w-4 h-4" />
+                    )}
+                {isStopping ? "Stopping..." : "Stop"}
               </Button>
             ) : (
               <Button
                 onClick={() => setIsRestartDialogOpen(true)}
                 className="flex items-center gap-2 bg-orange-500 hover:bg-orange focus:ring-2 focus:ring-orange-700 focus:ring-offset-2"
+                disabled={isStarting}
               >
-                <Rocket className="w-4 h-4" />
-                Start
+                {isStarting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                        <Rocket className="w-4 h-4" />
+                    )}
+                {isStarting ? "Starting..." : "Start"}
               </Button>
             )}
             <Button
@@ -381,7 +452,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
               value="builds"
               className="w-full text-purple-500 bg-white bg-opacity-20 py-2 px-4 data-[state=active]:bg-purple-500 data-[state=active]:text-white"
             >
-              Build History
+              Build History ({buildNumber.length})
             </TabsTrigger>
             <TabsTrigger
               value="logs"
@@ -403,46 +474,43 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                   <dl className="space-y-4">
                     {/* Build Status */}
                     <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide">
-                        Build Status
-                      </dt>
-                      <dd className="font-medium text-lg flex items-center gap-2">
-                        {buildNumber.length > 0 ? (
-                          buildNumber[0].status === "BUILDING" ? (
+                        <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide">
+                            Build Status
+                        </dt>
+                        <dd className="font-medium text-lg flex items-center gap-2">
+                            {buildNumber.length > 0 ? (
+                            buildNumber[0].status === "BUILDING" ? (
+                                <>
+                                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                <span className="text-blue-500">
+                                    Building... ({elapsedTime}s)
+                                </span>
+                                </>
+                            ) : buildNumber[0].status === "FAILED" ? (
+                                <>
+                                <AlertCircle className="w-4 h-4 text-red-500" />
+                                <span className="text-red-500">Build Failed</span>
+                                </>
+                            ) : buildNumber[0].status === "SUCCESS" ? (
+                                <>
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                                <span className="text-green-500">Build Successful</span>
+                                </>
+                            ) : (
+                                <>
+                                <AlertCircle className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-500">Build Status Unknown</span>
+                                </>
+                            )
+                            ) : (
                             <>
-                              <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                              <span className="text-blue-500">Building...</span>
+                                <AlertCircle className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-500">No Builds Available</span>
                             </>
-                          ) : buildNumber[0].status === "FAILED" ? (
-                            <>
-                              <AlertCircle className="w-4 h-4 text-red-500" />
-                              <span className="text-red-500">Build Failed</span>
-                            </>
-                          ) : buildNumber[0].status === "SUCCESS" ? (
-                            <>
-                              <CheckCircle className="w-4 h-4 text-green-500" />
-                              <span className="text-green-500">
-                                Build Successful
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <AlertCircle className="w-4 h-4 text-gray-500" />
-                              <span className="text-gray-500">
-                                Build Status Unknown
-                              </span>
-                            </>
-                          )
-                        ) : (
-                          <>
-                            <AlertCircle className="w-4 h-4 text-gray-500" />
-                            <span className="text-gray-500">
-                              No Builds Available
-                            </span>
-                          </>
-                        )}
-                      </dd>
+                            )}
+                        </dd>
                     </div>
+                 
 
                     {/* Service Status */}
                     <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -522,7 +590,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           <TabsContent value="builds" className="w-full">
             <Card className="w-full">
               <CardHeader>
-                <CardTitle className="text-purple-500">Build History</CardTitle>
+                <CardTitle className="text-purple-500">Build History ({buildNumber.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
@@ -611,8 +679,12 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             <AlertDialogAction
               onClick={handleBuildService}
               className="bg-purple-500 hover:bg-purple-700"
+              disabled={isDeploying}
             >
-              Deploy Service
+              {isDeploying ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : null}
+              {isDeploying ? "Deploying..." : "Deploy Service"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -37,7 +37,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
     // Set a timeout for the connection
     const connectionTimeout = setTimeout(() => {
       if (eventSourceRef.current?.readyState !== EventSource.OPEN) {
-        console.error("Connection timed out");
+        // console.error("Connection timed out");
         setError("Connection timed out. Please try again later.");
         setIsDeploying(false);
         eventSourceRef.current?.close();
