@@ -10,7 +10,7 @@ const navigation = {
   links: [
     { name: "Home", href: "/" },
     { name: "Service", href: "/service" },
-    { name: "Document", href: "https://cloudinator-doc.cloudinator.cloud/" },
+    { name: "Document", href: "https://doc.cloudinator.cloud/" },
     { name: "Start Building", href: "/start-building" },
     { name: "About Us", href: "/about" },
   ],
@@ -19,7 +19,8 @@ const navigation = {
 const contact = {
   phone: "+85595990910",
   email: "info.istad@gmail.com",
-  address: "No. 24, Street 562 ,Sangkat Boeung Kok, Toul Kork, Phnom Penh City.",
+  address:
+    "No. 24, Street 562 ,Sangkat Boeung Kok, Toul Kork, Phnom Penh City.",
   mapUrl: "https://maps.app.goo.gl/HRN4hrCyrAqTdZzP6",
 };
 

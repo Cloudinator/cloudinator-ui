@@ -35,7 +35,7 @@ const NavBarHomePage = () => {
     { path: "/", label: "Home" },
     { path: "/service", label: "Service" },
     {
-      path: "https://cloudinator-doc.cloudinator.cloud/",
+      path: "https://doc.cloudinator.cloud/",
       label: "Document",
       target: "_blank",
       rel: "noopener noreferrer",

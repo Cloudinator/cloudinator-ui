@@ -498,7 +498,12 @@ export default function Service() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between">
+                <div className="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between relative">
+                  {/* Add a special border or background for subworkspace */}
+                  {service.type === "subworkspace" && (
+                    <div className="absolute inset-0 rounded-xl border-2 border-purple-500 pointer-events-none"></div>
+                  )}
+
                   {/* Service Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
