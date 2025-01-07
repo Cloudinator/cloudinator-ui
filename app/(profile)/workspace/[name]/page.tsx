@@ -109,15 +109,15 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   // Real-time build status updates
   useEffect(() => {
     if (!projectName) return;
-  
+
     const eventSource = new EventSource(
       `https://stream.psa-khmer.world/api/v1/jenkins/stream-log/${projectName}`,
     );
-  
+
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log("Received build status update:", data);
-  
+
       // Update the build status in the state
       setBuildNumber((prevBuilds) =>
         prevBuilds.map((build) =>
@@ -126,38 +126,38 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             : build,
         ),
       );
-  
+
       // If the build status is "BUILDING", set the start time
       if (data.status === "BUILDING") {
         setBuildStartTime(Date.now());
         setElapsedTime(0); // Reset elapsed time
       }
-  
+
       // If the build status is "SUCCESS" or "FAILED", reset the timer
       if (data.status === "SUCCESS" || data.status === "FAILED") {
         setBuildStartTime(null);
         setElapsedTime(0);
       }
     };
-  
+
     eventSource.onerror = () => {
       eventSource.close();
     };
-  
+
     return () => {
       eventSource.close();
     };
   }, [projectName, refetchBuilds]);
-  
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
-  
+
     if (buildStartTime !== null) {
       interval = setInterval(() => {
         setElapsedTime(Math.floor((Date.now() - buildStartTime) / 1000)); // Calculate elapsed time in seconds
       }, 1000);
     }
-  
+
     return () => {
       if (interval) clearInterval(interval);
     };
@@ -165,17 +165,17 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
   const handleBuildService = async () => {
     setIsDeploying(true); // Start loading
-  
+
     const newBuild = {
       buildNumber: buildNumber.length + 1,
       status: "BUILDING",
     };
-  
+
     setBuildNumber((prevBuilds) => [newBuild, ...prevBuilds]);
-  
+
     try {
       const result = await buildService({ name: projectName }).unwrap();
-  
+
       setBuildNumber((prevBuilds) =>
         prevBuilds.map((build) =>
           build.buildNumber === newBuild.buildNumber
@@ -189,7 +189,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             : build,
         ),
       );
-  
+
       toast({
         title: "Success",
         description: `Service "${projectName}" is starting to build, be patient`,
@@ -198,13 +198,13 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       });
     } catch (err) {
       const error = err as ErrorResponse;
-  
+
       if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
         toast({
           title: "Success",
           description:
             error?.data?.message ||
-            `Service "${projectName}" build initiated successfully.`,
+            `Service "${projectName}" is starting to build, be patient`,
           variant: "success",
           duration: 3000,
         });
@@ -226,7 +226,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
   const handleStopService = async () => {
     setIsStopping(true); // Start loading
-  
+
     try {
       await stopServiceDeployment({
         name: projectName,
@@ -241,7 +241,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       refetchProjects();
     } catch (err) {
       const error = err as ErrorResponse;
-  
+
       if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
         toast({
           title: "Success",
@@ -269,7 +269,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
   const handleRestartService = async () => {
     setIsStarting(true); // Start loading
-  
+
     try {
       await startServiceDeployment({ name: projectName }).unwrap();
       setIsRestartDialogOpen(false);
@@ -282,7 +282,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       refetchProjects();
     } catch (err) {
       const error = err as ErrorResponse;
-  
+
       if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
         toast({
           title: "Success",
@@ -510,7 +510,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                             )}
                         </dd>
                     </div>
-                 
+
 
                     {/* Service Status */}
                     <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
