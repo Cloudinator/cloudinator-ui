@@ -135,9 +135,21 @@ export default function Service() {
   const { data: workspacesData } = useGetWorkspacesQuery();
   const workspaces = workspacesData || [];
 
-  const [selectedWorkspace, setSelectedWorkspace] = useState(
-    workspaces.length > 0 ? workspaces[0].name : "",
-  );
+  const [selectedWorkspace, setSelectedWorkspace] = useState(() => {
+    // Retrieve the selected workspace from local storage on initial load
+    if (typeof window !== "undefined") {
+      const savedWorkspace = localStorage.getItem("selectedWorkspace");
+      return savedWorkspace || (workspaces.length > 0 ? workspaces[0].name : "");
+    }
+    return workspaces.length > 0 ? workspaces[0].name : "";
+  });
+
+  // Update local storage whenever the selected workspace changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedWorkspace", selectedWorkspace);
+    }
+  }, [selectedWorkspace]);
 
   const { data: servicesData, refetch: data1 } = useGetServiceDeploymentQuery({
     workspaceName: selectedWorkspace,
@@ -155,24 +167,92 @@ export default function Service() {
     const services = servicesData?.results || [];
     const subWorkspaces = subWorkspace?.results || [];
 
+    // Add a default `updatedAt` value if missing or invalid
+    const processedServices = services.map((service) => ({
+      ...service,
+      updatedAt: service.updatedAt || new Date().toISOString(), // Default to current time
+    }));
+
+    const processedSubWorkspaces = subWorkspaces.map((subWorkspace) => ({
+      ...subWorkspace,
+      updatedAt: subWorkspace.updatedAt || new Date().toISOString(), // Default to current time
+    }));
+
     // Combine and sort by `updatedAt` in descending order (latest first)
-    return [...services, ...subWorkspaces].sort((a, b) => {
+    return [...processedServices, ...processedSubWorkspaces].sort((a, b) => {
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
   }, [servicesData, subWorkspace]);
 
   console.log(combinedResults);
 
+  const formatDate = (dateString: string | null | undefined): string => {
+    if (!dateString) {
+      return "N/A"; // Return a placeholder if the date is missing or invalid
+    }
+  
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return "N/A"; // Return a placeholder if the date is invalid
+    }
+  
+    const now = new Date();
+    const diffInMilliseconds = now.getTime() - date.getTime();
+  
+    // Convert milliseconds to seconds, minutes, hours, or days
+    const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+  
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} second${diffInSeconds !== 1 ? "s" : ""} ago`;
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes !== 1 ? "s" : ""} ago`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
+    } else if (diffInDays < 30) {
+      return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
+    } else {
+      // For dates older than 30 days, show the actual date
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+  };
+
+  // Helper function to get a value from local storage
+  const getFromLocalStorage = (key: string): string | null => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(key);
+    }
+    return null;
+  };
+
+  // Helper function to set a value in local storage
+  const setToLocalStorage = (key: string, value: string): void => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(key, value);
+    }
+  };
+
   useEffect(() => {
     if (combinedResults) {
-      const filtered = combinedResults.filter(
-        (service: ServiceType | SubWorkspaceType) =>
-          service.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          (selectedType === "all" || service.type === selectedType),
-      );
-      setFilteredServices(filtered);
+      // Retrieve timestamps from local storage for each service/sub-workspace
+      const updatedResults = combinedResults.map((service) => {
+        const localStorageTimestamp = getFromLocalStorage(`lastModified_${service.name}`);
+        return {
+          ...service,
+          updatedAt: localStorageTimestamp || service.updatedAt, // Use local storage timestamp if available
+        };
+      });
+  
+      // Update the filtered services with the retrieved timestamps
+      setFilteredServices(updatedResults);
     }
-  }, [searchTerm, selectedType, combinedResults]);
+  }, [combinedResults]);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState<ServiceType | null>(
@@ -197,6 +277,12 @@ export default function Service() {
       try {
         await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
 
+        // Store the deletion timestamp in local storage
+        setToLocalStorage(
+          `lastModified_${serviceToDelete.name}`,
+          new Date().toISOString(),
+        );
+
         toast({
           title: "Success",
           description: `Service "${serviceToDelete.name}" has been deleted successfully.`,
@@ -208,33 +294,14 @@ export default function Service() {
         data2();
       } catch (err) {
         const error = err as ErrorResponse;
-
-        if (
-          error?.status === "PARSING_ERROR" &&
-          error?.originalStatus === 200
-        ) {
-          toast({
-            title: "Success",
-            description:
-              error?.data?.message ||
-              `Service "${serviceToDelete.name}" has been deleted successfully.`,
-            variant: "success",
-            duration: 3000,
-          });
-
-          data1();
-          data2();
-        } else {
-          toast({
-            title: "Error",
-            description:
-              error?.data?.message ||
-              "Failed to delete service. Please try again.",
-            variant: "error",
-            duration: 5000,
-          });
-        }
-        console.log("Delete service response:", error);
+        toast({
+          title: "Error",
+          description:
+            error?.data?.message ||
+            "Failed to delete service. Please try again.",
+          variant: "error",
+          duration: 5000,
+        });
       } finally {
         setIsDeleteModalOpen(false);
         setServiceToDelete(null);
@@ -251,7 +318,12 @@ export default function Service() {
       try {
         await deleteSubWorkspace({ name: subWorkspaceToDelete.name }).unwrap();
 
-        // Success toast - this will show for successful deletion (status 200)
+        // Store the deletion timestamp in local storage
+        setToLocalStorage(
+          `lastModified_${subWorkspaceToDelete.name}`,
+          new Date().toISOString(),
+        );
+
         toast({
           title: "Success",
           description: `Subworkspace "${subWorkspaceToDelete.name}" has been deleted successfully.`,
@@ -259,50 +331,41 @@ export default function Service() {
           duration: 3000,
         });
 
-        // Refresh data and close modal
         data1();
         data2();
       } catch (err) {
         const error = err as ErrorResponse;
-
-        // Handle different error cases
-        if (
-          error?.status === "PARSING_ERROR" &&
-          error?.originalStatus === 200
-        ) {
-          // This is actually a success case with non-JSON response
-          toast({
-            title: "Success",
-            description:
-              error?.data?.message ||
-              `Subworkspace "${subWorkspaceToDelete.name}" has been deleted successfully.`,
-            variant: "success",
-            duration: 3000,
-          });
-
-          // Refresh data since deletion was successful
-          data1();
-          data2();
-        } else {
-          // Real error case
-          toast({
-            title: "Error",
-            description:
-              error?.data?.message ||
-              "Failed to delete subworkspace. Please try again.",
-            variant: "destructive",
-            duration: 5000,
-          });
-        }
-        console.log("Delete subworkspace response:", error);
+        toast({
+          title: "Error",
+          description:
+            error?.data?.message ||
+            "Failed to delete subworkspace. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
       } finally {
-        // Clean up state
         setIsDeleteModalOpen(false);
         setSubWorkspaceToDelete(null);
         setDeleteConfirmationName("");
       }
     }
   };
+
+  useEffect(() => {
+    if (combinedResults) {
+      // Retrieve timestamps from local storage for each service/sub-workspace
+      const updatedResults = combinedResults.map((service) => {
+        const localStorageTimestamp = getFromLocalStorage(`lastModified_${service.name}`);
+        return {
+          ...service,
+          updatedAt: localStorageTimestamp || service.updatedAt, // Use local storage timestamp if available
+        };
+      });
+
+      // Update the filtered services with the retrieved timestamps
+      setFilteredServices(updatedResults);
+    }
+  }, [combinedResults]);
 
   const EmptyState = ({
     type,
@@ -517,8 +580,8 @@ export default function Service() {
                     <Badge
                       variant="outline"
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${service.status
-                          ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
-                          : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
+                        ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
+                        : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
                         }`}
                     >
                       {service.status ? (
@@ -622,32 +685,42 @@ export default function Service() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className={`text-purple-600 border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${!service.status ? "opacity-50 cursor-not-allowed" : ""
+                        className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${!service.status ? "opacity-50 cursor-not-allowed" : ""
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
                           if (service.status) {
-                            // Determine the path based on service.type
                             const path =
                               service.type === "subworkspace"
                                 ? `/workspace/sub-workspace/${service.name}`
                                 : `/workspace/${service.name}`;
-                            router.push(path); // Navigate to the determined path
+                            router.push(path);
                           }
                         }}
-                        disabled={!service.status} // Disable the button if status is false
+                        disabled={!service.status}
                       >
                         {service.status ? "View Details" : "Not Available"}
                       </Button>
                     )}
-                    <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                      <GitBranch className="w-3 h-3 mr-1 flex-shrink-0 text-purple-500" />
-                      <span className="truncate">
-                        {service?.type === "subworkspace"
-                          ? "Sub Workspace"
-                          : service.branch}
+                    <div className="flex flex-col items-start sm:items-end gap-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                        <GitBranch className="w-3 h-3 mr-1 flex-shrink-0 text-purple-500" />
+                        <span className="truncate">
+                          {service?.type === "subworkspace"
+                            ? "Sub Workspace"
+                            : service.branch}
+                        </span>
                       </span>
-                    </span>
+                      {/* Add Last Modified Section */}
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                        <span className="truncate">
+                          Last Modified:{" "}
+                          <span className="text-purple-500 font-semibold">
+                            {formatDate(service.updatedAt)}
+                          </span>
+                        </span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </motion.div>

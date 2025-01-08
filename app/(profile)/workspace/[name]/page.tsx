@@ -41,6 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { motion } from "framer-motion";
+import Breadcrumbs from "@/components/Breadcrumb2";
 
 export type PropsParams = {
   params: Promise<{ name: string }>;
@@ -349,6 +350,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   return (
     <div className="px-12 py-6 w-full">
       <div className="flex flex-col gap-4">
+        <Breadcrumbs />
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           {/* Header section */}
           <div className="flex items-center gap-8">
@@ -463,49 +465,49 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           </TabsList>
           <TabsContent value="overview" className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white">
-                <CardHeader className="border-b border-purple-100">
-                  <CardTitle className="text-xl text-purple-500 font-bold flex items-center gap-2">
+              <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800">
+                <CardHeader className="border-b border-purple-100 dark:border-gray-700">
+                  <CardTitle className="text-xl text-purple-500 font-bold flex items-center gap-2 dark:text-white">
                     <Code className="w-5 h-5" />
                     Project Details
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent className="p-6 dark:text-white">
                   <dl className="space-y-4">
                     {/* Build Status */}
-                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                        <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
                             Build Status
                         </dt>
-                        <dd className="font-medium text-lg flex items-center gap-2">
+                        <dd className="font-medium text-lg flex items-center gap-2 dark:text-white">
                             {buildNumber.length > 0 ? (
                             buildNumber[0].status === "BUILDING" ? (
                                 <>
-                                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                                <span className="text-blue-500">
+                                <Loader2 className="w-4 h-4 animate-spin text-blue-500 dark:text-blue-300" />
+                                <span className="text-blue-500 dark:text-blue-300">
                                     Building... ({elapsedTime}s)
                                 </span>
                                 </>
                             ) : buildNumber[0].status === "FAILED" ? (
                                 <>
-                                <AlertCircle className="w-4 h-4 text-red-500" />
-                                <span className="text-red-500">Build Failed</span>
+                                <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-300" />
+                                <span className="text-red-500 dark:text-red-300">Build Failed</span>
                                 </>
                             ) : buildNumber[0].status === "SUCCESS" ? (
                                 <>
-                                <CheckCircle className="w-4 h-4 text-green-500" />
-                                <span className="text-green-500">Build Successful</span>
+                                <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-300" />
+                                <span className="text-green-500 dark:text-green-300">Build Successful</span>
                                 </>
                             ) : (
                                 <>
-                                <AlertCircle className="w-4 h-4 text-gray-500" />
-                                <span className="text-gray-500">Build Status Unknown</span>
+                                <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
+                                <span className="text-gray-500 dark:text-gray-300">Build Status Unknown</span>
                                 </>
                             )
                             ) : (
                             <>
-                                <AlertCircle className="w-4 h-4 text-gray-500" />
-                                <span className="text-gray-500">No Builds Available</span>
+                                <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
+                                <span className="text-gray-500 dark:text-gray-300">No Builds Available</span>
                             </>
                             )}
                         </dd>
@@ -513,23 +515,23 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
 
                     {/* Service Status */}
-                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
                         Service Status
                       </dt>
                       <dd
                         className={`${
                           projects.status ? "text-green-500" : "text-red-500"
-                        } font-medium text-lg flex items-center gap-2`}
+                        } font-medium text-lg flex items-center gap-2 dark:text-white`}
                       >
                         {projects.status ? (
                           <>
-                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                            <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-300 animate-pulse" />
                             Running
                           </>
                         ) : (
                           <>
-                            <div className="w-2 h-2 rounded-full bg-red-500" />
+                            <div className="w-2 h-2 rounded-full bg-red-500 dark:bg-red-300" />
                             Stopped
                           </>
                         )}
@@ -537,8 +539,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                     </div>
 
                     {/* URL */}
-                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
                         URL
                       </dt>
                       <dd>
@@ -546,7 +548,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-2"
+                          className="text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 hover:underline flex items-center gap-2"
                         >
                           <ExternalLink className="w-4 h-4" />
                           {url}
@@ -555,8 +557,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                     </div>
 
                     {/* Repository */}
-                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
                         Repository
                       </dt>
                       <dd>
@@ -564,7 +566,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                           href={projects.gitUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-2"
+                          className="text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 hover:underline flex items-center gap-2"
                         >
                           <Github className="w-4 h-4" />
                           {projects.gitUrl.split("/").slice(-2).join("/")}
@@ -574,30 +576,30 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                   </dl>
                 </CardContent>
               </Card>
-              <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white">
-                <CardHeader className="border-b border-purple-100">
-                  <CardTitle className="text-xl text-purple-500 font-bold flex items-center gap-2">
+              <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800">
+                <CardHeader className="border-b border-purple-100 dark:border-gray-700">
+                  <CardTitle className="text-xl text-purple-500 font-bold flex items-center gap-2 dark:text-white">
                     <ExternalLink className="w-5 h-5" />
                     Project Preview
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent className="p-6 dark:text-white">
                   <WebsitePreview url={url} />
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
           <TabsContent value="builds" className="w-full">
-            <Card className="w-full">
+            <Card className="w-full dark:bg-gray-800">
               <CardHeader>
-                <CardTitle className="text-purple-500">Build History ({buildNumber.length})</CardTitle>
+                <CardTitle className="text-purple-500 dark:text-white">Build History ({buildNumber.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
                   {buildNumber.map((build: BuildNumber) => (
                     <li
                       key={build.buildNumber}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                      className="flex items-center justify-between p-4 rounded-lg dark:bg-gray-700"
                     >
                       <div className="flex items-center gap-4">
                         <Badge
@@ -611,19 +613,21 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                           style={
                             build.status === "SUCCESS"
                               ? { backgroundColor: "green", color: "white" }
-                              : {}
+                              : build.status === "BUILDING"
+                                ? { backgroundColor: "#F59E0B", color: "white" }
+                                : { backgroundColor: "#DC2626", color: "white" }
                           }
                         >
                           {build.status}
                         </Badge>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-300">
                           {projectName}
                         </span>
                       </div>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="flex items-center gap-2 text-purple-500 hover:text-purple-700 bg-gray-100 hover:bg-gray-200"
+                        className="flex items-center gap-2 text-purple-500 hover:text-purple-700 dark:text-white dark:hover:text-white dark:bg-gray-700 dark:hover:bg-gray-600"
                       >
                         <Code className="w-4 h-4" />
                         <Link

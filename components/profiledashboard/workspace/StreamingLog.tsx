@@ -120,54 +120,47 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-50 min-h-screen">
-      <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold mb-2 text-gray-800">{name} Logs</h1>
-        <p className="text-gray-600">
-          Build: <span className="font-semibold">{name}</span> | Number:{" "}
-          <span className="font-semibold">#{buildNumber}</span>
+    <div className="container mx-auto px-4 py-8 bg-gray-800 min-h-screen dark:bg-gray-900">
+      <div className="mb-6 bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
+        <h1 className="text-3xl font-bold mb-2 text-gray-800 dark:text-white">{name} Logs</h1>
+        <p className="text-gray-600 dark:text-gray-300">
+          Build: <span className="font-semibold">{name}</span> | Number:{" "}<span className="font-semibold">#{buildNumber}</span>
         </p>
         <Progress value={progress} className="mt-4" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
+        <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md flex items-center justify-between">
           <div className="flex items-center">
-            <Terminal className="h-6 w-6 text-gray-500 mr-2" />
+            <Terminal className="h-6 w-6 text-gray-500 mr-2 dark:text-gray-300" />
             <span className="font-semibold">Total Logs</span>
           </div>
           <span className="text-2xl font-bold">{logs.length}</span>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
+        <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md flex items-center justify-between">
           <div className="flex items-center">
-            <AlertCircle className="h-6 w-6 text-red-500 mr-2" />
+            <AlertCircle className="h-6 w-6 text-red-500 mr-2 dark:text-red-400" />
             <span className="font-semibold">Errors</span>
           </div>
-          <span className="text-2xl font-bold text-red-500">
-            {logStats.errorCount}
-          </span>
+          <span className="text-2xl font-bold text-red-500 dark:text-red-400">{logStats.errorCount}</span>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
+        <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md flex items-center justify-between">
           <div className="flex items-center">
-            <AlertTriangle className="h-6 w-6 text-yellow-500 mr-2" />
+            <AlertTriangle className="h-6 w-6 text-yellow-500 mr-2 dark:text-yellow-400" />
             <span className="font-semibold">Warnings</span>
           </div>
-          <span className="text-2xl font-bold text-yellow-500">
-            {logStats.warningCount}
-          </span>
+          <span className="text-2xl font-bold text-yellow-500 dark:text-yellow-400">{logStats.warningCount}</span>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between">
+        <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md flex items-center justify-between">
           <div className="flex items-center">
-            <Info className="h-6 w-6 text-blue-500 mr-2" />
+            <Info className="h-6 w-6 text-blue-500 mr-2 dark:text-blue-400" />
             <span className="font-semibold">Info</span>
           </div>
-          <span className="text-2xl font-bold text-blue-500">
-            {logStats.infoCount}
-          </span>
+          <span className="text-2xl font-bold text-blue-500 dark:text-blue-400">{logStats.infoCount}</span>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-2">
             <Switch
@@ -180,13 +173,13 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
             </label>
           </div>
           {isDeploying && (
-            <div className="flex items-center text-blue-600">
+            <div className="flex items-center text-blue-600 dark:text-blue-400">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               {error ? "Reconnecting..." : "Deploying..."}
             </div>
           )}
           {!isDeploying && !error && (
-            <div className="flex items-center text-green-600">
+            <div className="flex items-center text-green-600 dark:text-green-400">
               <CheckCircle className="mr-2 h-4 w-4" />
               Deployment Complete
             </div>
@@ -203,11 +196,11 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
 
         <div
           ref={logContainerRef}
-          className="bg-gray-100 p-4 rounded-lg overflow-auto h-[600px] font-mono text-sm"
+          className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-auto h-[600px] font-mono text-sm"
         >
           {logs.map((log, index) => (
             <div key={index} className={`py-1 ${getLogClass(log)}`}>
-              <span className="text-gray-500 mr-2">
+              <span className="text-gray-500 dark:text-gray-300 mr-2">
                 {String(index + 1).padStart(4, "0")}
               </span>
               {log}
