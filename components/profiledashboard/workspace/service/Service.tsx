@@ -139,7 +139,9 @@ export default function Service() {
     // Retrieve the selected workspace from local storage on initial load
     if (typeof window !== "undefined") {
       const savedWorkspace = localStorage.getItem("selectedWorkspace");
-      return savedWorkspace || (workspaces.length > 0 ? workspaces[0].name : "");
+      return (
+        savedWorkspace || (workspaces.length > 0 ? workspaces[0].name : "")
+      );
     }
     return workspaces.length > 0 ? workspaces[0].name : "";
   });
@@ -184,75 +186,32 @@ export default function Service() {
     });
   }, [servicesData, subWorkspace]);
 
-  console.log(combinedResults);
-
-  const formatDate = (dateString: string | null | undefined): string => {
-    if (!dateString) {
-      return "N/A"; // Return a placeholder if the date is missing or invalid
-    }
-  
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return "N/A"; // Return a placeholder if the date is invalid
-    }
-  
-    const now = new Date();
-    const diffInMilliseconds = now.getTime() - date.getTime();
-  
-    // Convert milliseconds to seconds, minutes, hours, or days
-    const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    const diffInDays = Math.floor(diffInHours / 24);
-  
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds} second${diffInSeconds !== 1 ? "s" : ""} ago`;
-    } else if (diffInMinutes < 60) {
-      return `${diffInMinutes} minute${diffInMinutes !== 1 ? "s" : ""} ago`;
-    } else if (diffInHours < 24) {
-      return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
-    } else if (diffInDays < 30) {
-      return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
-    } else {
-      // For dates older than 30 days, show the actual date
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-    }
-  };
-
-  // Helper function to get a value from local storage
-  const getFromLocalStorage = (key: string): string | null => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem(key);
-    }
-    return null;
-  };
-
-  // Helper function to set a value in local storage
-  const setToLocalStorage = (key: string, value: string): void => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(key, value);
-    }
-  };
-
   useEffect(() => {
     if (combinedResults) {
-      // Retrieve timestamps from local storage for each service/sub-workspace
-      const updatedResults = combinedResults.map((service) => {
-        const localStorageTimestamp = getFromLocalStorage(`lastModified_${service.name}`);
-        return {
-          ...service,
-          updatedAt: localStorageTimestamp || service.updatedAt, // Use local storage timestamp if available
-        };
+      // Step 1: Sort by `createdAt` (newest first)
+      const sortedResults = [...combinedResults].sort((a, b) => {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       });
-  
-      // Update the filtered services with the retrieved timestamps
-      setFilteredServices(updatedResults);
+
+      // Step 2: Filter by selected type
+      let filtered = sortedResults;
+      if (selectedType !== "all") {
+        filtered = filtered.filter((service) => service.type === selectedType);
+      }
+
+      // Step 3: Filter by search term
+      if (searchTerm) {
+        filtered = filtered.filter((service) =>
+          service.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
+      }
+
+      // Update the filtered services
+      setFilteredServices(filtered);
     }
-  }, [combinedResults]);
+  }, [combinedResults, searchTerm, selectedType]);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState<ServiceType | null>(
@@ -276,12 +235,6 @@ export default function Service() {
     if (serviceToDelete && deleteConfirmationName === serviceToDelete.name) {
       try {
         await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
-
-        // Store the deletion timestamp in local storage
-        setToLocalStorage(
-          `lastModified_${serviceToDelete.name}`,
-          new Date().toISOString(),
-        );
 
         toast({
           title: "Success",
@@ -318,12 +271,6 @@ export default function Service() {
       try {
         await deleteSubWorkspace({ name: subWorkspaceToDelete.name }).unwrap();
 
-        // Store the deletion timestamp in local storage
-        setToLocalStorage(
-          `lastModified_${subWorkspaceToDelete.name}`,
-          new Date().toISOString(),
-        );
-
         toast({
           title: "Success",
           description: `Subworkspace "${subWorkspaceToDelete.name}" has been deleted successfully.`,
@@ -350,22 +297,6 @@ export default function Service() {
       }
     }
   };
-
-  useEffect(() => {
-    if (combinedResults) {
-      // Retrieve timestamps from local storage for each service/sub-workspace
-      const updatedResults = combinedResults.map((service) => {
-        const localStorageTimestamp = getFromLocalStorage(`lastModified_${service.name}`);
-        return {
-          ...service,
-          updatedAt: localStorageTimestamp || service.updatedAt, // Use local storage timestamp if available
-        };
-      });
-
-      // Update the filtered services with the retrieved timestamps
-      setFilteredServices(updatedResults);
-    }
-  }, [combinedResults]);
 
   const EmptyState = ({
     type,
@@ -517,8 +448,9 @@ export default function Service() {
             <Button
               key={type}
               variant={selectedType === type ? "default" : "outline"}
-              className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${selectedType === type ? "ring-2 ring-purple-500" : ""
-                }`}
+              className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${
+                selectedType === type ? "ring-2 ring-purple-500" : ""
+              }`}
               onClick={() => setSelectedType(type)}
             >
               <div className="flex items-center">
@@ -574,15 +506,24 @@ export default function Service() {
                       {getServiceIcon(service.type)}
                       <h3 className="font-semibold text-lg text-purple-600 dark:text-purple-400">
                         {service.name}
+                        {/* Show "New" badge for services created in the last 24 hours */}
+                        {new Date().getTime() -
+                          new Date(service.createdAt).getTime() <
+                          24 * 60 * 60 * 1000 && (
+                          <Badge variant="secondary" className="ml-2 text-xs">
+                            New
+                          </Badge>
+                        )}
                       </h3>
                     </div>
                     {/* Badge for Service Status */}
                     <Badge
                       variant="outline"
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${service.status
-                        ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
-                        : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
-                        }`}
+                      className={`flex items-center gap-1.5 px-2 py-1 rounded-full border transition-all duration-300 ${
+                        service.status
+                          ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
+                          : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
+                      }`}
                     >
                       {service.status ? (
                         <motion.div
@@ -594,9 +535,6 @@ export default function Service() {
                       ) : (
                         <StopCircle className="w-4 h-4" />
                       )}
-                      <span className="text-sm font-medium">
-                        {service.status ? "Running" : "Stopped"}
-                      </span>
                     </Badge>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -658,7 +596,8 @@ export default function Service() {
                     {/* Subdomain or Subworkspace Description */}
                     {service?.type === "subworkspace" ? (
                       <span className="text-gray-500 dark:text-gray-400">
-                        This is a sub-workspace where you can manage your microservices.
+                        This is a sub-workspace where you can manage your
+                        microservices.
                       </span>
                     ) : service.subdomain ? (
                       <a
@@ -685,8 +624,9 @@ export default function Service() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${!service.status ? "opacity-50 cursor-not-allowed" : ""
-                          }`}
+                        className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${
+                          !service.status ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                         onClick={(e) => {
                           e.preventDefault();
                           if (service.status) {
@@ -712,14 +652,14 @@ export default function Service() {
                         </span>
                       </span>
                       {/* Add Last Modified Section */}
-                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                      {/* <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
                         <span className="truncate">
-                          Last Modified:{" "}
+                          Created:{" "}
                           <span className="text-purple-500 font-semibold">
-                            {formatDate(service.updatedAt)}
+                            {formatDate(service.createdAt)}
                           </span>
                         </span>
-                      </span>
+                      </span> */}
                     </div>
                   </div>
                 </div>
@@ -751,13 +691,13 @@ export default function Service() {
               Cancel
             </Button>
             {serviceToDelete?.type === "subworkspace" ||
-              subWorkspaceToDelete ? (
+            subWorkspaceToDelete ? (
               <Button
                 onClick={confirmDeleteSubWorkspace}
                 disabled={
                   (!serviceToDelete && !subWorkspaceToDelete) ||
                   deleteConfirmationName !==
-                  (serviceToDelete?.name || subWorkspaceToDelete?.name)
+                    (serviceToDelete?.name || subWorkspaceToDelete?.name)
                 }
                 className="bg-red-600 hover:bg-red-700 text-white"
               >
