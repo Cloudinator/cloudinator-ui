@@ -336,7 +336,7 @@ export default function SubWorkspacePage(props: PropsParams) {
   return (
     <div className="flex-1 space-y-6 p-8">
       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-        <Link href={"/workspace"}>Workspace</Link>
+        <Link href={"/workspace"}>workspace</Link>
         <ChevronRight className="h-4 w-4" />
         <span className="font-medium text-foreground">{params?.name}</span>
       </div>
@@ -363,7 +363,7 @@ export default function SubWorkspacePage(props: PropsParams) {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle className="text-2xl">Select Services</DialogTitle>
+                <DialogTitle className="text-2xl text-purple-500">Select Services</DialogTitle>
                 <DialogDescription>
                   Choose the services you want to use
                 </DialogDescription>
@@ -456,7 +456,7 @@ export default function SubWorkspacePage(props: PropsParams) {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[700px]">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-center">
+                <DialogTitle className="text-2xl font-bold text-center text-purple-500">
                   Create Your Spring Project
                 </DialogTitle>
                 <DialogDescription className="text-center">
@@ -466,12 +466,12 @@ export default function SubWorkspacePage(props: PropsParams) {
               <div className="flex flex-col space-y-6 mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card
-                    className="cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-md"
+                    className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
                     onClick={() => handleCreateProject("new")}
                   >
                     <CardHeader className="flex flex-col items-center">
-                      <Sparkles className="h-12 w-12 text-primary mb-2" />
-                      <CardTitle>Create New Project</CardTitle>
+                      <Sparkles className="h-12 w-12 text-purple-500 mb-2" />
+                      <CardTitle className="text-purple-500">Create New Project</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-center text-sm text-muted-foreground">
@@ -481,12 +481,12 @@ export default function SubWorkspacePage(props: PropsParams) {
                     </CardContent>
                   </Card>
                   <Card
-                    className="cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-md"
+                    className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
                     onClick={() => handleCreateProject("existing")}
                   >
                     <CardHeader className="flex flex-col items-center">
-                      <Code className="h-12 w-12 text-primary mb-2" />
-                      <CardTitle>Use Existing Code</CardTitle>
+                      <Code className="h-12 w-12 text-purple-500 mb-2" />
+                      <CardTitle className="text-purple-500">Use Existing Code</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-center text-sm text-muted-foreground">

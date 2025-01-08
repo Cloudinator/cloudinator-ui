@@ -6,7 +6,7 @@ import {
   useUpdateUserByUsernameMutation,
 } from "@/redux/api/userApi";
 import { useState, useEffect } from "react";
-import { User, Upload } from "lucide-react";
+import { Upload, Settings } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,8 +90,8 @@ export default function ProfilePage() {
       <div className="w-full">
         <div className="flex justify-between">
           <h1 className="text-3xl font-bold text-purple-500 flex items-center mb-8">
-            <User className="mr-2 h-8 w-8" />
-            Profile Information
+            <Settings className="mr-2 h-8 w-8" />
+            Setting
           </h1>
 
           <Button

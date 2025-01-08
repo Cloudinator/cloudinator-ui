@@ -35,8 +35,9 @@ import {
   Globe,
   ExternalLink,
   Folder,
-  Terminal,
   Loader2,
+  StopCircle,
+  CheckCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -50,6 +51,7 @@ import { useRouter } from "next/navigation";
 import { Breadcrumbs } from "../../Breadcrumbs";
 import { useToast } from "@/hooks/use-toast";
 import Loading from "@/components/Loading";
+import { Badge } from "@/components/ui/badge";
 
 const CreateProjectContent = lazy(
   () => import("@/components/profiledashboard/workspace/CreateProjectContent"),
@@ -366,7 +368,7 @@ export default function Service() {
       >
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <div className="flex justify-between items-center w-full">
-            <Breadcrumbs title="Workspace Page" titleIcon={Terminal} />
+            <Breadcrumbs />
             <DialogTrigger asChild>
               <Button className=" bg-purple-500 hover:bg-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2">
                 <Plus className="mr-2 h-5 w-5" />
@@ -452,9 +454,8 @@ export default function Service() {
             <Button
               key={type}
               variant={selectedType === type ? "default" : "outline"}
-              className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${
-                selectedType === type ? "ring-2 ring-purple-500" : ""
-              }`}
+              className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${selectedType === type ? "ring-2 ring-purple-500" : ""
+                }`}
               onClick={() => setSelectedType(type)}
             >
               <div className="flex items-center">
@@ -512,6 +513,28 @@ export default function Service() {
                         {service.name}
                       </h3>
                     </div>
+                    {/* Badge for Service Status */}
+                    <Badge
+                      variant="outline"
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${service.status
+                          ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
+                          : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
+                        }`}
+                    >
+                      {service.status ? (
+                        <motion.div
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </motion.div>
+                      ) : (
+                        <StopCircle className="w-4 h-4" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {service.status ? "Running" : "Stopped"}
+                      </span>
+                    </Badge>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -524,9 +547,6 @@ export default function Service() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                          Edit
-                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onSelect={(e) => {
                             e.preventDefault();
@@ -554,8 +574,8 @@ export default function Service() {
 
                   {/* Service Details */}
                   <div className="space-y-4 text-sm">
-                    {/* Git URL */}
-                    {service.gitUrl ? (
+                    {/* Git URL - Only show if not a subworkspace */}
+                    {service.type !== "subworkspace" && service.gitUrl ? (
                       <a
                         href={service.gitUrl}
                         target="_blank"
@@ -566,17 +586,16 @@ export default function Service() {
                         <GitBranch className="w-4 h-4 mr-2 flex-shrink-0 text-purple-500" />
                         <span className="truncate">{service.gitUrl}</span>
                       </a>
-                    ) : (
+                    ) : service.type !== "subworkspace" ? (
                       <span className="text-gray-500 dark:text-gray-400">
                         Git URL not available
                       </span>
-                    )}
+                    ) : null}
 
                     {/* Subdomain or Subworkspace Description */}
                     {service?.type === "subworkspace" ? (
                       <span className="text-gray-500 dark:text-gray-400">
-                        This is a sub-workspace where you can manage your
-                        microservices.
+                        This is a sub-workspace where you can manage your microservices.
                       </span>
                     ) : service.subdomain ? (
                       <a
@@ -603,9 +622,8 @@ export default function Service() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className={`text-purple-600 border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${
-                          !service.status ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
+                        className={`text-purple-600 border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${!service.status ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
                         onClick={(e) => {
                           e.preventDefault();
                           if (service.status) {
@@ -660,13 +678,13 @@ export default function Service() {
               Cancel
             </Button>
             {serviceToDelete?.type === "subworkspace" ||
-            subWorkspaceToDelete ? (
+              subWorkspaceToDelete ? (
               <Button
                 onClick={confirmDeleteSubWorkspace}
                 disabled={
                   (!serviceToDelete && !subWorkspaceToDelete) ||
                   deleteConfirmationName !==
-                    (serviceToDelete?.name || subWorkspaceToDelete?.name)
+                  (serviceToDelete?.name || subWorkspaceToDelete?.name)
                 }
                 className="bg-red-600 hover:bg-red-700 text-white"
               >

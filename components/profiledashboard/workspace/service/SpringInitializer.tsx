@@ -139,12 +139,13 @@ export function SpringInitializer({ isOpen, onClose, folder, springProjects, ref
                     <DialogTitle>Spring Initializer</DialogTitle>
                 </VisuallyHidden>
                 <div className="flex flex-col min-h-[90vh]">
-                    <header className="bg-gradient-to-r from-green-700 to-green-800 text-white py-6 px-6">
+                    {/* header of spring initializer */}
+                    <header className="bg-gradient-to-r from-purple-700 to-purple-800 text-white py-6 px-6 rounded-t-xl">
                         <div className="flex items-center gap-3">
                             <Leaf className="h-8 w-8" aria-hidden="true"/>
                             <div>
                                 <h1 className="text-2xl font-bold">Spring Initializer</h1>
-                                <p className="text-green-100 text-sm">Bootstrap your application</p>
+                                <p className="text-purple-100 text-sm">Bootstrap your application</p>
                             </div>
                         </div>
                     </header>
@@ -219,7 +220,7 @@ export function SpringInitializer({ isOpen, onClose, folder, springProjects, ref
                                     <Button
                                         type="button"
                                         onClick={() => setIsModalOpen(true)}
-                                        className="bg-black hover:bg-gray-800 text-white"
+                                        className="bg-purple-500 hover:bg-purple-700 text-white "
                                     >
                                         ADD DEPENDENCIES
                                     </Button>
@@ -250,7 +251,7 @@ export function SpringInitializer({ isOpen, onClose, folder, springProjects, ref
                                 )}
                             </div>
 
-                            <Button type="submit" className="w-full bg-green-700 hover:bg-green-800">
+                            <Button type="submit" className="w-full bg-purple-500 hover:bg-purple-700">
                                 Generate Project
                             </Button>
                         </form>
