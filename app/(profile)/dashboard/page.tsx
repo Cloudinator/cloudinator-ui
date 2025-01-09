@@ -105,7 +105,7 @@ export default function DashboardPage() {
                         {isLoadingBuildAnalytic ? (
                             <Skeleton className="h-8 w-3/4" />
                         ) : (
-                            <div className="text-2xl font-bold">{successRate.toFixed(2)} %</div>
+                            <div className="text-2xl font-bold">{successRate.toFixed(2) || "-"} %</div>
                         )}
                     </CardContent>
                 </Card>
@@ -120,7 +120,7 @@ export default function DashboardPage() {
                         {isLoadingBuildAnalytic ? (
                             <Skeleton className="h-8 w-3/4" />
                         ) : (
-                            <div className="text-2xl font-bold">{buildAnalytic?.success || 0}</div>
+                            <div className="text-2xl font-bold">{buildAnalytic?.success || "-"}</div>
                         )}
                     </CardContent>
                 </Card>
@@ -140,7 +140,7 @@ export default function DashboardPage() {
                         {isLoadingBuildAnalytic ? (
                             <Skeleton className="h-40 w-full" />
                         ) : (
-                            <DeploymentOverview success={buildAnalytic?.success || 0} failure={buildAnalytic?.fail || 0} />
+                            <DeploymentOverview success={buildAnalytic?.success || "-"} failure={buildAnalytic?.fail || "-"} />
                         )}
                     </CardContent>
                 </Card>

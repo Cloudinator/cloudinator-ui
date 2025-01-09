@@ -4,7 +4,13 @@ import { UserUpdateRequest } from '@/types/user'
 interface User {
     id: string,
     username: string,
+    firstName: string,
+    lastName: string,
     email: string,
+    phoneNumber: string,
+    dateOfBirth: string,
+    status: string,
+    gender: string,
     uuid: string,
 }
 

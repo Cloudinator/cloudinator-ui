@@ -29,7 +29,7 @@ import Link from "next/link";
 import RollbackModal from "@/components/profiledashboard/workspace/RollbackModal";
 import { StreamingLog } from "@/components/profiledashboard/workspace/StreamingLog";
 import Loading from "@/components/Loading";
-import { useToast } from "@/hooks/use-toast";
+import { useApiErrorHandler, useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,7 +55,9 @@ interface ErrorResponse {
   };
 }
 
+
 export default function ProjectDetailPage({ params }: PropsParams) {
+  const { handleError } = useApiErrorHandler();
   const [projectName, setProjectName] = useState<string>("");
   const [buildNumber, setBuildNumber] = useState<BuildNumber[]>([]);
   const [isRollbackModalOpen, setIsRollbackModalOpen] = useState(false);
@@ -77,6 +79,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     data: projects,
     refetch: refetchProjects,
     isLoading: isProjectsLoading,
+    error: buildsError, 
   } = useGetServiceByNameQuery(
     { name: projectName },
     {
@@ -89,6 +92,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     data: builds,
     refetch: refetchBuilds,
     isLoading: isBuildsLoading,
+    error: projectsError,
   } = useGetBuildInfoByNameQuery(
     { name: projectName },
     {
@@ -96,6 +100,12 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       refetchOnMountOrArgChange: true,
     },
   );
+
+  useEffect(() => {
+    if (projectsError) {
+      handleError(projectsError); // Handle the error
+    }
+  }, [projectsError]);
 
   useEffect(() => {
     params.then(({ name }) => setProjectName(name));
@@ -164,6 +174,12 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       if (interval) clearInterval(interval);
     };
   }, [buildStartTime]);
+
+  useEffect(() => {
+    if (buildsError) {
+      handleError(buildsError);
+    }
+  }, [buildsError]);
 
   const handleBuildService = async () => {
     setIsDeploying(true); // Start loading
@@ -340,6 +356,27 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
   if (!projectName || !projects || !builds) {
     return null;
+  }
+
+  if (buildsError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-4">
+          <AlertCircle className="w-12 h-12 text-red-500" />
+          <h1 className="text-2xl font-bold text-red-500">Server Error</h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            An error occurred while fetching build numbers. Please try again later.
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => refetchBuilds()} // Retry the query
+            className="mt-4"
+          >
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   const url = `https://${projects.subdomain}.cloudinator.cloud`;

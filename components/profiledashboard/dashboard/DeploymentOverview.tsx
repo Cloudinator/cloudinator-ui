@@ -18,8 +18,6 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart"
 
-
-
 const chartConfig = {
     desktop: {
         label: "failure",
@@ -31,23 +29,29 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
+type Placeholder = "-" | "No data";
+
 type PropsType = {
-    success: number,
-    failure: number,
-}
+    success: number | Placeholder; // Can be a number or a specific placeholder
+    failure: number | Placeholder; // Can be a number or a specific placeholder
+};
 
-export default function DeploymentOverview({success, failure}: PropsType) {
-    const totalVisitors = success + failure
+export default function DeploymentOverview({ success, failure }: PropsType) {
+    // Handle placeholder values for totalVisitors
+    const totalVisitors = typeof success === "number" && typeof failure === "number"
+        ? success + failure
+        : "-";
 
+    // Format chart data, ensuring numeric values
     const chartData = [
         {
             month: "january",
-            success: success,
-            failure: failure,
+            success: typeof success === "number" ? success : 0, // Use 0 if success is a placeholder
+            failure: typeof failure === "number" ? failure : 0, // Use 0 if failure is a placeholder
         }
-    ]
+    ];
 
-    const date = Date.now()
+    const date = Date.now();
 
     const formattedDate = new Intl.DateTimeFormat('en-GB', {
         day: '2-digit',
@@ -89,7 +93,9 @@ export default function DeploymentOverview({success, failure}: PropsType) {
                                                     y={(viewBox.cy || 0) - 16}
                                                     className="fill-foreground text-2xl font-bold"
                                                 >
-                                                    {totalVisitors.toLocaleString()}
+                                                    {typeof totalVisitors === "number"
+                                                        ? totalVisitors.toLocaleString()
+                                                        : totalVisitors}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
@@ -126,9 +132,9 @@ export default function DeploymentOverview({success, failure}: PropsType) {
                     Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
                 </div>
                 <div className="leading-none text-muted-foreground">
-                    Showing total visitors for the last 6 months
+                    Showing total builds for the last 6 months
                 </div>
             </CardFooter>
         </Card>
-    )
+    );
 }

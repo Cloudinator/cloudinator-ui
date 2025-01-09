@@ -192,4 +192,28 @@ function useToast() {
   }
 }
 
-export { useToast, toast }
+function useApiErrorHandler() {
+  const { toast } = useToast();
+
+  const handleError = (error: unknown) => {
+    if (error instanceof Error && error.message === "Server Error") {
+      toast({
+        title: "Server Error",
+        description: "An unexpected error occurred on the server. Please try again later.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: (error as { data: { message: string } })?.data?.message || "500 - Internal Server Error",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  };
+
+  return { handleError };
+};
+
+export { useToast, toast, useApiErrorHandler }

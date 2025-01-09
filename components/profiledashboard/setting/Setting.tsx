@@ -14,12 +14,21 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import Loading from "@/components/Loading";
 import SignOutModal from "./SignOutModal";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 
 export default function ProfilePage() {
   const params = useParams();
 
   const [email, setEmail] = useState<string>("");
   const [displayUsername, setDisplayUsername] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(undefined);
+  const [status, setStatus] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
   const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.png");
   const [isSignOutModalOpen, setSignOutModalOpen] = useState<boolean>(false);
 
@@ -27,12 +36,18 @@ export default function ProfilePage() {
   const [updateUser, { isLoading: isUpdating }] =
     useUpdateUserByUsernameMutation();
 
-  useEffect(() => {
-    if (userData) {
-      setEmail(userData.email);
-      setDisplayUsername(userData.username);
-    }
-  }, [userData]);
+    useEffect(() => {
+      if (userData) {
+        setEmail(userData.email);
+        setDisplayUsername(userData.username);
+        setFirstName(userData.firstName || "");
+        setLastName(userData.lastName || "");
+        setPhoneNumber(userData.phoneNumber || "");
+        setDateOfBirth(userData.dateOfBirth ? new Date(userData.dateOfBirth) : undefined); // Convert string to Date
+        setStatus(userData.status || "");
+        setGender(userData.gender || "");
+      }
+    }, [userData]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,20 +68,24 @@ export default function ProfilePage() {
         userUpdateRequest: {
           email,
           username: displayUsername,
+          firstName,
+          lastName,
+          phoneNumber,
+          dateOfBirth: dateOfBirth ? dateOfBirth.toISOString() : undefined, // Convert Date to string
+          status,
+          gender,
         },
       }).unwrap();
       toast({
         title: "Profile Updated",
-        description:
-          "Your test-profile information has been successfully updated.",
+        description: "Your profile information has been successfully updated.",
         variant: "default",
       });
     } catch (error) {
       console.error("Failed to update user", error);
       toast({
         title: "Update Failed",
-        description:
-          "There was an error updating your test-profile. Please try again.",
+        description: "There was an error updating your profile. Please try again.",
         variant: "destructive",
       });
     }
@@ -168,6 +187,109 @@ export default function ProfilePage() {
               placeholder="Enter your username"
               required
             />
+          </div>
+
+          <div>
+            <Label htmlFor="firstname" className="text-base text-purple-500">
+              <span className="text-red-500">*</span> First Name
+            </Label>
+            <Input
+              id="firstname"
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="mt-2"
+              placeholder="Enter your first name"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="lastname" className="text-base text-purple-500">
+              <span className="text-red-500">*</span> Last Name
+            </Label>
+            <Input
+              id="lastname"
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="mt-2"
+              placeholder="Enter your last name"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="phoneNumber" className="text-base text-purple-500">
+              <span className="text-red-500">*</span> Phone Number
+            </Label>
+            <Input
+              id="phoneNumber"
+              type="text"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="mt-2"
+              placeholder="Enter your phone number"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="dateOfBirth" className="text-base text-purple-500">
+            <span className="text-red-500">*</span> Date of Birth
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal mt-2"
+                >
+                  {dateOfBirth ? (
+                    format(dateOfBirth, "PPP") // Format the date using date-fns
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={dateOfBirth}
+                  onSelect={setDateOfBirth}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div>
+            <Label htmlFor="status" className="text-base text-purple-500">
+              <span className="text-red-500">*</span> Status
+            </Label>
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="mt-2 block w-full p-2 border border-border rounded-md"
+            >
+              <option value="single">Single</option>
+              <option value="married">Married</option>
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="gender" className="text-base text-purple-500">
+              <span className="text-red-500">*</span> Gender
+            </Label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="mt-2 block w-full p-2 border border-border rounded-md"
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
           </div>
 
           {/* Sign Out Modal */}
