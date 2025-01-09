@@ -181,12 +181,12 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         prevBuilds.map((build) =>
           build.buildNumber === newBuild.buildNumber
             ? {
-                ...build,
-                status:
-                  typeof result.status === "string"
-                    ? result.status
-                    : "BUILDING",
-              }
+              ...build,
+              status:
+                typeof result.status === "string"
+                  ? result.status
+                  : "BUILDING",
+            }
             : build,
         ),
       );
@@ -358,26 +358,25 @@ export default function ProjectDetailPage({ params }: PropsParams) {
               {projects.name}
             </h1>
             <Badge
-                variant="outline"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${
-                    projects.status
-                    ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
-                    : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
+              variant="outline"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${projects.status
+                ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
+                : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
                 }`}
+            >
+              {projects.status ? (
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                {projects.status ? (
-                    <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                    <CheckCircle className="w-4 h-4" />
-                    </motion.div>
-                ) : (
-                    <StopCircle className="w-4 h-4" />
-                )}
-                <span className="text-sm font-medium">
-                    {projects.status ? "Running" : "Stopped"}
-                </span>
+                  <CheckCircle className="w-4 h-4" />
+                </motion.div>
+              ) : (
+                <StopCircle className="w-4 h-4" />
+              )}
+              <span className="text-sm font-medium">
+                {projects.status ? "Running" : "Stopped"}
+              </span>
             </Badge>
           </div>
           <div className="flex flex-wrap gap-3 mt-4 lg:mt-0">
@@ -387,11 +386,11 @@ export default function ProjectDetailPage({ params }: PropsParams) {
               disabled={isDeploymentRunning || isDeploying}
             >
               {isDeploying ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                    <Rocket className="w-4 h-4" />
-                )}
-                {isDeploying ? "Deploying..." : "Deploy"}
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Rocket className="w-4 h-4" />
+              )}
+              {isDeploying ? "Deploying..." : "Deploy"}
             </Button>
             <Button
               onClick={() => setIsRollbackModalOpen(true)}
@@ -410,10 +409,10 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                 disabled={isStopping}
               >
                 {isStopping ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                        <StopCircle className="w-4 h-4" />
-                    )}
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <StopCircle className="w-4 h-4" />
+                )}
                 {isStopping ? "Stopping..." : "Stop"}
               </Button>
             ) : (
@@ -423,10 +422,10 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                 disabled={isStarting}
               >
                 {isStarting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                        <Rocket className="w-4 h-4" />
-                    )}
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Rocket className="w-4 h-4" />
+                )}
                 {isStarting ? "Starting..." : "Start"}
               </Button>
             )}
@@ -476,41 +475,41 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                   <dl className="space-y-4">
                     {/* Build Status */}
                     <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                        <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
-                            Build Status
-                        </dt>
-                        <dd className="font-medium text-lg flex items-center gap-2 dark:text-white">
-                            {buildNumber.length > 0 ? (
-                            buildNumber[0].status === "BUILDING" ? (
-                                <>
-                                <Loader2 className="w-4 h-4 animate-spin text-blue-500 dark:text-blue-300" />
-                                <span className="text-blue-500 dark:text-blue-300">
-                                    Building... ({elapsedTime}s)
-                                </span>
-                                </>
-                            ) : buildNumber[0].status === "FAILED" ? (
-                                <>
-                                <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-300" />
-                                <span className="text-red-500 dark:text-red-300">Build Failed</span>
-                                </>
-                            ) : buildNumber[0].status === "SUCCESS" ? (
-                                <>
-                                <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-300" />
-                                <span className="text-green-500 dark:text-green-300">Build Successful</span>
-                                </>
-                            ) : (
-                                <>
-                                <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
-                                <span className="text-gray-500 dark:text-gray-300">Build Status Unknown</span>
-                                </>
-                            )
-                            ) : (
+                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
+                        Build Status
+                      </dt>
+                      <dd className="font-medium text-lg flex items-center gap-2 dark:text-white">
+                        {buildNumber.length > 0 ? (
+                          buildNumber[0].status === "BUILDING" ? (
                             <>
-                                <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
-                                <span className="text-gray-500 dark:text-gray-300">No Builds Available</span>
+                              <Loader2 className="w-4 h-4 animate-spin text-blue-500 dark:text-blue-300" />
+                              <span className="text-blue-500 dark:text-blue-300">
+                                Building... ({elapsedTime}s)
+                              </span>
                             </>
-                            )}
-                        </dd>
+                          ) : buildNumber[0].status === "FAILED" ? (
+                            <>
+                              <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-300" />
+                              <span className="text-red-500 dark:text-red-300">Build Failed</span>
+                            </>
+                          ) : buildNumber[0].status === "SUCCESS" ? (
+                            <>
+                              <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-300" />
+                              <span className="text-green-500 dark:text-green-300">Build Successful</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
+                              <span className="text-gray-500 dark:text-gray-300">Build Status Unknown</span>
+                            </>
+                          )
+                        ) : (
+                          <>
+                            <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
+                            <span className="text-gray-500 dark:text-gray-300">No Builds Available</span>
+                          </>
+                        )}
+                      </dd>
                     </div>
 
 
@@ -520,9 +519,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                         Service Status
                       </dt>
                       <dd
-                        className={`${
-                          projects.status ? "text-green-500" : "text-red-500"
-                        } font-medium text-lg flex items-center gap-2 dark:text-white`}
+                        className={`${projects.status ? "text-green-500" : "text-red-500"
+                          } font-medium text-lg flex items-center gap-2 dark:text-white`}
                       >
                         {projects.status ? (
                           <>
@@ -576,6 +574,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                   </dl>
                 </CardContent>
               </Card>
+              {/* Project Preview Card */}
               <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800">
                 <CardHeader className="border-b border-purple-100 dark:border-gray-700">
                   <CardTitle className="text-xl text-purple-500 font-bold flex items-center gap-2 dark:text-white">
@@ -583,8 +582,55 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                     Project Preview
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 dark:text-white">
-                  <WebsitePreview url={url} />
+                <CardContent className="p-6 dark:text-white relative group">
+                  {buildNumber.length > 0 && buildNumber[0].status === "SUCCESS" ? (
+                    // Show the Website Preview if the build is successful
+                    <Link
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block relative"
+                    >
+                      {/* Blurred Preview */}
+                      <div className="blur-sm group-hover:blur-none transition-all duration-300">
+                        <WebsitePreview url={url} />
+                      </div>
+
+                      {/* Hover Text Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p className="text-white text-lg font-semibold">Click to Visit Site</p>
+                      </div>
+                    </Link>
+                  ) : (
+                    // Fallback UI for non-successful builds
+                    <div className="flex flex-col items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                      {buildNumber.length > 0 && buildNumber[0].status === "BUILDING" ? (
+                        // Build in progress
+                        <>
+                          <Loader2 className="w-8 h-8 animate-spin text-blue-500 dark:text-blue-300" />
+                          <p className="mt-4 text-gray-600 dark:text-gray-300 text-center">
+                            Build in progress... Please wait.
+                          </p>
+                        </>
+                      ) : buildNumber.length > 0 && buildNumber[0].status === "FAILED" ? (
+                        // Build failed
+                        <>
+                          <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-300" />
+                          <p className="mt-4 text-gray-600 dark:text-gray-300 text-center">
+                            Build failed. Please check the logs and try again.
+                          </p>
+                        </>
+                      ) : (
+                        // No builds available
+                        <>
+                          <AlertCircle className="w-8 h-8 text-gray-500 dark:text-gray-300" />
+                          <p className="mt-4 text-gray-600 dark:text-gray-300 text-center">
+                            No builds available. Start a new build to see the preview.
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -687,7 +733,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             >
               {isDeploying ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : null}
+              ) : null}
               {isDeploying ? "Deploying..." : "Deploy Service"}
             </AlertDialogAction>
           </AlertDialogFooter>
