@@ -234,32 +234,65 @@ export default function Service() {
   const confirmDelete = async () => {
     if (serviceToDelete && deleteConfirmationName === serviceToDelete.name) {
       try {
-        await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
-
+        // Attempt to delete the service deployment
+        const result = await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
+  
+        // Success notification
         toast({
           title: "Success",
           description: `Service "${serviceToDelete.name}" has been deleted successfully.`,
           variant: "success",
           duration: 3000,
         });
-
+  
+        console.log("Service deployment deleted:", result);
+  
+        // Refresh data and close the modal
         data1();
         data2();
       } catch (err) {
         const error = err as ErrorResponse;
-        toast({
-          title: "Error",
-          description:
-            error?.data?.message ||
-            "Failed to delete service. Please try again.",
-          variant: "error",
-          duration: 5000,
-        });
+  
+        console.log("Failed to delete service deployment:", error);
+  
+        // Error handling with toast notifications
+        if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
+          toast({
+            title: "Success",
+            description:
+              error?.data?.message ||
+              `Service "${serviceToDelete.name}" has been deleted successfully.`,
+            variant: "success",
+            duration: 3000,
+          });
+  
+          // Refresh data and close the modal
+          data1();
+          data2();
+        } else {
+          toast({
+            title: "Error",
+            description:
+              error?.data?.message ||
+              "Failed to delete service. Please try again.",
+            variant: "error",
+            duration: 5000,
+          });
+        }
       } finally {
+        // Cleanup: Close the modal and reset state
         setIsDeleteModalOpen(false);
         setServiceToDelete(null);
         setDeleteConfirmationName("");
       }
+    } else {
+      // If the confirmation name doesn't match, show an error toast
+      toast({
+        title: "Error",
+        description: "The confirmation name does not match the service name.",
+        variant: "error",
+        duration: 5000,
+      });
     }
   };
 

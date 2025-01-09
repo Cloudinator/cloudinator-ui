@@ -138,6 +138,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       if (data.status === "SUCCESS" || data.status === "FAILED") {
         setBuildStartTime(null);
         setElapsedTime(0);
+        refetchProjects();
       }
     };
 
@@ -148,7 +149,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     return () => {
       eventSource.close();
     };
-  }, [projectName, refetchBuilds]);
+  }, [projectName, refetchBuilds, refetchProjects]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -511,7 +512,6 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                         )}
                       </dd>
                     </div>
-
 
                     {/* Service Status */}
                     <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
