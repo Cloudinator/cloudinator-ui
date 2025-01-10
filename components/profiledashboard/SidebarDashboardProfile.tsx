@@ -36,9 +36,9 @@ export function SidebarDashboardProfile() {
         { name: 'Setting', href: `/setting/${username}`, icon: Settings },
     ]
 
-    const { data } = useGetWorkspacesQuery()
+    const { data: workspacesData } = useGetWorkspacesQuery()
 
-    console.log(data)
+    console.log(workspacesData)
 
     // Persist sidebar state in localStorage
     useEffect(() => {
@@ -97,6 +97,7 @@ export function SidebarDashboardProfile() {
                                                                 : 'text-gray-700 hover:bg-gray-100 hover:dark:bg-gray-700'
                                                             }`}
                                                         onClick={() => setIsOpen(false)}
+                                                        style={item.name === 'Workspace' && !workspacesData?.length ? { opacity: 0.5, pointerEvents: 'none' } : {}}
                                                     >
                                                         <item.icon
                                                             className={`h-5 w-5 ${pathname === item.href
@@ -167,6 +168,7 @@ export function SidebarDashboardProfile() {
                                                             ? 'text-purple-500 font-bold bg-gray-100 dark:bg-gray-700'
                                                             : 'text-gray-700 hover:bg-gray-100 hover:dark:bg-gray-700'
                                                         }`}
+                                                    style={item.name === 'Workspace' && !workspacesData?.length ? { opacity: 0.5, pointerEvents: 'none' } : {}}
                                                 >
                                                     <item.icon
                                                         className={`h-5 w-5 ${pathname === item.href

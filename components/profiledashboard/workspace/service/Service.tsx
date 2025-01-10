@@ -186,6 +186,43 @@ export default function Service() {
     });
   }, [servicesData, subWorkspace]);
 
+
+  // Utility function to handle local storage
+  const getLocalStorageKey = (projectName: string) => `project_${projectName}_createdAt`;
+
+  const storeCreationTime = (projectName: string, createdAt: string) => {
+    const key = getLocalStorageKey(projectName);
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, createdAt);
+      console.log(`Stored creation time for ${projectName}: ${createdAt}`); // Debug log
+    }
+  };
+
+  const isProjectNew = (projectName: string) => {
+    const key = getLocalStorageKey(projectName);
+    const createdAt = localStorage.getItem(key);
+    if (!createdAt) {
+      console.log(`No creation time found for ${projectName}`); // Debug log
+      return false;
+    }
+
+    const creationTime = new Date(createdAt).getTime();
+    const currentTime = new Date().getTime();
+    const isNew = currentTime - creationTime < 24 * 60 * 60 * 1000; // 24 hours
+
+    console.log(`Checking if ${projectName} is new:`, { creationTime, currentTime, isNew }); // Debug log
+
+    return isNew;
+  };
+
+  useEffect(() => {
+    if (combinedResults) {
+      combinedResults.forEach((service) => {
+        storeCreationTime(service.name, service.createdAt);
+      });
+    }
+  }, [combinedResults]);
+
   useEffect(() => {
     if (combinedResults) {
       // Step 1: Sort by `createdAt` (newest first)
@@ -220,6 +257,26 @@ export default function Service() {
   const [subWorkspaceToDelete, setSubWorkspaceToDelete] =
     useState<SubWorkspaceType | null>(null);
   const [deleteConfirmationName, setDeleteConfirmationName] = useState("");
+
+  const cleanupOldProjects = () => {
+    const currentTime = new Date().getTime();
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("project_") && key.endsWith("_createdAt")) {
+        const createdAt = localStorage.getItem(key);
+        if (createdAt) {
+          const creationTime = new Date(createdAt).getTime();
+          if (currentTime - creationTime >= 24 * 60 * 60 * 1000) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    });
+  };
+
+  // Call the cleanup function when the component mounts
+  useEffect(() => {
+    cleanupOldProjects();
+  }, []);
 
   const handleDeleteClick = (service: ServiceType | SubWorkspaceType) => {
     if (service.type === "subworkspace") {
@@ -562,7 +619,7 @@ export default function Service() {
                         <Badge
                           variant="outline"
                           className={`text-sm font-medium px-3 py-1 rounded-full ${service.status
-                            ? "bg-green-100 text-green-700 border-green-200"
+                            ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
                             : "bg-red-100 text-red-700 border-red-200"
                             }`}
                         >
@@ -675,10 +732,16 @@ export default function Service() {
                           }}
                           disabled={!service.status}
                         >
-                          {service.status ? "View Details" : "Not Available"}
+                          {service.status ? "See More" : "Not Available"}
                         </Button>
                       )}
                       <div className="flex flex-col items-start sm:items-end gap-1">
+                        {/* Add the "NEW" badge here */}
+                        {isProjectNew(service.name) && (
+                          <Badge className="text-xs bg-purple-100 text-purple-700 border border-purple-500 animate-pulse mb-1">
+                            New
+                          </Badge>
+                        )}
                         <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
                           <GitBranch className="w-3 h-3 mr-1 flex-shrink-0 text-purple-500" />
                           <span className="truncate">
