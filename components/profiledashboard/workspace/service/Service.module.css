@@ -1,0 +1,31 @@
+.newProject {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .newProject::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      opacity: 0.5;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+      opacity: 0.5;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+  }

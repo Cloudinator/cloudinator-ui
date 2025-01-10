@@ -32,22 +32,22 @@ export default function ProfilePage() {
   const [avatarSrc, setAvatarSrc] = useState<string>("/placeholder.png");
   const [isSignOutModalOpen, setSignOutModalOpen] = useState<boolean>(false);
 
-  const { data: userData, error, isLoading } = useGetMeQuery();
+  const { data: userData, isLoading } = useGetMeQuery();
   const [updateUser, { isLoading: isUpdating }] =
     useUpdateUserByUsernameMutation();
 
-    useEffect(() => {
-      if (userData) {
-        setEmail(userData.email);
-        setDisplayUsername(userData.username);
-        setFirstName(userData.firstName || "");
-        setLastName(userData.lastName || "");
-        setPhoneNumber(userData.phoneNumber || "");
-        setDateOfBirth(userData.dateOfBirth ? new Date(userData.dateOfBirth) : undefined); // Convert string to Date
-        setStatus(userData.status || "");
-        setGender(userData.gender || "");
-      }
-    }, [userData]);
+  useEffect(() => {
+    if (userData) {
+      setEmail(userData.email);
+      setDisplayUsername(userData.username);
+      setFirstName(userData.firstName || "");
+      setLastName(userData.lastName || "");
+      setPhoneNumber(userData.phoneNumber || "");
+      setDateOfBirth(userData.dateOfBirth ? new Date(userData.dateOfBirth) : undefined); // Convert string to Date
+      setStatus(userData.status || "");
+      setGender(userData.gender || "");
+    }
+  }, [userData]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -97,12 +97,12 @@ export default function ProfilePage() {
         <Loading />
       </div>
     );
-  if (error)
-    return (
-      <div className="w-full h-full text-purple-500 text-3xl grid place-content-center">
-        User Must Login First
-      </div>
-    );
+  // if (error)
+  //   return (
+  //     <div className="w-full h-full text-purple-500 text-3xl grid place-content-center">
+  //       User Must Login First
+  //     </div>
+  //   );
 
   return (
     <div className="flex flex-col bg-background min-h-screen w-full p-6 md:p-10">
@@ -159,137 +159,143 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="email" className="text-base text-purple-500">
-              <span className="text-red-500">*</span> Email Address
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-2"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
+          {/* Grid Layout for Input Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          <div>
-            <Label htmlFor="username" className="text-base text-purple-500">
-              <span className="text-red-500">*</span> Username
-            </Label>
-            <Input
-              id="username"
-              type="text"
-              value={displayUsername}
-              onChange={(e) => setDisplayUsername(e.target.value)}
-              className="mt-2"
-              placeholder="Enter your username"
-              required
-            />
-          </div>
+            <div>
+              <Label htmlFor="username" className="text-base text-purple-500">
+                <span className="text-red-500">*</span> Username
+              </Label>
+              <Input
+                id="username"
+                type="text"
+                value={displayUsername}
+                onChange={(e) => setDisplayUsername(e.target.value)}
+                className="mt-2"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="firstname" className="text-base text-purple-500">
-              <span className="text-red-500">*</span> First Name
-            </Label>
-            <Input
-              id="firstname"
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="mt-2"
-              placeholder="Enter your first name"
-              required
-            />
-          </div>
+            <div>
+              <Label htmlFor="email" className="text-base text-purple-500">
+                <span className="text-red-500">*</span> Email Address
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-2"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="lastname" className="text-base text-purple-500">
-              <span className="text-red-500">*</span> Last Name
-            </Label>
-            <Input
-              id="lastname"
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="mt-2"
-              placeholder="Enter your last name"
-              required
-            />
-          </div>
+            
 
-          <div>
-            <Label htmlFor="phoneNumber" className="text-base text-purple-500">
-              <span className="text-red-500">*</span> Phone Number
-            </Label>
-            <Input
-              id="phoneNumber"
-              type="text"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="mt-2"
-              placeholder="Enter your phone number"
-            />
-          </div>
+            <div>
+              <Label htmlFor="firstname" className="text-base text-purple-500">
+                <span className="text-red-500">*</span> First Name
+              </Label>
+              <Input
+                id="firstname"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="mt-2"
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="dateOfBirth" className="text-base text-purple-500">
-            <span className="text-red-500">*</span> Date of Birth
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal mt-2"
-                >
-                  {dateOfBirth ? (
-                    format(dateOfBirth, "PPP") // Format the date using date-fns
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={dateOfBirth}
-                  onSelect={setDateOfBirth}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+            <div>
+              <Label htmlFor="lastname" className="text-base text-purple-500">
+                <span className="text-red-500">*</span> Last Name
+              </Label>
+              <Input
+                id="lastname"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="mt-2"
+                placeholder="Enter your last name"
+                required
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="status" className="text-base text-purple-500">
-              <span className="text-red-500">*</span> Status
-            </Label>
-            <select
-              id="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="mt-2 block w-full p-2 border border-border rounded-md"
-            >
-              <option value="single">Single</option>
-              <option value="married">Married</option>
-            </select>
-          </div>
+            <div>
+              <Label htmlFor="phoneNumber" className="text-base text-purple-500">
+                <span className="text-red-500">*</span> Phone Number
+              </Label>
+              <Input
+                id="phoneNumber"
+                type="text"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="mt-2"
+                placeholder="Enter your phone number"
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="gender" className="text-base text-purple-500">
-              <span className="text-red-500">*</span> Gender
-            </Label>
-            <select
-              id="gender"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              className="mt-2 block w-full p-2 border border-border rounded-md"
-            >
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
+            <div>
+              <Label htmlFor="dateOfBirth" className="text-base text-purple-500">
+                <span className="text-red-500">*</span> Date of Birth
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal mt-2"
+                  >
+                    {dateOfBirth ? (
+                      format(dateOfBirth, "PPP") // Format the date using date-fns
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={dateOfBirth}
+                    onSelect={setDateOfBirth}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div>
+              <Label htmlFor="status" className="text-base text-purple-500">
+                <span className="text-red-500">*</span> Status
+              </Label>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="mt-2 block w-full p-2 border border-border rounded-md"
+              >
+                <option value="single">Single</option>
+                <option value="married">Married</option>
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="gender" className="text-base text-purple-500">
+                <span className="text-red-500">*</span> Gender
+              </Label>
+              <select
+                id="gender"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="mt-2 block w-full p-2 border border-border rounded-md"
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
           </div>
 
           {/* Sign Out Modal */}
@@ -301,7 +307,7 @@ export default function ProfilePage() {
           <div className="flex justify-end">
             <Button
               type="submit"
-              className="bg-purple-500 hover:bg-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
+              className="bg-purple-500 hover:bg-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2 dark:text-white"
               disabled={isUpdating}
             >
               {isUpdating ? "Updating..." : "Update Profile"}
