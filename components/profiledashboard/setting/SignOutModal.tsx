@@ -9,8 +9,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/hooks/use-toast";
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
 
 interface SignOutModalProps {
     isOpen: boolean;
@@ -22,36 +21,6 @@ const SignOutModal: React.FC<SignOutModalProps> = ({
                                                        isOpen,
                                                        onClose
                                                    }) => {
-    const router = useRouter();
-
-    const handleSignOut = async () => {
-        try {
-            // Redirect to external logout URL
-            const logoutUrl = 'http://localhost:8080/logout';
-            window.location.href = logoutUrl;
-
-            // Show success toast after redirection
-            toast({
-                title: "Signed Out",
-                description: "You have been successfully signed out",
-                variant: "default"
-            });
-
-            // Redirect to home test-profile after a short delay
-            setTimeout(() => {
-                router.push('http://localhost:8081/');
-            }, 2000); // Adjust delay as needed
-
-        } catch (error) {
-            // Handle sign-out errors
-            toast({
-                title: "Sign Out Error",
-                description: "Failed to sign out. Please try again.",
-                variant: "destructive"
-            });
-            console.error("Sign out error:", error);
-        }
-    };
 
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -65,10 +34,9 @@ const SignOutModal: React.FC<SignOutModalProps> = ({
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                        onClick={handleSignOut}
                         className="bg-red-500 hover:bg-red-700"
                     >
-                        Sign Out
+                        <Link href={'/identity/logout'}>Sign Out</Link>
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

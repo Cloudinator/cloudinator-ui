@@ -15,8 +15,9 @@ import { toast } from "@/hooks/use-toast";
 import Loading from "@/components/Loading";
 import SignOutModal from "./SignOutModal";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import {format} from "date-fns";
+
 
 export default function ProfilePage() {
   const params = useParams();
