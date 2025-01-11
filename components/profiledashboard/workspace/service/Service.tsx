@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import styles from "./Service.module.css";
 import React, { useState, useEffect, lazy, Suspense, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,8 +38,6 @@ import {
   ExternalLink,
   Folder,
   Loader2,
-  StopCircle,
-  CheckCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -155,13 +155,13 @@ export default function Service() {
 
   const { data: servicesData, refetch: data1 } = useGetServiceDeploymentQuery({
     workspaceName: selectedWorkspace,
-    size: 10,
+    size: 50,
     page: 0,
   }) as unknown as { data: ServiceDeploymentResponse; refetch: () => void };
 
   const { data: subWorkspace, refetch: data2 } = useGetSubWorkspacesQuery({
     workspaceName: selectedWorkspace,
-    size: 10,
+    size: 50,
     page: 0,
   }) as unknown as { data: SubWorkSpaceResponse; refetch: () => void };
 
@@ -185,6 +185,43 @@ export default function Service() {
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
   }, [servicesData, subWorkspace]);
+
+
+  // Utility function to handle local storage
+  const getLocalStorageKey = (projectName: string) => `project_${projectName}_createdAt`;
+
+  const storeCreationTime = (projectName: string, createdAt: string) => {
+    const key = getLocalStorageKey(projectName);
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, createdAt);
+      console.log(`Stored creation time for ${projectName}: ${createdAt}`); // Debug log
+    }
+  };
+
+  const isProjectNew = (projectName: string) => {
+    const key = getLocalStorageKey(projectName);
+    const createdAt = localStorage.getItem(key);
+    if (!createdAt) {
+      console.log(`No creation time found for ${projectName}`); // Debug log
+      return false;
+    }
+
+    const creationTime = new Date(createdAt).getTime();
+    const currentTime = new Date().getTime();
+    const isNew = currentTime - creationTime < 24 * 60 * 60 * 1000; // 24 hours
+
+    console.log(`Checking if ${projectName} is new:`, { creationTime, currentTime, isNew }); // Debug log
+
+    return isNew;
+  };
+
+  useEffect(() => {
+    if (combinedResults) {
+      combinedResults.forEach((service) => {
+        storeCreationTime(service.name, service.createdAt);
+      });
+    }
+  }, [combinedResults]);
 
   useEffect(() => {
     if (combinedResults) {
@@ -221,6 +258,26 @@ export default function Service() {
     useState<SubWorkspaceType | null>(null);
   const [deleteConfirmationName, setDeleteConfirmationName] = useState("");
 
+  const cleanupOldProjects = () => {
+    const currentTime = new Date().getTime();
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("project_") && key.endsWith("_createdAt")) {
+        const createdAt = localStorage.getItem(key);
+        if (createdAt) {
+          const creationTime = new Date(createdAt).getTime();
+          if (currentTime - creationTime >= 24 * 60 * 60 * 1000) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    });
+  };
+
+  // Call the cleanup function when the component mounts
+  useEffect(() => {
+    cleanupOldProjects();
+  }, []);
+
   const handleDeleteClick = (service: ServiceType | SubWorkspaceType) => {
     if (service.type === "subworkspace") {
       setSubWorkspaceToDelete(service as SubWorkspaceType);
@@ -236,7 +293,7 @@ export default function Service() {
       try {
         // Attempt to delete the service deployment
         const result = await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
-  
+
         // Success notification
         toast({
           title: "Success",
@@ -244,17 +301,17 @@ export default function Service() {
           variant: "success",
           duration: 3000,
         });
-  
+
         console.log("Service deployment deleted:", result);
-  
+
         // Refresh data and close the modal
         data1();
         data2();
       } catch (err) {
         const error = err as ErrorResponse;
-  
+
         console.log("Failed to delete service deployment:", error);
-  
+
         // Error handling with toast notifications
         if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
           toast({
@@ -265,7 +322,7 @@ export default function Service() {
             variant: "success",
             duration: 3000,
           });
-  
+
           // Refresh data and close the modal
           data1();
           data2();
@@ -481,9 +538,8 @@ export default function Service() {
             <Button
               key={type}
               variant={selectedType === type ? "default" : "outline"}
-              className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${
-                selectedType === type ? "ring-2 ring-purple-500" : ""
-              }`}
+              className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${selectedType === type ? "ring-2 ring-purple-500" : ""
+                }`}
               onClick={() => setSelectedType(type)}
             >
               <div className="flex items-center">
@@ -526,176 +582,178 @@ export default function Service() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <div className="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between relative">
-                  {/* Add a special border or background for subworkspace */}
-                  {service.type === "subworkspace" && (
-                    <div className="absolute inset-0 rounded-xl border-2 border-purple-500 pointer-events-none"></div>
-                  )}
+                <Link
+                  href={
+                    service.type === "subworkspace"
+                      ? `/workspace/sub-workspace/${service.name}`
+                      : `/workspace/${service.name}`
+                  }
+                  passHref
+                  legacyBehavior
+                >
+                  <div
+                    className={`p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between relative group cursor-pointer hover:border-purple-500 hover:bg-gray-100 ${new Date().getTime() - new Date(service.createdAt).getTime() <
+                      24 * 60 * 60 * 1000
+                      ? styles.newProject
+                      : ""
+                      }`}
+                  >
+                    {/* Card content */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        {getServiceIcon(service.type)}
+                        <h3 className="font-semibold text-lg text-purple-600 dark:text-purple-400">
+                          {service.name}
+                          {new Date().getTime() - new Date(service.createdAt).getTime() <
+                            24 * 60 * 60 * 1000 && (
+                              <Badge className="ml-2 text-xs bg-purple-100 text-purple-700 border border-purple-500 animate-pulse">
+                                New
+                              </Badge>
+                            )}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className={`text-sm font-medium px-3 py-1 rounded-full ${service.status
+                            ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
+                            : "bg-red-100 text-red-700 border-red-200"
+                            }`}
+                        >
+                          {service.status ? "Running" : "Stopping"}
+                        </Badge>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              onClick={(e) => {
+                                e.preventDefault(); // Prevent default behavior
+                                e.stopPropagation(); // Stop event propagation
+                              }}
+                            >
+                              <MoreVertical className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.preventDefault(); // Prevent default behavior
+                                e.stopPropagation(); // Stop event propagation
+                                const path =
+                                  service.type === "subworkspace"
+                                    ? `/workspace/sub-workspace/${service.name}`
+                                    : `/workspace/${service.name}`;
+                                router.push(path);
+                              }}
+                            >
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.preventDefault(); // Prevent default behavior
+                                e.stopPropagation(); // Stop event propagation
+                                handleDeleteClick(service);
+                              }}
+                              className="text-red-600"
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
 
-                  {/* Service Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      {getServiceIcon(service.type)}
-                      <h3 className="font-semibold text-lg text-purple-600 dark:text-purple-400">
-                        {service.name}
-                        {/* Show "New" badge for services created in the last 24 hours */}
-                        {new Date().getTime() -
-                          new Date(service.createdAt).getTime() <
-                          24 * 60 * 60 * 1000 && (
-                          <Badge variant="secondary" className="ml-2 text-xs">
+                    {/* Service Details */}
+                    <div className="space-y-4 text-sm">
+                      {/* Git URL - Only show if not a subworkspace */}
+                      {service.type !== "subworkspace" && service.gitUrl ? (
+                        <a
+                          href={service.gitUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center text-blue-600 hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <GitBranch className="w-4 h-4 mr-2 flex-shrink-0 text-purple-500" />
+                          <span className="truncate">{service.gitUrl}</span>
+                        </a>
+                      ) : service.type !== "subworkspace" ? (
+                        <span className="text-gray-500 dark:text-gray-400">
+                          Git URL not available
+                        </span>
+                      ) : null}
+
+                      {/* Subdomain or Subworkspace Description */}
+                      {service?.type === "subworkspace" ? (
+                        <span className="text-gray-500 dark:text-gray-400">
+                          This is a sub-workspace where you can manage your microservices.
+                        </span>
+                      ) : service.subdomain ? (
+                        <a
+                          href={`https://${service.subdomain}.cloudinator.cloud`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center text-green-600 hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Globe className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="truncate">{`https://${service.subdomain}.cloudinator.cloud`}</span>
+                          <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0" />
+                        </a>
+                      ) : (
+                        <span className="text-gray-500 dark:text-gray-400">
+                          Subdomain not available
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Service Footer */}
+                    <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                      {service.type !== "subworkspace" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${!service.status ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (service.status) {
+                              const path =
+                                service.type === "subworkspace"
+                                  ? `/workspace/sub-workspace/${service.name}`
+                                  : `/workspace/${service.name}`;
+                              router.push(path);
+                            }
+                          }}
+                          disabled={!service.status}
+                        >
+                          {service.status ? "See More" : "Not Available"}
+                        </Button>
+                      )}
+                      <div className="flex flex-col items-start sm:items-end gap-1">
+                        {/* Add the "NEW" badge here */}
+                        {isProjectNew(service.name) && (
+                          <Badge className="text-xs bg-purple-100 text-purple-700 border border-purple-500 animate-pulse mb-1">
                             New
                           </Badge>
                         )}
-                      </h3>
-                    </div>
-                    {/* Badge for Service Status */}
-                    <Badge
-                      variant="outline"
-                      className={`flex items-center gap-1.5 px-2 py-1 rounded-full border transition-all duration-300 ${
-                        service.status
-                          ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
-                          : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
-                      }`}
-                    >
-                      {service.status ? (
-                        <motion.div
-                          animate={{ scale: [1, 1.2, 1] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                        </motion.div>
-                      ) : (
-                        <StopCircle className="w-4 h-4" />
-                      )}
-                    </Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          onClick={(e) => e.preventDefault()}
-                        >
-                          <MoreVertical className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            const path =
-                              service.type === "subworkspace"
-                                ? `/workspace/sub-workspace/${service.name}`
-                                : `/workspace/${service.name}`;
-                            router.push(path);
-                          }}
-                        >
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            handleDeleteClick(service);
-                          }}
-                          className="text-red-600"
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-
-                  {/* Service Details */}
-                  <div className="space-y-4 text-sm">
-                    {/* Git URL - Only show if not a subworkspace */}
-                    {service.type !== "subworkspace" && service.gitUrl ? (
-                      <a
-                        href={service.gitUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-blue-600 hover:underline"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <GitBranch className="w-4 h-4 mr-2 flex-shrink-0 text-purple-500" />
-                        <span className="truncate">{service.gitUrl}</span>
-                      </a>
-                    ) : service.type !== "subworkspace" ? (
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Git URL not available
-                      </span>
-                    ) : null}
-
-                    {/* Subdomain or Subworkspace Description */}
-                    {service?.type === "subworkspace" ? (
-                      <span className="text-gray-500 dark:text-gray-400">
-                        This is a sub-workspace where you can manage your
-                        microservices.
-                      </span>
-                    ) : service.subdomain ? (
-                      <a
-                        href={`https://${service.subdomain}.cloudinator.cloud`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-green-600 hover:underline"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Globe className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span className="truncate">{`https://${service.subdomain}.cloudinator.cloud`}</span>
-                        <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0" />
-                      </a>
-                    ) : (
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Subdomain not available
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Service Footer */}
-                  <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    {service.type !== "subworkspace" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${
-                          !service.status ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (service.status) {
-                            const path =
-                              service.type === "subworkspace"
-                                ? `/workspace/sub-workspace/${service.name}`
-                                : `/workspace/${service.name}`;
-                            router.push(path);
-                          }
-                        }}
-                        disabled={!service.status}
-                      >
-                        {service.status ? "View Details" : "Not Available"}
-                      </Button>
-                    )}
-                    <div className="flex flex-col items-start sm:items-end gap-1">
-                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                        <GitBranch className="w-3 h-3 mr-1 flex-shrink-0 text-purple-500" />
-                        <span className="truncate">
-                          {service?.type === "subworkspace"
-                            ? "Sub Workspace"
-                            : service.branch}
-                        </span>
-                      </span>
-                      {/* Add Last Modified Section */}
-                      {/* <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                        <span className="truncate">
-                          Created:{" "}
-                          <span className="text-purple-500 font-semibold">
-                            {formatDate(service.createdAt)}
+                        <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                          <GitBranch className="w-3 h-3 mr-1 flex-shrink-0 text-purple-500" />
+                          <span className="truncate">
+                            {service?.type === "subworkspace"
+                              ? "Sub Workspace"
+                              : service.branch}
                           </span>
                         </span>
-                      </span> */}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </motion.div>
             ))
           )}
@@ -724,13 +782,13 @@ export default function Service() {
               Cancel
             </Button>
             {serviceToDelete?.type === "subworkspace" ||
-            subWorkspaceToDelete ? (
+              subWorkspaceToDelete ? (
               <Button
                 onClick={confirmDeleteSubWorkspace}
                 disabled={
                   (!serviceToDelete && !subWorkspaceToDelete) ||
                   deleteConfirmationName !==
-                    (serviceToDelete?.name || subWorkspaceToDelete?.name)
+                  (serviceToDelete?.name || subWorkspaceToDelete?.name)
                 }
                 className="bg-red-600 hover:bg-red-700 text-white"
               >

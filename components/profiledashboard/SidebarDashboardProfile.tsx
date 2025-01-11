@@ -36,9 +36,9 @@ export function SidebarDashboardProfile() {
         { name: 'Setting', href: `/setting/${username}`, icon: Settings },
     ]
 
-    const { data } = useGetWorkspacesQuery()
+    const { data: workspacesData } = useGetWorkspacesQuery()
 
-    console.log(data)
+    console.log(workspacesData)
 
     // Persist sidebar state in localStorage
     useEffect(() => {
@@ -92,19 +92,18 @@ export function SidebarDashboardProfile() {
                                                 >
                                                     <Link
                                                         href={item.href}
-                                                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors duration-200 ${
-                                                            pathname === item.href
+                                                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors duration-200 ${pathname === item.href
                                                                 ? 'text-purple-500 font-bold bg-gray-100 dark:bg-gray-700'
                                                                 : 'text-gray-700 hover:bg-gray-100 hover:dark:bg-gray-700'
-                                                        }`}
+                                                            }`}
                                                         onClick={() => setIsOpen(false)}
+                                                        style={item.name === 'Workspace' && !workspacesData?.length ? { opacity: 0.5, pointerEvents: 'none' } : {}}
                                                     >
                                                         <item.icon
-                                                            className={`h-5 w-5 ${
-                                                                pathname === item.href
+                                                            className={`h-5 w-5 ${pathname === item.href
                                                                     ? 'text-purple-500'
                                                                     : 'text-gray-700 dark:text-gray-300'
-                                                            }`}
+                                                                }`}
                                                         />
                                                         <span className="text-lg dark:text-gray-300">{item.name}</span>
                                                     </Link>
@@ -127,9 +126,8 @@ export function SidebarDashboardProfile() {
             <div className="hidden lg:flex">
                 {/* Sidebar */}
                 <div
-                    className={`flex flex-col h-full bg-white dark:bg-gray-800 border-r dark:border-gray-700 transition-all duration-300 ${
-                        isSidebarOpen ? 'w-64' : 'w-20'
-                    }`}
+                    className={`flex flex-col h-full bg-white dark:bg-gray-800 border-r dark:border-gray-700 transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'
+                        }`}
                 >
                     <SidebarHeader className="border-b p-3">
                         <div className="flex items-center justify-between">
@@ -166,18 +164,17 @@ export function SidebarDashboardProfile() {
                                             >
                                                 <Link
                                                     href={item.href}
-                                                    className={`flex items-center gap-4 p-3 rounded-lg transition-colors duration-200 mb-2 ${
-                                                        pathname === item.href
+                                                    className={`flex items-center gap-4 p-3 rounded-lg transition-colors duration-200 mb-2 ${pathname === item.href
                                                             ? 'text-purple-500 font-bold bg-gray-100 dark:bg-gray-700'
                                                             : 'text-gray-700 hover:bg-gray-100 hover:dark:bg-gray-700'
-                                                    }`}
+                                                        }`}
+                                                    style={item.name === 'Workspace' && !workspacesData?.length ? { opacity: 0.5, pointerEvents: 'none' } : {}}
                                                 >
                                                     <item.icon
-                                                        className={`h-5 w-5 ${
-                                                            pathname === item.href
+                                                        className={`h-5 w-5 ${pathname === item.href
                                                                 ? 'text-purple-500'
                                                                 : 'text-gray-700 dark:text-gray-300'
-                                                        }`}
+                                                            }`}
                                                     />
                                                     {isSidebarOpen && (
                                                         <span className="text-lg dark:text-gray-300">{item.name}</span>
@@ -189,10 +186,11 @@ export function SidebarDashboardProfile() {
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>
-                        <div className="flex justify-center p-4">
-                            <ModeToggle />
-                        </div>
+
                     </SidebarContent>
+                    <div className="flex justify-center p-4">
+                        <ModeToggle />
+                    </div>
                 </div>
             </div>
         </>

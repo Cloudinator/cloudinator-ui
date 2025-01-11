@@ -1,0 +1,19 @@
+.newProject {
+    border-color: #9333ea; /* Purple border for new projects */
+  }
+  
+  .newProject .badge {
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
