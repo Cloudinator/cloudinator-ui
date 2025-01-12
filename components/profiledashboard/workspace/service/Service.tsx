@@ -135,6 +135,13 @@ export default function Service() {
   const { data: workspacesData } = useGetWorkspacesQuery();
   const workspaces = workspacesData || [];
 
+  // Redirect if no workspaces exist
+  useEffect(() => {
+    if (workspaces.length === 0) {
+      router.push("/dashboard"); // Redirect to the dashboard or another page
+    }
+  }, [workspaces, router]);
+
   const [selectedWorkspace, setSelectedWorkspace] = useState(() => {
     // Retrieve the selected workspace from local storage on initial load
     if (typeof window !== "undefined") {
@@ -186,9 +193,9 @@ export default function Service() {
     });
   }, [servicesData, subWorkspace]);
 
-
   // Utility function to handle local storage
-  const getLocalStorageKey = (projectName: string) => `project_${projectName}_createdAt`;
+  const getLocalStorageKey = (projectName: string) =>
+    `project_${projectName}_createdAt`;
 
   const storeCreationTime = (projectName: string, createdAt: string) => {
     const key = getLocalStorageKey(projectName);
@@ -210,7 +217,11 @@ export default function Service() {
     const currentTime = new Date().getTime();
     const isNew = currentTime - creationTime < 24 * 60 * 60 * 1000; // 24 hours
 
-    console.log(`Checking if ${projectName} is new:`, { creationTime, currentTime, isNew }); // Debug log
+    console.log(`Checking if ${projectName} is new:`, {
+      creationTime,
+      currentTime,
+      isNew,
+    }); // Debug log
 
     return isNew;
   };
@@ -292,7 +303,9 @@ export default function Service() {
     if (serviceToDelete && deleteConfirmationName === serviceToDelete.name) {
       try {
         // Attempt to delete the service deployment
-        const result = await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
+        const result = await deleteServiceDeployment({
+          name: serviceToDelete.name,
+        }).unwrap();
 
         // Success notification
         toast({
@@ -313,7 +326,10 @@ export default function Service() {
         console.log("Failed to delete service deployment:", error);
 
         // Error handling with toast notifications
-        if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
+        if (
+          error?.status === "PARSING_ERROR" &&
+          error?.originalStatus === 200
+        ) {
           toast({
             title: "Success",
             description:
@@ -538,8 +554,9 @@ export default function Service() {
             <Button
               key={type}
               variant={selectedType === type ? "default" : "outline"}
-              className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${selectedType === type ? "ring-2 ring-purple-500" : ""
-                }`}
+              className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${
+                selectedType === type ? "ring-2 ring-purple-500" : ""
+              }`}
               onClick={() => setSelectedType(type)}
             >
               <div className="flex items-center">
@@ -595,11 +612,13 @@ export default function Service() {
                   legacyBehavior
                 >
                   <div
-                    className={`p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between relative group cursor-pointer hover:border-purple-500 hover:bg-gray-100 ${new Date().getTime() - new Date(service.createdAt).getTime() <
+                    className={`p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between relative group cursor-pointer hover:border-purple-500 hover:bg-gray-100 ${
+                      new Date().getTime() -
+                        new Date(service.createdAt).getTime() <
                       24 * 60 * 60 * 1000
-                      ? styles.newProject
-                      : ""
-                      }`}
+                        ? styles.newProject
+                        : ""
+                    }`}
                   >
                     {/* Card content */}
                     <div className="flex items-center justify-between mb-4">
@@ -607,21 +626,23 @@ export default function Service() {
                         {getServiceIcon(service.type)}
                         <h3 className="font-semibold text-lg text-purple-600 dark:text-purple-400">
                           {service.name}
-                          {new Date().getTime() - new Date(service.createdAt).getTime() <
+                          {new Date().getTime() -
+                            new Date(service.createdAt).getTime() <
                             24 * 60 * 60 * 1000 && (
-                              <Badge className="ml-2 text-xs bg-purple-100 text-purple-700 border border-purple-500 animate-pulse">
-                                New
-                              </Badge>
-                            )}
+                            <Badge className="ml-2 text-xs bg-purple-100 text-purple-700 border border-purple-500 animate-pulse">
+                              New
+                            </Badge>
+                          )}
                         </h3>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge
                           variant="outline"
-                          className={`text-sm font-medium px-3 py-1 rounded-full ${service.status
-                            ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
-                            : "bg-red-100 text-red-700 border-red-200"
-                            }`}
+                          className={`text-sm font-medium px-3 py-1 rounded-full ${
+                            service.status
+                              ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
+                              : "bg-red-100 text-red-700 border-red-200"
+                          }`}
                         >
                           {service.status ? "Running" : "Stopping"}
                         </Badge>
@@ -691,7 +712,8 @@ export default function Service() {
                       {/* Subdomain or Subworkspace Description */}
                       {service?.type === "subworkspace" ? (
                         <span className="text-gray-500 dark:text-gray-400">
-                          This is a sub-workspace where you can manage your microservices.
+                          This is a sub-workspace where you can manage your
+                          microservices.
                         </span>
                       ) : service.subdomain ? (
                         <a
@@ -718,8 +740,11 @@ export default function Service() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${!service.status ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
+                          className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${
+                            !service.status
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
                           onClick={(e) => {
                             e.preventDefault();
                             if (service.status) {
@@ -782,13 +807,13 @@ export default function Service() {
               Cancel
             </Button>
             {serviceToDelete?.type === "subworkspace" ||
-              subWorkspaceToDelete ? (
+            subWorkspaceToDelete ? (
               <Button
                 onClick={confirmDeleteSubWorkspace}
                 disabled={
                   (!serviceToDelete && !subWorkspaceToDelete) ||
                   deleteConfirmationName !==
-                  (serviceToDelete?.name || subWorkspaceToDelete?.name)
+                    (serviceToDelete?.name || subWorkspaceToDelete?.name)
                 }
                 className="bg-red-600 hover:bg-red-700 text-white"
               >
