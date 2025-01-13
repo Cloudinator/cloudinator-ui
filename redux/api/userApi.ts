@@ -12,6 +12,7 @@ interface User {
     status: string,
     gender: string,
     uuid: string,
+    profileImage: string,
 }
 
 const identityApi = createServiceApi('identity')

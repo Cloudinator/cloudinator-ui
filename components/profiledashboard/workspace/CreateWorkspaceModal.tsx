@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Zap, Loader2 } from 'lucide-react'
-import {useCreateWorkspaceMutation} from "@/redux/api/projectApi";
-import {useToast} from "@/hooks/use-toast";
+import { useCreateWorkspaceMutation, useGetWorkspacesQuery } from "@/redux/api/projectApi"
+import { useToast } from "@/hooks/use-toast"
 
 interface ErrorResponse {
     data?: {
@@ -24,11 +24,13 @@ interface ErrorResponse {
 }
 
 export function CreateWorkspaceModal() {
-    const {toast} = useToast();
+    const { toast } = useToast()
     const [open, setOpen] = useState(false)
     const [workspaceName, setWorkspaceName] = useState("")
     const [isCreating, setIsCreating] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
+
+    const { data } = useGetWorkspacesQuery()
 
     const [createWorkspace] = useCreateWorkspaceMutation()
 
@@ -39,50 +41,50 @@ export function CreateWorkspaceModal() {
     }, [open])
 
     const handleCreateWorkspace = async () => {
-        setIsCreating(true);
+        setIsCreating(true)
         try {
-            await createWorkspace({ name: workspaceName });
+            await createWorkspace({ name: workspaceName })
 
-            // Success notification
             toast({
                 title: "Success",
                 description: `Workspace "${workspaceName}" created successfully!`,
                 variant: "success",
                 duration: 3000,
-            });
+            })
 
-            setWorkspaceName("");
-            setOpen(false);
-
+            setWorkspaceName("")
+            setOpen(false)
         } catch (err) {
+            const error = err as ErrorResponse
+            console.error(error)
 
-            const error = err as ErrorResponse;
-            console.error(error);
-
-            // Error notification
             toast({
                 title: "Error",
                 description: error?.data?.message || "Failed to create workspace. Please try again.",
                 variant: "error",
                 duration: 5000,
-            });
+            })
         } finally {
-            setIsCreating(false);
+            setIsCreating(false)
         }
-    };
+    }
 
+    if (!data) return null
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-purple-500 text-primary-foreground hover:bg-purple-700">
+                <Button
+                    className="bg-purple-500 text-primary-foreground hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={data && data.length > 0}
+                >
                     <Zap className="mr-2 h-4 w-4" />
                     Create Workspace
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-purple-500">Create Workspace</DialogTitle>
+                    <DialogTitle>Create Workspace</DialogTitle>
                     <DialogDescription>
                         Enter a name for your new workspace and bring your ideas to life.
                     </DialogDescription>
@@ -131,4 +133,3 @@ export function CreateWorkspaceModal() {
         </Dialog>
     )
 }
-
