@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "../globals.css";
 
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { SidebarDashboardProfile } from "@/components/profiledashboard/SidebarDashboardProfile";
-import { ThemeProvider } from "next-themes";
 import { Poppins } from "next/font/google";
 import StoreProvider from "@/app/StoreProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { LayoutProvider } from "./provider/LayoutProvider";
+import { Sidebar } from "@/components/sidebar";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -27,22 +26,17 @@ export default function DashboardLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={poppins.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
           <StoreProvider>
-            <SidebarProvider>
-              <SidebarDashboardProfile />
-              <div className="flex flex-col h-screen w-full">
-                {children}
-                <Toaster />
-              </div>
-            </SidebarProvider>
+            <LayoutProvider>
+              <main className="flex min-h-screen">
+                <Sidebar />
+                <div className="flex-1 overflow-y-auto">
+                  {children}
+                  <Toaster />
+                </div>
+              </main>
+            </LayoutProvider>
           </StoreProvider>
-        </ThemeProvider>
       </body>
     </html>
   );

@@ -6,16 +6,20 @@ const nextConfig: NextConfig = {
         remotePatterns: [
             {
                 protocol: "https",
-                hostname: "cloudinary.istad.co",
-                pathname: "/photo-:id",
-            },
-            {
-                protocol: "https",
-                hostname: "example.com",
-                pathname: "/image/:id",
+                hostname: "**",
+                pathname: "/**",
             },
         ],
+        domains: ["cloudinator.istad.co"],
     },
+    async rewrites() {
+        return [
+          {
+            source: "/uploads/:path*",
+            destination: "/uploads/:path*",
+          },
+        ];
+      },
 };
 
 export default nextConfig;

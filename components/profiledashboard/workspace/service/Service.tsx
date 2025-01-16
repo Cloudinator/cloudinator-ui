@@ -260,21 +260,34 @@ export default function Service() {
     }, [combinedResults]);
 
     useEffect(() => {
-        if (combinedResults) {
-            let filtered = [...combinedResults];
-            if (selectedType !== "all") {
-                filtered = filtered.filter((service) => service.type === selectedType);
-            }
+      if (combinedResults) {
+          let filtered = [...combinedResults];
+          
+          // Filter by type
+          if (selectedType !== "all") {
+              filtered = filtered.filter((service) => {
+                  if (service.type === "database") {
+                      return selectedType === "database";
+                  } else if (service.type === "subworkspace") {
+                      return selectedType === "subworkspace";
+                  } else {
+                      // For frontend and backend services
+                      return service.type === selectedType;
+                  }
+              });
+          }
 
-            if (searchTerm) {
-                filtered = filtered.filter((service) =>
-                    service.name.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
+          // Filter by search term
+          if (searchTerm) {
+              filtered = filtered.filter((service) => {
+                  const searchField = service.type === "database" ? service.name : service.name;
+                  return searchField.toLowerCase().includes(searchTerm.toLowerCase());
+              });
+          }
 
-            setFilteredServices(filtered);
-        }
-    }, [combinedResults, searchTerm, selectedType]);
+          setFilteredServices(filtered);
+      }
+  }, [combinedResults, searchTerm, selectedType]);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [serviceToDelete, setServiceToDelete] = useState<ServiceType | null>(
