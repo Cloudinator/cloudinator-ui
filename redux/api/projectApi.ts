@@ -52,6 +52,20 @@ export type BuildAnalytic = {
     success: number
 }
 
+type Database = {
+    dbName: string,
+    username: string,
+    password: string,
+    dbType: string,
+    dbVersion: string,
+    workspaceName: string,
+    gitUrl: string,
+    branch: string,
+    status:boolean,
+    subdomain: string,
+    name: string,
+}
+
 const projectApi = createServiceApi('project')
 
 export const projectsApi = projectApi.injectEndpoints({
@@ -260,6 +274,17 @@ export const projectsApi = projectApi.injectEndpoints({
             query: () => 'api/v1/deploy-service/get-build-analytics',
         }),
 
+        createDatabase: builder.mutation<void, { dbName: string, dbUser: string, dbPassword: string,dbType:string,dbVersion:string, workspaceName: string }>({
+            query: ({ dbName, dbUser, dbPassword,dbType,dbVersion, workspaceName }) => ({
+                url: 'api/v1/database/deploy-database',
+                method: 'POST',
+                body: { dbName, dbUser, dbPassword,dbType,dbVersion, workspaceName },
+            }),
+        }),
+
+        getDatabaseServices: builder.query<Database[], { workspaceName: string,size: number,page:number }>({
+            query: ({ workspaceName,size,page }) => `api/v1/database/${workspaceName}?size=${size}&page=${page}`,
+        }),
 
 
 
@@ -270,4 +295,4 @@ export const projectsApi = projectApi.injectEndpoints({
 
 
 export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation,useGetTestMutation,useGetMetadataQuery,useDeleteSpringProjectMutation,useGetRepositoryQuery,useCreateGitlabServiceMutation,useCreateExistingProjectMutation,useUpdateExistingServiceMutation,useDeploySpringServiceMutation,useCountWorkspaceQuery,
-useCountSubworkspacesQuery,useCountServiceQuery,useGetBuildAnalyticQuery} = projectsApi
+useCountSubworkspacesQuery,useCountServiceQuery,useGetBuildAnalyticQuery,useCreateDatabaseMutation,useGetDatabaseServicesQuery} = projectsApi

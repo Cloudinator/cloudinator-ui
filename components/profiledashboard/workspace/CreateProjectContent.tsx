@@ -117,7 +117,7 @@ export default function CreateProjectContent({ onClose, selectedWorkspace, data1
 
         switch (selectedType) {
             case 'database':
-                return <DatabaseForm onClose={onClose} />;
+                return <DatabaseForm onClose={onClose} selectedWorkspace={selectedWorkspace} />;
             case 'subworkspace':
                 return <SubworkspaceForm onClose={onClose} selectedWorkspace={selectedWorkspace} data2={data2}/>;
             default:

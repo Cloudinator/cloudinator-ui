@@ -46,7 +46,9 @@ export default function HeroSection() {
     const getGreeting = () => {
         if (isLoading) return "Welcome"
         if (error) return "Hello there"
-        return `Good ${timeOfDay}, ${userData?.username || 'there'}`
+        const firstName = userData?.firstName ?? ''
+        const lastName = userData?.lastName ?? ''
+        return `Good ${timeOfDay}, ${firstName + lastName || 'bro'}`
     }
     
     return (

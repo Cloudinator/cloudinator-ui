@@ -42,12 +42,13 @@ export function CreateWorkspaceModal() {
 
     const handleCreateWorkspace = async () => {
         setIsCreating(true)
+        const formattedWorkspaceName = workspaceName.trim().replace(/\s+/g, '-')
         try {
-            await createWorkspace({ name: workspaceName })
+            await createWorkspace({ name: formattedWorkspaceName })
 
             toast({
                 title: "Success",
-                description: `Workspace "${workspaceName}" created successfully!`,
+                description: `Workspace "${formattedWorkspaceName}" created successfully!`,
                 variant: "success",
                 duration: 3000,
             })
