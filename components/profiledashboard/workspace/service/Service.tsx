@@ -129,6 +129,7 @@ export default function Service() {
   );
   const [deleteServiceDeployment] = useDeleteServiceDeploymentMutation();
   const [deleteSubWorkspace] = useDeleteSubWorkSpaceMutation();
+  const [hasRedirected, setHasRedirected ] = useState(false);
 
   const { toast } = useToast();
 
@@ -137,10 +138,12 @@ export default function Service() {
 
   // Redirect if no workspaces exist
   useEffect(() => {
-    if (workspaces.length === 0) {
-      router.push("/dashboard"); // Redirect to the dashboard or another page
+    if (workspaces.length === 0 && !hasRedirected) {
+      // Redirect to the dashboard with a query parameter
+      router.push("/dashboard?redirectedFromNoWorkspaces=true");
+      setHasRedirected(true); // Set the flag to prevent further redirects
     }
-  }, [workspaces, router]);
+  }, [workspaces, router, hasRedirected]);
 
   const [selectedWorkspace, setSelectedWorkspace] = useState(() => {
     // Retrieve the selected workspace from local storage on initial load

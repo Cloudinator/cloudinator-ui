@@ -11,7 +11,6 @@ export default function DeploymentPage() {
     return (
         <>
             <Deployments />
-            {/*<ProjectDetail />*/}
         </>
     );
 }

@@ -57,8 +57,8 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
       setProgress((prev) => Math.min(prev + 2, 100));
     };
 
-    eventSourceRef.current.onerror = (error: Event) => {
-      console.error("Connection error:", error);
+    eventSourceRef.current.onerror = () => {
+      // console.error("Connection error:", error);
 
       if (eventSourceRef.current?.readyState === EventSource.CLOSED) {
         console.log("Stream ended normally");
