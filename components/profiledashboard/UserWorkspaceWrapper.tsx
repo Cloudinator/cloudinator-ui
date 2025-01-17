@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import Loading from "../Loading";
 import { Loader2 } from "lucide-react";
 import { useGetWorkspacesQuery } from "@/redux/api/projectApi";
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast";
 
 export default function UserWorkspaceWrapper({
   children,
@@ -14,19 +14,19 @@ export default function UserWorkspaceWrapper({
 }) {
   const { data, isLoading } = useGetWorkspacesQuery();
   const router = useRouter();
-  const {toast} = useToast();
+//   const {toast} = useToast();
 
   // Redirect logic for no workspaces
   useEffect(() => {
     if (!isLoading && data && data.length === 0) {
       // Show a toast notification
-      toast({
-        title: "No Workspace Found",
-        description: "You must create a workspace before accessing this page.",
-        variant: "destructive", // Use a destructive variant for emphasis
-        duration: 5000, // Display for 5 seconds
-      });
-      router.push("/dashboard");
+    //   toast({
+    //     title: "No Workspace Found",
+    //     description: "You must create a workspace before accessing this page.",
+    //     variant: "destructive", // Use a destructive variant for emphasis
+    //     duration: 5000, // Display for 5 seconds
+    //   });
+      router.push("/no-workspace");
     }
   }, [data, isLoading, router]);
 

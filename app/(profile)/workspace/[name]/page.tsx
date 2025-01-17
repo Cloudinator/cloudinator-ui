@@ -55,7 +55,6 @@ interface ErrorResponse {
   };
 }
 
-
 export default function ProjectDetailPage({ params }: PropsParams) {
   const { handleError } = useApiErrorHandler();
   const [projectName, setProjectName] = useState<string>("");
@@ -67,19 +66,19 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   const [isDeploying, setIsDeploying] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [buildStartTime, setBuildStartTime] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
+  const { toast } = useToast();
 
   const [buildService] = useBuildServiceMutation();
   const [stopServiceDeployment] = useStopServiceDeploymentMutation();
   const [startServiceDeployment] = useStartServiceDeploymentMutation();
-  const [buildStartTime, setBuildStartTime] = useState<number | null>(null);
-  const [elapsedTime, setElapsedTime] = useState<number>(0);
-  const { toast } = useToast();
 
   const {
     data: projects,
     refetch: refetchProjects,
     isLoading: isProjectsLoading,
-    error: buildsError, 
+    error: projectsError,
   } = useGetServiceByNameQuery(
     { name: projectName },
     {
@@ -92,7 +91,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     data: builds,
     refetch: refetchBuilds,
     isLoading: isBuildsLoading,
-    error: projectsError,
+    error: buildsError,
   } = useGetBuildInfoByNameQuery(
     { name: projectName },
     {
@@ -148,7 +147,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       if (data.status === "SUCCESS" || data.status === "FAILED") {
         setBuildStartTime(null);
         setElapsedTime(0);
-        refetchProjects();
+        refetchProjects(); // Refetch project data
+        refetchBuilds(); // Refetch build data
       }
     };
 
@@ -198,12 +198,12 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         prevBuilds.map((build) =>
           build.buildNumber === newBuild.buildNumber
             ? {
-              ...build,
-              status:
-                typeof result.status === "string"
-                  ? result.status
-                  : "BUILDING",
-            }
+                ...build,
+                status:
+                  typeof result.status === "string"
+                    ? result.status
+                    : "BUILDING",
+              }
             : build,
         ),
       );

@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import styles from "./Service.module.css";
-import React, {useState, useEffect, lazy, Suspense, useMemo} from "react";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
+import React, { useState, useEffect, lazy, Suspense, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -39,7 +39,7 @@ import {
     Folder,
     Loader2
 } from 'lucide-react';
-import {motion, AnimatePresence} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     useDeleteServiceDeploymentMutation,
     useDeleteSubWorkSpaceMutation,
@@ -48,11 +48,10 @@ import {
     useGetSubWorkspacesQuery,
     useGetWorkspacesQuery,
 } from "@/redux/api/projectApi";
-import {useRouter} from "next/navigation";
-import {Breadcrumbs} from "../../Breadcrumbs";
-import {useToast} from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 import Loading from "@/components/Loading";
-import {Badge} from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 const CreateProjectContent = lazy(
     () => import("@/components/profiledashboard/workspace/CreateProjectContent")
@@ -138,15 +137,15 @@ interface ErrorResponse {
 function getServiceIcon(type: ServiceType["type"]) {
     switch (type) {
         case "all":
-            return <Folder className="w-5 h-5 text-yellow-500"/>;
+            return <Folder className="w-5 h-5 text-yellow-500" />;
         case "frontend":
-            return <Layout className="w-5 h-5 text-purple-600"/>;
+            return <Layout className="w-5 h-5 text-purple-600" />;
         case "backend":
-            return <Server className="w-5 h-5 text-pink-600"/>;
+            return <Server className="w-5 h-5 text-pink-600" />;
         case "database":
-            return <Database className="w-5 h-5 text-orange-600"/>;
+            return <Database className="w-5 h-5 text-orange-600" />;
         case "subworkspace":
-            return <Share2 className="w-5 h-5 text-blue-600"/>;
+            return <Share2 className="w-5 h-5 text-blue-600" />;
     }
 }
 
@@ -161,9 +160,9 @@ export default function Service() {
     const [deleteServiceDeployment] = useDeleteServiceDeploymentMutation();
     const [deleteSubWorkspace] = useDeleteSubWorkSpaceMutation();
 
-    const {toast} = useToast();
+    const { toast } = useToast();
 
-    const {data: workspacesData} = useGetWorkspacesQuery();
+    const { data: workspacesData } = useGetWorkspacesQuery();
     const workspaces = workspacesData || [];
 
     const [selectedWorkspace, setSelectedWorkspace] = useState(() => {
@@ -177,24 +176,31 @@ export default function Service() {
     });
 
     useEffect(() => {
+        if (workspaces && workspaces.length === 1) {
+            // Automatically select the only workspace available
+            setSelectedWorkspace(workspaces[0].name);
+        }
+    }, [workspaces]);
+
+    useEffect(() => {
         if (typeof window !== "undefined") {
             localStorage.setItem("selectedWorkspace", selectedWorkspace);
         }
     }, [selectedWorkspace]);
 
-    const {data: servicesData, refetch: data1} = useGetServiceDeploymentQuery({
+    const { data: servicesData, refetch: data1 } = useGetServiceDeploymentQuery({
         workspaceName: selectedWorkspace,
         size: 50,
         page: 0,
     }) as unknown as { data: ServiceDeploymentResponse; refetch: () => void };
 
-    const {data: subWorkspace, refetch: data2} = useGetSubWorkspacesQuery({
+    const { data: subWorkspace, refetch: data2 } = useGetSubWorkspacesQuery({
         workspaceName: selectedWorkspace,
         size: 50,
         page: 0,
     }) as unknown as { data: SubWorkSpaceResponse; refetch: () => void };
 
-    const {data: databaseData, refetch: data3} = useGetDatabaseServicesQuery({
+    const { data: databaseData, refetch: data3 } = useGetDatabaseServicesQuery({
         workspaceName: selectedWorkspace,
         size: 50,
         page: 0,
@@ -260,34 +266,34 @@ export default function Service() {
     }, [combinedResults]);
 
     useEffect(() => {
-      if (combinedResults) {
-          let filtered = [...combinedResults];
-          
-          // Filter by type
-          if (selectedType !== "all") {
-              filtered = filtered.filter((service) => {
-                  if (service.type === "database") {
-                      return selectedType === "database";
-                  } else if (service.type === "subworkspace") {
-                      return selectedType === "subworkspace";
-                  } else {
-                      // For frontend and backend services
-                      return service.type === selectedType;
-                  }
-              });
-          }
+        if (combinedResults) {
+            let filtered = [...combinedResults];
 
-          // Filter by search term
-          if (searchTerm) {
-              filtered = filtered.filter((service) => {
-                  const searchField = service.type === "database" ? service.name : service.name;
-                  return searchField.toLowerCase().includes(searchTerm.toLowerCase());
-              });
-          }
+            // Filter by type
+            if (selectedType !== "all") {
+                filtered = filtered.filter((service) => {
+                    if (service.type === "database") {
+                        return selectedType === "database";
+                    } else if (service.type === "subworkspace") {
+                        return selectedType === "subworkspace";
+                    } else {
+                        // For frontend and backend services
+                        return service.type === selectedType;
+                    }
+                });
+            }
 
-          setFilteredServices(filtered);
-      }
-  }, [combinedResults, searchTerm, selectedType]);
+            // Filter by search term
+            if (searchTerm) {
+                filtered = filtered.filter((service) => {
+                    const searchField = service.type === "database" ? service.name : service.name;
+                    return searchField.toLowerCase().includes(searchTerm.toLowerCase());
+                });
+            }
+
+            setFilteredServices(filtered);
+        }
+    }, [combinedResults, searchTerm, selectedType]);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [serviceToDelete, setServiceToDelete] = useState<ServiceType | null>(
@@ -332,7 +338,7 @@ export default function Service() {
     const confirmDelete = async () => {
         if (serviceToDelete && deleteConfirmationName === serviceToDelete.name) {
             try {
-                const result = await deleteServiceDeployment({name: serviceToDelete.name}).unwrap();
+                const result = await deleteServiceDeployment({ name: serviceToDelete.name }).unwrap();
 
                 toast({
                     title: "Success",
@@ -388,7 +394,7 @@ export default function Service() {
             deleteConfirmationName === subWorkspaceToDelete.name
         ) {
             try {
-                await deleteSubWorkspace({name: subWorkspaceToDelete.name}).unwrap();
+                await deleteSubWorkspace({ name: subWorkspaceToDelete.name }).unwrap();
 
                 toast({
                     title: "Success",
@@ -453,16 +459,16 @@ export default function Service() {
     };
 
     const EmptyState = ({
-                            type,
-                            onCreateProject,
-                        }: {
+        type,
+        onCreateProject,
+    }: {
         type: string;
         onCreateProject: () => void;
     }) => {
         return (
             <div
                 className="w-full h-[500px] flex flex-col items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
-                <Folder className="w-12 h-12 text-purple-500 mb-4"/>
+                <Folder className="w-12 h-12 text-purple-500 mb-4" />
                 <h3 className="text-lg font-semibold text-purple-500 mb-2">
                     No {type} Projects Found
                 </h3>
@@ -473,7 +479,7 @@ export default function Service() {
                     onClick={onCreateProject}
                     className="bg-purple-500 hover:bg-purple-700 text-white w-[300px]"
                 >
-                    <Plus className="mr-2 h-4 w-4"/>
+                    <Plus className="mr-2 h-4 w-4" />
                     Create {type} Project
                 </Button>
             </div>
@@ -499,8 +505,8 @@ export default function Service() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="w-8 h-8 animate-spin text-purple-500"/>
-                    <Loading/>
+                    <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                    <Loading />
                 </div>
             </div>
         );
@@ -508,57 +514,68 @@ export default function Service() {
 
     return (
         <div className="py-6 px-4 sm:px-6 lg:px-8">
-            <motion.div
-                initial={{opacity: 0, y: -20}}
-                animate={{opacity: 1, y: 0}}
-                transition={{duration: 0.5}}
-                className="flex flex-col sm:flex-row items-center justify-between pb-6 space-y-4 sm:space-y-0"
-            >
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <div className="flex justify-between items-center w-full">
-                        <Breadcrumbs/>
-                        <DialogTrigger asChild>
-                            <Button
-                                className="bg-purple-500 hover:bg-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2">
-                                <Plus className="mr-2 h-5 w-5"/>
-                                Create Project
-                            </Button>
-                        </DialogTrigger>
-                    </div>
-                    <DialogContent
-                        className="p-0 bg-white dark:bg-gray-950 max-w-[90vw] sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px] w-full h-[90vh] sm:h-auto">
-                        <DialogTitle className="sr-only">Create New Project</DialogTitle>
-                        <Suspense
-                            fallback={
-                                <div className="flex items-center justify-center h-64">
-                                    <motion.div
-                                        animate={{rotate: 360}}
-                                        transition={{
-                                            duration: 1,
-                                            repeat: Infinity,
-                                            ease: "linear",
-                                        }}
-                                    >
-                                        <Database className="w-12 h-12 text-purple-500"/>
-                                    </motion.div>
-                                </div>
-                            }
-                        >
-                            <CreateProjectContent
-                                onClose={() => setIsDialogOpen(false)}
-                                selectedWorkspace={selectedWorkspace}
-                                data1={data1}
-                                data2={data2}
-                            />
-                        </Suspense>
-                    </DialogContent>
-                </Dialog>
-            </motion.div>
+
+            <div className="flex justify-between items-center w-full bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg shadow-gray-200/20 dark:shadow-purple-500/10">
+                {/* Workspace Title */}
+                <div className="flex items-center gap-4">
+                    <Plus className="w-8 h-8 text-purple-500" />
+                    <h1 className="text-purple-500 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 font-bold text-4xl">
+                        Workspace
+                    </h1>
+                </div>
+
+                {/* Create Project Button */}
+                <div className="flex items-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="flex items-center"
+                    >
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button className="bg-purple-500 hover:bg-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2">
+                                    <Plus className="mr-2 h-5 w-5" />
+                                    Create Project
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="p-0 bg-white dark:bg-gray-950 max-w-[90vw] sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px] w-full h-[90vh] sm:h-auto">
+                                <DialogTitle className="sr-only">Create New Project</DialogTitle>
+                                <Suspense
+                                    fallback={
+                                        <div className="flex items-center justify-center h-64">
+                                            <motion.div
+                                                animate={{ rotate: 360 }}
+                                                transition={{
+                                                    duration: 1,
+                                                    repeat: Infinity,
+                                                    ease: "linear",
+                                                }}
+                                            >
+                                                <Database className="w-12 h-12 text-purple-500" />
+                                            </motion.div>
+                                        </div>
+                                    }
+                                >
+                                    <CreateProjectContent
+                                        onClose={() => setIsDialogOpen(false)}
+                                        selectedWorkspace={selectedWorkspace}
+                                        data1={data1}
+                                        data2={data2}
+                                    />
+                                </Suspense>
+                            </DialogContent>
+                        </Dialog>
+                    </motion.div>
+                </div>
+            </div>
+
+
 
             <motion.div
-                initial={{opacity: 0, y: 20}}
-                animate={{opacity: 1, y: 0}}
-                transition={{duration: 0.5, delay: 0.2}}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
                 className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-md"
             >
                 <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
@@ -569,8 +586,8 @@ export default function Service() {
                         }}
                     >
                         <SelectTrigger className="w-full sm:w-[200px] text-purple-500 focus:ring-purple-500">
-                            <User2 className="mr-2 h-4 w-4"/>
-                            <SelectValue placeholder="Select Workspace"/>
+                            <User2 className="mr-2 h-4 w-4" />
+                            <SelectValue placeholder="Select Workspace" />
                         </SelectTrigger>
                         <SelectContent className="text-purple-500">
                             {workspaces.map((workspace) => (
@@ -581,7 +598,7 @@ export default function Service() {
                         </SelectContent>
                     </Select>
                     <div className="relative w-full sm:w-auto flex-grow">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500"/>
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500" />
                         <Input
                             type="text"
                             placeholder="Search Projects..."
@@ -603,18 +620,17 @@ export default function Service() {
                         <Button
                             key={type}
                             variant={selectedType === type ? "default" : "outline"}
-                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${
-                                selectedType === type ? "ring-2 ring-purple-500" : ""
-                            }`}
+                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${selectedType === type ? "ring-2 ring-purple-500" : ""
+                                }`}
                             onClick={() => setSelectedType(type)}
                         >
                             <div className="flex items-center">
-                <span className="inline-block w-5 h-5">
-                  {getServiceIcon(type)}
-                </span>
+                                <span className="inline-block w-5 h-5">
+                                    {getServiceIcon(type)}
+                                </span>
                                 <span className="ml-2">
-                  {type} ({projectCounts[type]})
-                </span>
+                                    {type} ({projectCounts[type]})
+                                </span>
                             </div>
                         </Button>
                     ))}
@@ -628,10 +644,10 @@ export default function Service() {
                 >
                     {filteredServices.length === 0 ? (
                         <motion.div
-                            initial={{opacity: 0, scale: 0.9}}
-                            animate={{opacity: 1, scale: 1}}
-                            exit={{opacity: 0, scale: 0.9}}
-                            transition={{duration: 0.3}}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.3 }}
                             className="col-span-full"
                         >
                             <EmptyState
@@ -643,12 +659,12 @@ export default function Service() {
                         filteredServices.map((service, index) => (
                             <motion.div
                                 key={service.name}
-                                initial={{opacity: 0, scale: 0.9}}
-                                animate={{opacity: 1, scale: 1}}
-                                exit={{opacity: 0, scale: 0.9}}
-                                transition={{duration: 0.3, delay: index * 0.1}}
-                                whileHover={{scale: 1.05}}
-                                whileTap={{scale: 0.95}}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ duration: 0.3, delay: index * 0.1 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                             >
                                 <Link
                                     href={
@@ -660,13 +676,12 @@ export default function Service() {
                                     legacyBehavior
                                 >
                                     <div
-                                        className={`p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between relative group cursor-pointer hover:border-purple-500 hover:bg-gray-100 ${
-                                            new Date().getTime() -
+                                        className={`p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between relative group cursor-pointer hover:border-purple-500 hover:bg-gray-100 ${new Date().getTime() -
                                             new Date(service.createdAt).getTime() <
                                             24 * 60 * 60 * 1000
-                                                ? styles.newProject
-                                                : ""
-                                        }`}
+                                            ? styles.newProject
+                                            : ""
+                                            }`}
                                     >
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex items-center gap-3">
@@ -686,11 +701,10 @@ export default function Service() {
                                             <div className="flex items-center gap-2">
                                                 <Badge
                                                     variant="outline"
-                                                    className={`text-sm font-medium px-3 py-1 rounded-full ${
-                                                        service.status
-                                                            ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
-                                                            : "bg-red-100 text-red-700 border-red-200"
-                                                    }`}
+                                                    className={`text-sm font-medium px-3 py-1 rounded-full ${service.status
+                                                        ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
+                                                        : "bg-red-100 text-red-700 border-red-200"
+                                                        }`}
                                                 >
                                                     {service.status ? "Running" : "Stopping"}
                                                 </Badge>
@@ -706,7 +720,7 @@ export default function Service() {
                                                             }}
                                                         >
                                                             <MoreVertical
-                                                                className="h-4 w-4 text-gray-500 dark:text-gray-400"/>
+                                                                className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="w-48">
@@ -747,32 +761,32 @@ export default function Service() {
                                                     className="flex items-center text-blue-600 hover:underline"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    <GitBranch className="w-4 h-4 mr-2 flex-shrink-0 text-purple-500"/>
+                                                    <GitBranch className="w-4 h-4 mr-2 flex-shrink-0 text-purple-500" />
                                                     <span className="truncate">{service.gitUrl}</span>
                                                 </a>
                                             ) : service.type !== "subworkspace" ? (
                                                 <span className="text-gray-500 dark:text-gray-400">
-                          Git URL not available
-                        </span>
+                                                    Git URL not available
+                                                </span>
                                             ) : null}
 
                                             {service?.type === "subworkspace" ? (
                                                 <span className="text-gray-500 dark:text-gray-400">
-                          This is a sub-workspace where you can manage your microservices.
-                        </span>
+                                                    This is a sub-workspace where you can manage your microservices.
+                                                </span>
                                             ) : service.type === "database" ? (
                                                 <div className="space-y-2">
                                                     <div className="flex items-center space-x-2">
-                                                        <Database className="w-4 h-4 text-purple-500"/>
+                                                        <Database className="w-4 h-4 text-purple-500" />
                                                         <span className="truncate">Database Type : {service.dbType} </span>
                                                     </div>
                                                     <div className="flex items-center space-x-2">
-                                                        <User2 className="w-4 h-4 text-purple-500"/>
+                                                        <User2 className="w-4 h-4 text-purple-500" />
                                                         <span className="truncate">User: {service.name}</span>
                                                         <span className="truncate">Password: {service.password}</span>
                                                     </div>
                                                     <div className="flex items-center space-x-2">
-                                                        <Server className="w-4 h-4 text-purple-500"/>
+                                                        <Server className="w-4 h-4 text-purple-500" />
                                                         <span className="truncate">Port: {service.port}</span>
                                                         <span className="truncate">Domain: {service.subdomain}</span>
                                                     </div>
@@ -785,15 +799,15 @@ export default function Service() {
                                                     className="flex items-center text-green-600 hover:underline"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    <Globe className="w-4 h-4 mr-2 flex-shrink-0"/>
+                                                    <Globe className="w-4 h-4 mr-2 flex-shrink-0" />
                                                     <span
                                                         className="truncate">{`https://${service.subdomain}.cloudinator.cloud`}</span>
-                                                    <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0"/>
+                                                    <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0" />
                                                 </a>
                                             ) : (
                                                 <span className="text-gray-500 dark:text-gray-400">
-                          Subdomain not available
-                        </span>
+                                                    Subdomain not available
+                                                </span>
                                             )}
                                         </div>
 
@@ -803,9 +817,8 @@ export default function Service() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${
-                                                        !service.status ? "opacity-50 cursor-not-allowed" : ""
-                                                    }`}
+                                                    className={`text-purple-600 border-purple-100 hover:bg-purple-50 dark:hover:bg-purple-900 w-full sm:w-auto ${!service.status ? "opacity-50 cursor-not-allowed" : ""
+                                                        }`}
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         if (service.status) {
@@ -830,15 +843,15 @@ export default function Service() {
                                                 )}
                                                 <span
                                                     className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                          <GitBranch className="w-3 h-3 mr-1 flex-shrink-0 text-purple-500"/>
-                          <span className="truncate">
-                            {service?.type === "subworkspace"
-                                ? "Sub Workspace"
-                                : service.type === "database"
-                                    ? `${service.type} Database`
-                                    : service.branch}
-                          </span>
-                        </span>
+                                                    <GitBranch className="w-3 h-3 mr-1 flex-shrink-0 text-purple-500" />
+                                                    <span className="truncate">
+                                                        {service?.type === "subworkspace"
+                                                            ? "Sub Workspace"
+                                                            : service.type === "database"
+                                                                ? `${service.type} Database`
+                                                                : service.branch}
+                                                    </span>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>

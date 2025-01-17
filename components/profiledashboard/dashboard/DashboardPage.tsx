@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowUpRight, Cloud, GitBranch, Globe, Zap } from "lucide-react";
+import { ArrowUpRight, Cloud, GitBranch, Globe, LayoutDashboard, Zap } from "lucide-react";
 import DeploymentOverview from "@/components/profiledashboard/dashboard/DeploymentOverview";
 import RecentDeployments, {
   ServiceDeployment,
@@ -105,9 +105,12 @@ export default function DashboardPage() {
       </div>
 
       <div className="flex justify-between items-center w-full bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg shadow-gray-200/20 dark:shadow-purple-500/10">
-        <h1 className="text-purple-500 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 font-bold text-4xl">
-          Dashboard Management
-        </h1>
+        <div className="flex items-center gap-4">
+          <LayoutDashboard className="w-8 h-8 text-purple-500" />
+          <h1 className="text-purple-500 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 font-bold text-4xl">
+            Dashboard
+          </h1>
+        </div>
         <div className="flex items-center justify-between space-y-2">
           <div className="flex items-center space-x-2">
             <CreateWorkspaceModal />
@@ -137,7 +140,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         {/* Total Projects Card */}
-        <Card className="from-purple-700/90 via-indigo-700/90 to-gray-900/90 border border-purple-800/30 rounded-xl shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
+        <Card className="from-purple-500/90 via-indigo-500/90 to-gray-800/90 dark:from-purple-600/90 dark:via-indigo-600/90 dark:to-gray-900/90 border border-purple-500/20 dark:border-purple-600/20 rounded-xl shadow-lg shadow-purple-500/10 dark:shadow-purple-500/20 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-md font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
               Totals Projects
@@ -158,7 +161,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Success Rate Card */}
-        <Card className="from-purple-700/90 via-indigo-700/90 to-gray-900/90 border border-purple-800/30 rounded-xl shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
+        <Card className="from-purple-500/90 via-indigo-500/90 to-gray-800/90 dark:from-purple-600/90 dark:via-indigo-600/90 dark:to-gray-900/90 border border-purple-500/20 dark:border-purple-600/20 rounded-xl shadow-lg shadow-purple-500/10 dark:shadow-purple-500/20 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-md font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
               Success Rate
@@ -179,7 +182,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Successful Deployment Card */}
-        <Card className="from-purple-700/90 via-indigo-700/90 to-gray-900/90 border border-purple-800/30 rounded-xl shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
+        <Card className="from-purple-500/90 via-indigo-500/90 to-gray-800/90 dark:from-purple-600/90 dark:via-indigo-600/90 dark:to-gray-900/90 border border-purple-500/20 dark:border-purple-600/20 rounded-xl shadow-lg shadow-purple-500/10 dark:shadow-purple-500/20 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-md font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
               Successful Deployment
