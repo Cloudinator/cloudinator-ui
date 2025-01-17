@@ -6,7 +6,6 @@ import RecentDeployments, {
   ServiceDeployment,
 } from "@/components/profiledashboard/dashboard/RecentDeployments";
 import { CreateWorkspaceModal } from "@/components/profiledashboard/workspace/CreateWorkspaceModal";
-import { Breadcrumbs } from "@/components/profiledashboard/Breadcrumbs";
 import {
   useCountServiceQuery,
   useCountSubworkspacesQuery,
@@ -20,11 +19,14 @@ import { Skeleton } from "@/components/ui/skeleton"; // Assuming you have a Skel
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useGetMeQuery } from "@/redux/api/userApi";
 
 export default function DashboardPage() {
-  
+
   const { toast } = useToast();
   const searchParams = useSearchParams();
+
+  const { data } = useGetMeQuery();
 
   // Fetch data for workspaces
   const { data: workspacesData } = useGetWorkspacesQuery();
@@ -88,9 +90,24 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
-      {/* Breadcrumbs and Create Workspace Button */}
-      <div className="flex justify-between items-center w-full">
-        <Breadcrumbs />
+
+      <div className="flex flex-col items-center space-y-4 p-8 bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-800 dark:to-indigo-800 rounded-lg shadow-lg transform transition-all hover:shadow-xl">
+        <h1 className="text-5xl font-bold text-white dark:text-purple-100 text-center">
+          Hi{" "}
+          <span className="text-purple-200 dark:text-purple-300 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 dark:from-purple-400 dark:to-pink-400 hover:from-purple-400 hover:to-pink-400 transition-all duration-500">
+            {data?.username}
+          </span>
+          , Welcome to Dashboard
+        </h1>
+        <p className="text-lg text-purple-100 dark:text-purple-200 font-medium text-center">
+          Explore your workspace and manage your projects seamlessly.
+        </p>
+      </div>
+
+      <div className="flex justify-between items-center w-full bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg shadow-gray-200/20 dark:shadow-purple-500/10">
+        <h1 className="text-purple-500 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 font-bold text-4xl">
+          Dashboard Management
+        </h1>
         <div className="flex items-center justify-between space-y-2">
           <div className="flex items-center space-x-2">
             <CreateWorkspaceModal />
@@ -100,53 +117,61 @@ export default function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Total Workspace Card */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-md font-medium text-purple-500">
+        <Card className="from-purple-500/90 via-indigo-500/90 to-gray-800/90 dark:from-purple-600/90 dark:via-indigo-600/90 dark:to-gray-900/90 border border-purple-500/20 dark:border-purple-600/20 rounded-xl shadow-lg shadow-purple-500/10 dark:shadow-purple-500/20 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-100 dark:to-pink-100">
               Total Workspace
             </CardTitle>
-            <Cloud className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-full bg-purple-500/10 dark:bg-purple-600/20 border border-purple-500/20 dark:border-purple-600/20">
+              <Cloud className="h-5 w-5 text-purple-500 dark:text-purple-100" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingCountWorkspace ? (
-              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-8 w-3/4 bg-gradient-to-r from-purple-500/50 to-indigo-500/50 dark:from-purple-600/50 dark:to-indigo-600/50 rounded-lg" />
             ) : (
-              <div className="text-2xl font-bold">{countWorkspace}</div>
+              <div className="text-4xl font-bold text-purple-500 dark:text-white bg-clip-text bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-25 dark:to-pink-25">
+                {countWorkspace}
+              </div>
             )}
           </CardContent>
         </Card>
-
         {/* Total Projects Card */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-md text-purple-500 font-medium">
+        <Card className="from-purple-700/90 via-indigo-700/90 to-gray-900/90 border border-purple-800/30 rounded-xl shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-md font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
               Totals Projects
             </CardTitle>
-            <GitBranch className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-full bg-purple-800/10 border border-purple-700/30">
+              <GitBranch className="h-5 w-5 text-purple-500" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingCountSubWorkspace || isLoadingCountServices ? (
-              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-8 w-3/4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50 rounded-lg" />
             ) : (
-              <div className="text-2xl font-bold">{projects}</div>
+              <div className="text-3xl font-bold text-purple-500 dark:text-white bg-clip-text bg-gradient-to-r from-purple-100 to-pink-100">
+                {projects}
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Success Rate Card */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-md text-purple-500 font-medium">
+        <Card className="from-purple-700/90 via-indigo-700/90 to-gray-900/90 border border-purple-800/30 rounded-xl shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-md font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
               Success Rate
             </CardTitle>
-            <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-full bg-purple-800/10 border border-purple-700/30">
+              <ArrowUpRight className="h-5 w-5 text-purple-500" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingBuildAnalytic ? (
-              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-8 w-3/4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50 rounded-lg" />
             ) : (
-              <div className="text-2xl font-bold">
+              <div className="text-3xl font-bold text-purple-500 dark:text-white bg-clip-text bg-gradient-to-r from-purple-100 to-pink-100">
                 {successRate.toFixed(2) || "-"} %
               </div>
             )}
@@ -154,18 +179,20 @@ export default function DashboardPage() {
         </Card>
 
         {/* Successful Deployment Card */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-md text-purple-500 font-medium">
+        <Card className="from-purple-700/90 via-indigo-700/90 to-gray-900/90 border border-purple-800/30 rounded-xl shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-md font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
               Successful Deployment
             </CardTitle>
-            <Globe className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-full bg-purple-800/10 border border-purple-700/30">
+              <Globe className="h-5 w-5 text-purple-500" />
+            </div>
           </CardHeader>
           <CardContent>
             {isLoadingBuildAnalytic ? (
-              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-8 w-3/4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50 rounded-lg" />
             ) : (
-              <div className="text-2xl font-bold">
+              <div className="text-3xl font-bold text-purple-500 dark:text-white bg-clip-text bg-gradient-to-r from-purple-100 to-pink-100">
                 {buildAnalytic?.success || "-"}
               </div>
             )}

@@ -6,6 +6,7 @@ import StoreProvider from "@/app/StoreProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { LayoutProvider } from "./provider/LayoutProvider";
 import { Sidebar } from "@/components/sidebar";
+import UserDataWrapper from "@/components/profiledashboard/UserDataWrapper";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -28,13 +29,15 @@ export default function DashboardLayout({
       <body className={poppins.className}>
           <StoreProvider>
             <LayoutProvider>
-              <main className="flex min-h-screen">
-                <Sidebar />
-                <div className="flex-1 overflow-y-auto">
-                  {children}
-                  <Toaster />
-                </div>
-              </main>
+              <UserDataWrapper>
+                <main className="flex min-h-screen">
+                  <Sidebar />
+                  <div className="flex-1 overflow-y-auto">
+                    {children}
+                    <Toaster />
+                  </div>
+                </main>
+              </UserDataWrapper>
             </LayoutProvider>
           </StoreProvider>
       </body>

@@ -14,8 +14,19 @@ type RecentDeploymentsProps = {
 }
 
 export default function RecentDeployments({ services }: RecentDeploymentsProps) {
-
-    if(!services) {return null}
+    // Handle empty state
+    if (!services || services.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center p-6 space-y-4 bg-muted/50 rounded-lg h-[500px]">
+                <p className="text-lg font-medium text-muted-foreground">
+                    No recent deployments yet.
+                </p>
+                <p className="text-sm text-muted-foreground text-center">
+                    Start deploying your services to see them listed here.
+                </p>
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-6">
