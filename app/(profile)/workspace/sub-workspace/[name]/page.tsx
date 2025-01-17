@@ -10,6 +10,7 @@ import {
   Code,
   ArrowRight,
   GripVertical,
+  FolderOpen,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -88,10 +89,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GitCommandModal } from "@/components/profiledashboard/workspace/GitCommandModal";
 import { useGetMeQuery } from "@/redux/api/userApi";
 import Breadcrumbs from "@/components/Breadcrumb2";
+import { useToast } from "@/hooks/use-toast";
 
 export type PropsParams = {
   params: Promise<{ name: string }>;
 };
+
+interface ErrorResponse {
+  status?: string;
+  originalStatus?: number;
+  data?: {
+    message?: string;
+  };
+}
 
 type SpringProjectType = {
   uuid: string;
@@ -138,6 +148,8 @@ export default function SubWorkspacePage(props: PropsParams) {
 
   const [deleteSpringProject] = useDeleteSpringProjectMutation();
   const [isGitCommandModalOpen, setIsGitCommandModalOpen] = useState(false);
+
+  const { toast } = useToast();
 
   const { data: profile } = useGetMeQuery();
 
@@ -192,8 +204,21 @@ export default function SubWorkspacePage(props: PropsParams) {
         name: project.name,
       });
 
+      // Show success toast
+      toast({
+        title: "Success",
+        description: "Project deleted successfully.",
+        variant: "success",
+      });
+
       console.log(result);
     } catch (error) {
+      // Show error toast
+      toast({
+        title: "Error",
+        description: "Failed to delete the project.",
+        variant: "error",
+      });
       console.log(error);
     } finally {
       refetch();
@@ -236,29 +261,67 @@ export default function SubWorkspacePage(props: PropsParams) {
     }
   };
 
-  const handleCreateExistingProject = (name: string) => {
+  const handleCreateExistingProject = async (name: string) => {
     try {
-      const result = createExistingProject({
+      const result = await createExistingProject({
         folder: params?.name ?? "",
         name: name,
         servicesNames: selectedServices,
+      }).unwrap();
+
+      // Show success toast
+      toast({
+        title: "Success",
+        description: `Project "${name}" created successfully.`,
+        variant: "success",
+        duration: 3000,
       });
 
-      console.log(result);
-      result.unwrap().then(
-        () => {
-          console.log("Project created successfully");
-        },
-        (err) => {
-          console.log(err);
-          setIsCreateProjectDialogOpen(false);
-          setSelectedServices([]);
-          setIsGitCommandModalOpen(true);
-          refetch();
-        },
-      );
-    } catch (error) {
-      console.log(error);
+      console.log("Project created successfully:", result);
+
+      // Reset state and close the dialog
+      setIsCreateProjectDialogOpen(false);
+      setSelectedServices([]);
+
+      // Refetch data
+      refetch();
+    } catch (err) {
+      const error = err as ErrorResponse;
+
+      console.log("Failed to create project:", error);
+
+      // Handle parsing error or other errors
+      if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
+        // Show success toast for parsing error with 200 status
+        toast({
+          title: "Success",
+          description:
+            error?.data?.message ||
+            `Project "${name}" created successfully (parsing error).`,
+          variant: "success",
+          duration: 3000,
+        });
+
+        // Reset state and close the dialog
+        setIsCreateProjectDialogOpen(false);
+        setSelectedServices([]);
+
+        // Refetch data
+        refetch();
+      } else {
+        // Show error toast for other errors
+        toast({
+          title: "Error",
+          description:
+            error?.data?.message ||
+            "Failed to create the project. Please try again.",
+          variant: "error",
+          duration: 5000,
+        });
+
+        // Open Git Command Modal for fallback
+        setIsGitCommandModalOpen(true);
+      }
     }
   };
 
@@ -569,7 +632,8 @@ export default function SubWorkspacePage(props: PropsParams) {
                       onClick={() =>
                         handleCreateExistingProject(existingProjectName)
                       }
-                      className="w-full bg-primary hover:bg-primary/90"
+                      className="w-full bg-purple-500 hover:bg-purple-700"
+                      disabled={!existingProjectName} // Disable if existingProjectName is empty
                     >
                       Create Project
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -609,65 +673,116 @@ export default function SubWorkspacePage(props: PropsParams) {
           {springProjects.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {springProjects.map((project) => (
-                <Card key={project.uuid}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      {project.name}
-                    </CardTitle>
-                    <div className="flex items-center space-x-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Link
-                              href={`/workspace/sub-workspace/${params?.name}/${project.name}`}
+                <motion.div
+                  key={project.uuid} // Ensure key is added to the motion.div
+                  initial={{ opacity: 0, y: 20 }} // Initial animation state
+                  animate={{ opacity: 1, y: 0 }} // Animate to this state
+                  transition={{ duration: 0.3, ease: "easeOut" }} // Smooth transition
+                  whileHover={{ scale: 1.02 }} // Scale up on hover
+                  whileTap={{ scale: 0.98 }} // Scale down on tap
+                >
+                  <Link
+                    href={`/workspace/sub-workspace/${params?.name}/${project.name}`}
+                  >
+                    <Card className="transition-all duration-300 hover:shadow-lg relative bg-white dark:bg-black/20 backdrop-blur-md dark:backdrop-blur-md border border-gray-200 dark:border-white/20 rounded-xl hover:border-purple-500/50 hover:shadow-purple-500/20 dark:hover:border-purple-500/50 dark:hover:shadow-purple-500/20 cursor-pointer">
+                      {/* Card Header */}
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-lg font-medium truncate max-w-[70%] text-purple-500 dark:text-white">
+                          {project.name}
+                        </CardTitle>
+                        <div className="flex items-center space-x-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full"
+                                onClick={(e) => e.stopPropagation()} // Prevent card click when dropdown is clicked
+                              >
+                                <span className="sr-only">Open menu</span>
+                                <MoreVertical className="h-4 w-4 text-gray-900 dark:text-white" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="w-48 bg-white dark:bg-black/80 backdrop-blur-md dark:backdrop-blur-md border border-gray-200 dark:border-white/20 rounded-lg"
                             >
-                              Go to Detail
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onSelect={() => handleDeleteProject(project)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Branch:</span>
-                        <span>{project.branch}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Namespace:
-                        </span>
-                        <span>{project.namespace}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Git:</span>
-                        <span className="truncate max-w-[150px]">
-                          {project.git}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                              <DropdownMenuItem asChild>
+                                <Link
+                                  href={`/workspace/sub-workspace/${params?.name}/${project.name}`}
+                                  className="w-full flex items-center text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10"
+                                >
+                                  <span>Go to Detail</span>
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault(); // Prevent default behavior
+                                  e.stopPropagation(); // Stop event propagation
+                                  handleDeleteProject(project); // Handle delete action
+                                }}
+                                className="text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-500"
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </CardHeader>
+
+                      {/* Card Content */}
+                      <CardContent>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Branch:
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {project.branch}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Namespace:
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              {project.namespace}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Git:</span>
+                            <span className="font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
+                              {project.git}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           ) : (
-            <div className="flex justify-center items-center h-64">
-              <p className="text-muted-foreground">
-                No Spring Projects available.
-              </p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex justify-center items-center h-64"
+            >
+              <div className="text-center space-y-2">
+                <FolderOpen className="h-8 w-8 text-muted-foreground mx-auto" />{" "}
+                {/* Add an icon for empty state */}
+                <p className="text-muted-foreground">
+                  No Spring Projects available.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCreateProjectDialogOpen(true)}
+                  className="mt-2 bg-purple-500 hover:bg-purple-700 text-white hover:text-white"
+                >
+                  Create New Project
+                </Button>
+              </div>
+            </motion.div>
           )}
         </TabsContent>
 
@@ -819,7 +934,12 @@ export default function SubWorkspacePage(props: PropsParams) {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteProject}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              disabled={deleteConfirmationName !== projectToDelete?.name} // Disable if input doesn't match
+              className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 ${
+                deleteConfirmationName === projectToDelete?.name
+                  ? "bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                  : "bg-red-300 cursor-not-allowed" // Disabled state styling
+              }`}
             >
               Delete
             </AlertDialogAction>
