@@ -570,46 +570,44 @@ export default function Service() {
                 </div>
             </div>
 
-
-
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-md"
+                className="bg-gradient-to-br mt-6 from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 backdrop-blur-md"
             >
-                <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+                <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 ">
                     <Select
                         defaultValue={selectedWorkspace}
                         onValueChange={(value) => {
                             setSelectedWorkspace(value);
                         }}
                     >
-                        <SelectTrigger className="w-full sm:w-[200px] text-purple-500 focus:ring-purple-500">
-                            <User2 className="mr-2 h-4 w-4" />
+                        <SelectTrigger className="w-full sm:w-[200px] bg-white dark:bg-gray-700 text-purple-500 dark:text-purple-400 focus:ring-purple-500 border border-gray-300 dark:border-gray-600 hover:border-purple-500 transition-all">
+                            <User2 className="mr-2 h-4 w-4 text-purple-500 dark:text-purple-400" />
                             <SelectValue placeholder="Select Workspace" />
                         </SelectTrigger>
-                        <SelectContent className="text-purple-500">
+                        <SelectContent className="bg-white dark:bg-gray-800 text-purple-500 dark:text-purple-400 border border-gray-300 dark:border-gray-700">
                             {workspaces.map((workspace) => (
-                                <SelectItem key={workspace.uuid} value={workspace.name}>
+                                <SelectItem key={workspace.uuid} value={workspace.name} className="hover:bg-gray-100 dark:hover:bg-gray-700">
                                     {workspace.name}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                     <div className="relative w-full sm:w-auto flex-grow">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 dark:text-purple-400" />
                         <Input
                             type="text"
                             placeholder="Search Projects..."
-                            className="pl-10 w-full"
+                            className="pl-10 w-full bg-white dark:bg-gray-700 text-purple-500 dark:text-purple-400 border border-gray-300 dark:border-gray-600 hover:border-purple-500 focus:border-purple-500 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                 </div>
                 <div className="mb-4">
-                    <h2 className="text-sm font-bold text-purple-500 dark:text-purple-500">
+                    <h2 className="text-sm font-bold text-purple-500 dark:text-purple-400">
                         Filter By:
                     </h2>
                 </div>
@@ -620,8 +618,9 @@ export default function Service() {
                         <Button
                             key={type}
                             variant={selectedType === type ? "default" : "outline"}
-                            className={`bg-white text-purple-500 dark:bg-gray-800 capitalize dark:text-gray-200 hover:text-purple-700 hover:bg-gray-100 focus:ring-500 border border-1 transition-all ease-in-out ${selectedType === type ? "ring-2 ring-purple-500" : ""
-                                }`}
+                            className={`bg-white dark:bg-gray-700 text-purple-500 dark:text-purple-400 capitalize hover:text-purple-700 dark:hover:text-purple-300 hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-purple-500 border border-gray-300 dark:border-gray-600 transition-all ease-in-out ${
+                                selectedType === type ? "ring-2 ring-purple-500 glow" : ""
+                            }`}
                             onClick={() => setSelectedType(type)}
                         >
                             <div className="flex items-center">
@@ -928,4 +927,3 @@ export default function Service() {
         </div>
     );
 }
-

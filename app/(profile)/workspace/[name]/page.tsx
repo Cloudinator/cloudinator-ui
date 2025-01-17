@@ -365,7 +365,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           <AlertCircle className="w-12 h-12 text-red-500" />
           <h1 className="text-2xl font-bold text-red-500">Server Error</h1>
           <p className="text-gray-600 dark:text-gray-300">
-            An error occurred while fetching build numbers. Please try again later.
+            An error occurred while fetching build numbers. Please try again
+            later.
           </p>
           <Button
             variant="outline"
@@ -386,7 +387,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   );
 
   return (
-    <div className="px-12 py-6 w-full">
+    <div className="px-12 py-10 w-full">
       <div className="flex flex-col gap-4">
         <Breadcrumbs />
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -397,10 +398,11 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             </h1>
             <Badge
               variant="outline"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${projects.status
-                ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
-                : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
-                }`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${
+                projects.status
+                  ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
+                  : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
+              }`}
             >
               {projects.status ? (
                 <motion.div
@@ -528,23 +530,31 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                           ) : buildNumber[0].status === "FAILED" ? (
                             <>
                               <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-300" />
-                              <span className="text-red-500 dark:text-red-300">Build Failed</span>
+                              <span className="text-red-500 dark:text-red-300">
+                                Build Failed
+                              </span>
                             </>
                           ) : buildNumber[0].status === "SUCCESS" ? (
                             <>
                               <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-300" />
-                              <span className="text-green-500 dark:text-green-300">Build Successful</span>
+                              <span className="text-green-500 dark:text-green-300">
+                                Build Successful
+                              </span>
                             </>
                           ) : (
                             <>
                               <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
-                              <span className="text-gray-500 dark:text-gray-300">Build Status Unknown</span>
+                              <span className="text-gray-500 dark:text-gray-300">
+                                Build Status Unknown
+                              </span>
                             </>
                           )
                         ) : (
                           <>
                             <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
-                            <span className="text-gray-500 dark:text-gray-300">No Builds Available</span>
+                            <span className="text-gray-500 dark:text-gray-300">
+                              No Builds Available
+                            </span>
                           </>
                         )}
                       </dd>
@@ -556,8 +566,9 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                         Service Status
                       </dt>
                       <dd
-                        className={`${projects.status ? "text-green-500" : "text-red-500"
-                          } font-medium text-lg flex items-center gap-2 dark:text-white`}
+                        className={`${
+                          projects.status ? "text-green-500" : "text-red-500"
+                        } font-medium text-lg flex items-center gap-2 dark:text-white`}
                       >
                         {projects.status ? (
                           <>
@@ -620,7 +631,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 dark:text-white relative group">
-                  {buildNumber.length > 0 && buildNumber[0].status === "SUCCESS" ? (
+                  {buildNumber.length > 0 &&
+                  buildNumber[0].status === "SUCCESS" ? (
                     // Show the Website Preview if the build is successful
                     <Link
                       href={url}
@@ -635,13 +647,16 @@ export default function ProjectDetailPage({ params }: PropsParams) {
 
                       {/* Hover Text Overlay */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <p className="text-white text-lg font-semibold">Click to Visit Site</p>
+                        <p className="text-white text-lg font-semibold">
+                          Click to Visit Site
+                        </p>
                       </div>
                     </Link>
                   ) : (
                     // Fallback UI for non-successful builds
                     <div className="flex flex-col items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                      {buildNumber.length > 0 && buildNumber[0].status === "BUILDING" ? (
+                      {buildNumber.length > 0 &&
+                      buildNumber[0].status === "BUILDING" ? (
                         // Build in progress
                         <>
                           <Loader2 className="w-8 h-8 animate-spin text-blue-500 dark:text-blue-300" />
@@ -649,7 +664,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                             Build in progress... Please wait.
                           </p>
                         </>
-                      ) : buildNumber.length > 0 && buildNumber[0].status === "FAILED" ? (
+                      ) : buildNumber.length > 0 &&
+                        buildNumber[0].status === "FAILED" ? (
                         // Build failed
                         <>
                           <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-300" />
@@ -662,7 +678,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                         <>
                           <AlertCircle className="w-8 h-8 text-gray-500 dark:text-gray-300" />
                           <p className="mt-4 text-gray-600 dark:text-gray-300 text-center">
-                            No builds available. Start a new build to see the preview.
+                            No builds available. Start a new build to see the
+                            preview.
                           </p>
                         </>
                       )}
@@ -675,7 +692,9 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           <TabsContent value="builds" className="w-full">
             <Card className="w-full dark:bg-gray-800">
               <CardHeader>
-                <CardTitle className="text-purple-500 dark:text-white">Build History ({buildNumber.length})</CardTitle>
+                <CardTitle className="text-purple-500 dark:text-white">
+                  Build History ({buildNumber.length})
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
@@ -727,9 +746,11 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           </TabsContent>
           <TabsContent value="logs" className="w-full">
             <Card className="w-full">
-              <CardHeader>
-                <CardTitle className="text-purple-500">Build Logs</CardTitle>
-              </CardHeader>
+              {/* <CardHeader>
+                <CardTitle className="text-purple-500 text-3xl">
+                  Build Logs
+                </CardTitle>
+              </CardHeader> */}
               <CardContent>
                 {buildNumber.length > 0 && (
                   <StreamingLog

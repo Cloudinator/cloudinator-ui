@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  ChevronRight,
   Plus,
   FileText,
   ChevronDown,
@@ -88,6 +87,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { motion, AnimatePresence } from "framer-motion";
 import { GitCommandModal } from "@/components/profiledashboard/workspace/GitCommandModal";
 import { useGetMeQuery } from "@/redux/api/userApi";
+import Breadcrumbs from "@/components/Breadcrumb2";
 
 export type PropsParams = {
   params: Promise<{ name: string }>;
@@ -335,11 +335,7 @@ export default function SubWorkspacePage(props: PropsParams) {
 
   return (
     <div className="flex-1 space-y-6 p-8">
-      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-        <Link href={"/workspace"}>workspace</Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="font-medium text-foreground">{params?.name}</span>
-      </div>
+      <Breadcrumbs />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
@@ -363,7 +359,9 @@ export default function SubWorkspacePage(props: PropsParams) {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle className="text-2xl text-purple-500">Select Services</DialogTitle>
+                <DialogTitle className="text-2xl text-purple-500">
+                  Select Services
+                </DialogTitle>
                 <DialogDescription>
                   Choose the services you want to use
                 </DialogDescription>
@@ -471,7 +469,9 @@ export default function SubWorkspacePage(props: PropsParams) {
                   >
                     <CardHeader className="flex flex-col items-center">
                       <Sparkles className="h-12 w-12 text-purple-500 mb-2" />
-                      <CardTitle className="text-purple-500">Create New Project</CardTitle>
+                      <CardTitle className="text-purple-500">
+                        Create New Project
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-center text-sm text-muted-foreground">
@@ -486,7 +486,9 @@ export default function SubWorkspacePage(props: PropsParams) {
                   >
                     <CardHeader className="flex flex-col items-center">
                       <Code className="h-12 w-12 text-purple-500 mb-2" />
-                      <CardTitle className="text-purple-500">Use Existing Code</CardTitle>
+                      <CardTitle className="text-purple-500">
+                        Use Existing Code
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-center text-sm text-muted-foreground">
@@ -767,41 +769,58 @@ export default function SubWorkspacePage(props: PropsParams) {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>
+            <AlertDialogTitle className="text-xl font-semibold text-purple-500">
               Are you sure you want to delete this project?
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              project &#34;{projectToDelete?.name}&#34; and remove all of its
-              data. To confirm, please enter the project name below.
+            <AlertDialogDescription className="mt-2 text-gray-600">
+              This will permanently delete the project &quot;
+              <span className="text-purple-500">{projectToDelete?.name}</span>
+              &quot; and remove all of its data. To confirm, please enter the
+              project name below.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="my-4">
+          <div className="my-6">
             <input
               type="text"
               value={deleteConfirmationName}
               onChange={handleDeleteConfirmationNameChange}
+              onPaste={(e) => {
+                e.preventDefault(); // Prevent pasting
+                setDeleteConfirmationError(
+                  "To ensure accuracy, please type the project name manually.",
+                );
+              }}
               placeholder="Enter project name to confirm"
-              className="w-full p-2 border rounded"
+              className={`w-full p-3 border ${
+                deleteConfirmationError ? "border-red-500" : "border-gray-300"
+              } rounded-lg focus:outline-none focus:ring-2 ${
+                deleteConfirmationError
+                  ? "focus:ring-red-500"
+                  : "focus:ring-blue-500"
+              } transition-colors`}
             />
             {deleteConfirmationError && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-red-500 text-sm mt-2">
                 {deleteConfirmationError}
               </p>
             )}
           </div>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex justify-end space-x-4">
             <AlertDialogCancel
               onClick={() => {
                 setDeleteConfirmationName("");
                 setDeleteConfirmationError("");
               }}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteProject}>
+            <AlertDialogAction
+              onClick={confirmDeleteProject}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
