@@ -54,7 +54,7 @@ export function MainNav({ isCollapsed }: MainNavProps) {
                                         "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                                         pathname === item.href
                                             ? "bg-purple-600 text-white" // Active state
-                                            : "text-gray-700 hover:bg-purple-500 hover:text-white", // Default and hover state
+                                            : "text-gray-700 dark:text-gray-100 hover:bg-purple-500 hover:text-white", // Default and hover state
                                         isCollapsed ? "justify-center" : "justify-start",
                                         isDisabled && "opacity-50 cursor-not-allowed" // Reduce opacity and disable pointer events if no workspace
                                     )}

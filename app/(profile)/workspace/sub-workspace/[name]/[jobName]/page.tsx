@@ -1,6 +1,6 @@
 'use client'
 import {useEffect, useState} from "react";
-import { Activity, AlertCircle, CheckCircle, ChevronRight, Clock, Code, GitBranch, Package, Rocket, XCircle } from 'lucide-react';
+import { Activity, AlertCircle, CheckCircle, Clock, Code, GitBranch, Package, Rocket, XCircle } from 'lucide-react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
@@ -16,8 +16,7 @@ import {
 import Link from "next/link";
 import {ConfigureProjectModal} from "@/components/profiledashboard/workspace/service/ConfigureProjectModal";
 import {SpringProjectResponse} from "@/app/(profile)/workspace/sub-workspace/[name]/page";
-
-
+import Breadcrumbs from "@/components/Breadcrumb2";
 
 export type PropsParams = {
     params: Promise<{ jobName: string }>;
@@ -113,37 +112,45 @@ const ProjectDetailPage = (props: PropsParams) =>{
     if (!projects) return null;
 
     return(
-        <div className="container mx-auto py-10 px-4">
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
+        <div className="container mx-auto py-8 px-2">
+            {/* <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
                 <Link href={'/workspace'}>Workspace</Link>
                 <ChevronRight className="h-4 w-4"/>
                 <Link href={`/workspace/sub-workspace/${projects.namespace}`}>{projects.namespace}</Link>
                 <ChevronRight className="h-4 w-4"/>
                 <span className="font-medium text-foreground">{projects.name}</span>
-            </div>
+            </div> */}
 
-            <div className="grid gap-6 md:grid-cols-3">
+            <Breadcrumbs />
+
+            <div className="grid gap-6 md:grid-cols-3 mt-6">
                 <Card className="md:col-span-2">
                     <CardHeader>
-                        <CardTitle className="text-3xl font-bold">{projects.name}</CardTitle>
+                        <CardTitle className="text-3xl font-bold text-purple-500">{projects.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4">
                             <div className="flex items-center">
                                 <Code className="h-5 w-5 mr-2 text-blue-500"/>
                                 <span className="text-sm font-medium">Namespace:</span>
-                                <span className="ml-2 text-sm bg-gray-100 px-2 py-1 rounded">{projects.namespace}</span>
+                                <span className="ml-2 text-sm bg-gray-100 px-2 py-1 rounded dark:text-black">{projects.namespace}</span>
                             </div>
                             <div className="flex items-center">
                                 <GitBranch className="h-5 w-5 mr-2 text-green-500"/>
                                 <span className="text-sm font-medium">Branch:</span>
-                                <span className="ml-2 text-sm bg-gray-100 px-2 py-1 rounded">{projects.branch}</span>
+                                <span className="ml-2 text-sm bg-gray-100 px-2 py-1 rounded dark:text-black">{projects.branch}</span>
                             </div>
                             <div className="flex items-center">
                                 <Package className="h-5 w-5 mr-2 text-purple-500"/>
                                 <span className="text-sm font-medium">Git:</span>
                                 <a href={projects.git} target="_blank" rel="noopener noreferrer"
                                    className="ml-2 text-sm text-blue-500 hover:underline truncate">{projects.git}</a>
+                            </div>
+                            <div className="flex items-center">
+                                <Package className="h-5 w-5 mr-2 text-purple-500"/>
+                                <span className="text-sm font-medium">Domain:</span>
+                                <a href={`https://${projects.name}.cloudinator.cloud`} target="_blank" rel="noopener noreferrer"
+                                   className="ml-2 text-sm text-blue-500 hover:underline truncate">{projects.name}.cloudinator.cloud</a>
                             </div>
                         </div>
                     </CardContent>
@@ -170,36 +177,8 @@ const ProjectDetailPage = (props: PropsParams) =>{
 
             <Tabs defaultValue="dependencies" className="mt-8">
                 <TabsList className="grid w-full grid-cols-2 rounded-xl bg-muted p-1">
-                    <TabsTrigger value="dependencies" className="rounded-lg transition-all">Dependencies</TabsTrigger>
-                    <TabsTrigger value="build-history" className="rounded-lg transition-all">Build History</TabsTrigger>
+                    <TabsTrigger value="build-history" className="w-full text-purple-500 bg-white bg-opacity-20 py-2 px-4 data-[state=active]:bg-purple-500 data-[state=active]:text-white">Build History</TabsTrigger>
                 </TabsList>
-                <TabsContent value="dependencies">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-2xl font-semibold">Project Dependencies</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Version</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {/*{project.dependencies.map((dep: Dependency) => (*/}
-                                    {/*    <TableRow key={dep.name}>*/}
-                                    {/*        <TableCell className="font-medium">{dep.name}</TableCell>*/}
-                                    {/*        <TableCell>*/}
-                                    {/*            <Badge variant="secondary">{dep.version}</Badge>*/}
-                                    {/*        </TableCell>*/}
-                                    {/*    </TableRow>*/}
-                                    {/*))}*/}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
                 <TabsContent value="build-history">
                     <Card>
                         <CardHeader>

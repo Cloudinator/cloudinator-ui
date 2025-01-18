@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronRight, Plus, FileText, ChevronDown, MoreVertical, Sparkles, Code, ArrowRight, GripVertical, X } from 'lucide-react';
+import {
+  Plus,
+  FileText,
+  ChevronDown,
+  MoreVertical,
+  Sparkles,
+  Code,
+  ArrowRight,
+  GripVertical,
+  FolderOpen,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -84,6 +95,14 @@ export type PropsParams = {
   params: Promise<{ name: string }>;
 };
 
+interface ErrorResponse {
+  status?: string;
+  originalStatus?: number;
+  data?: {
+    message?: string;
+  };
+}
+
 type SpringProjectType = {
   uuid: string;
   name: string;
@@ -108,39 +127,29 @@ type BuildHistoryItem = {
   status: "BUILDING" | "SUCCESS" | "FAILURE";
 };
 
-interface ErrorResponse {
-  status?: string | number;
-  originalStatus?: number;
-  data?: {
-    message?: string;
-  };
-}
-
 export default function SubWorkspacePage(props: PropsParams) {
   const [params, setParams] = useState<{ name: string } | null>(null);
   const [isCreateProjectDialogOpen, setIsCreateProjectDialogOpen] =
-      useState(false);
+    useState(false);
   const [isSpringInitializerOpen, setIsSpringInitializerOpen] = useState(false);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [isDeployDialogOpen, setIsDeployDialogOpen] = useState(false);
   const [buildSpringService] = useBuildSpringServiceMutation();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] =
-      useState<SpringProjectType | null>(null);
+    useState<SpringProjectType | null>(null);
   const [deleteConfirmationName, setDeleteConfirmationName] = useState("");
   const [deleteConfirmationError, setDeleteConfirmationError] = useState("");
-  const [existingProjectName, setExistingProjectName] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const [gitName, setGitName] = useState<string | null>(null);
-
+  const [existingProjectName, setExistingProjectName] = useState<string | null>(
+    null,
+  );
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [createExistingProject] = useCreateExistingProjectMutation();
 
   const [deleteSpringProject] = useDeleteSpringProjectMutation();
   const [isGitCommandModalOpen, setIsGitCommandModalOpen] = useState(false);
 
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const { data: profile } = useGetMeQuery();
 
@@ -195,8 +204,21 @@ export default function SubWorkspacePage(props: PropsParams) {
         name: project.name,
       });
 
+      // Show success toast
+      toast({
+        title: "Success",
+        description: "Project deleted successfully.",
+        variant: "success",
+      });
+
       console.log(result);
     } catch (error) {
+      // Show error toast
+      toast({
+        title: "Error",
+        description: "Failed to delete the project.",
+        variant: "error",
+      });
       console.log(error);
     } finally {
       refetch();
@@ -210,7 +232,7 @@ export default function SubWorkspacePage(props: PropsParams) {
   };
 
   const handleDeleteConfirmationNameChange = (
-      e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setDeleteConfirmationName(e.target.value);
     setDeleteConfirmationError("");
@@ -223,8 +245,8 @@ export default function SubWorkspacePage(props: PropsParams) {
       setDeleteConfirmationName("");
       setDeleteConfirmationError("");
     } else if (
-        projectToDelete &&
-        projectToDelete.name !== deleteConfirmationName
+      projectToDelete &&
+      projectToDelete.name !== deleteConfirmationName
     ) {
       setDeleteConfirmationError("Project name does not match");
     }
@@ -240,78 +262,75 @@ export default function SubWorkspacePage(props: PropsParams) {
   };
 
   const handleCreateExistingProject = async (name: string) => {
-    if (!name || error) {
-      setError("Please enter a valid project name");
-      return;
-    }
-
-    const existingProjectName = name + Math.floor(Math.random() * 1000);
-
-    setGitName(existingProjectName);
-
     try {
       const result = await createExistingProject({
         folder: params?.name ?? "",
-        name: existingProjectName,
+        name: name,
         servicesNames: selectedServices,
-      }).unwrap()
+      }).unwrap();
 
+      // Show success toast
+      toast({
+        title: "Success",
+        description: `Project "${name}" created successfully.`,
+        variant: "success",
+        duration: 3000,
+      });
 
+      console.log("Project created successfully:", result);
 
-      console.log(result);
+      // Reset state and close the dialog
+      setIsCreateProjectDialogOpen(false);
+      setSelectedServices([]);
+
+      // Refetch data
+      refetch();
     } catch (err) {
-
       const error = err as ErrorResponse;
 
-      if (error?.status === 'PARSING_ERROR' && error?.originalStatus === 200) {
+      console.log("Failed to create project:", error);
+
+      // Handle parsing error or other errors
+      if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
+        // Show success toast for parsing error with 200 status
         toast({
           title: "Success",
           description:
-              error?.data?.message ||
-              `ProjectName "${name}" created successfully!`,
+            error?.data?.message ||
+            `Project "${name}" created successfully (parsing error).`,
           variant: "success",
           duration: 3000,
         });
+
+        // Reset state and close the dialog
         setIsCreateProjectDialogOpen(false);
         setSelectedServices([]);
-        setIsGitCommandModalOpen(true);
+
+        // Refetch data
         refetch();
-      }else {
+      } else {
+        // Show error toast for other errors
         toast({
           title: "Error",
           description:
-              error?.data?.message || "Failed to create project. Please try again.",
+            error?.data?.message ||
+            "Failed to create the project. Please try again.",
           variant: "error",
           duration: 5000,
         });
-      }
 
-      console.log(error);
+        // Open Git Command Modal for fallback
+        setIsGitCommandModalOpen(true);
+      }
     }
   };
 
   const sensors = useSensors(
-      useSensor(PointerSensor),
-      useSensor(KeyboardSensor, {
-        coordinateGetter: sortableKeyboardCoordinates,
-      }),
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim();
-    setExistingProjectName(value);
-    if (!value) {
-      setError("Project name cannot be empty");
-    } else if (value.length < 3) {
-      setError("Project name must be at least 3 characters long");
-    } else if (value.length > 50) {
-      setError("Project name must not exceed 50 characters");
-    } else if (!/^[a-zA-Z0-9-_]+$/.test(value)) {
-      setError("Project name can only contain letters, numbers, hyphens, and underscores");
-    } else {
-      setError(null);
-    }
-  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -328,7 +347,7 @@ export default function SubWorkspacePage(props: PropsParams) {
 
   function SortableItem(props: { id: string }) {
     const { attributes, listeners, setNodeRef, transform, transition } =
-        useSortable({ id: props.id });
+      useSortable({ id: props.id });
 
     const style = {
       transform: CSS.Transform.toString(transform),
@@ -336,32 +355,32 @@ export default function SubWorkspacePage(props: PropsParams) {
     };
 
     return (
-        <motion.li
-            ref={setNodeRef}
-            style={style}
-            {...attributes}
-            {...listeners}
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex justify-between items-center mb-2 cursor-move"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
-        >
+      <motion.li
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex justify-between items-center mb-2 cursor-move"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        transition={{ duration: 0.2 }}
+      >
         <span className="flex items-center">
           <GripVertical className="mr-2 h-4 w-4" />
           {props.id}
         </span>
-          <Button
-              variant="ghost"
-              size="sm"
-              onClick={() =>
-                  setSelectedServices(selectedServices.filter((s) => s !== props.id))
-              }
-              className="text-primary-foreground hover:text-primary-foreground/80"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </motion.li>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() =>
+            setSelectedServices(selectedServices.filter((s) => s !== props.id))
+          }
+          className="text-primary-foreground hover:text-primary-foreground/80"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </motion.li>
     );
   }
 
@@ -371,7 +390,7 @@ export default function SubWorkspacePage(props: PropsParams) {
 
   const gitCommands = [
     "git init --initial-branch=main",
-    `git remote add origin https://git.cloudinator.cloud/group-${profile.username}/${gitName}.git`,
+    `git remote add origin https://git.cloudinator.cloud/group-${profile.username}/${existingProjectName}.git`,
     "git add .",
     'git commit -m "message"',
     "git push --set-upstream origin main",
@@ -401,7 +420,7 @@ export default function SubWorkspacePage(props: PropsParams) {
               <h1 className="text-purple-500 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 font-bold text-4xl">
                 Spring Microservices
               </h1>
-              
+
             </div>
             <p className="text-lg text-muted-foreground">Manage Spring Microservice projects and their relationships</p>
           </div>
@@ -627,15 +646,34 @@ export default function SubWorkspacePage(props: PropsParams) {
                         </DndContext>
                       </div>
                       <Button
-                        onClick={() =>
-                          handleCreateExistingProject(existingProjectName)
-                        }
-                        className="w-full bg-purple-500 hover:bg-purple-700"
-                        disabled={!existingProjectName} // Disable if existingProjectName is empty
+                        onClick={() => handleCreateExistingProject(existingProjectName)}
+                        className="w-full flex items-center gap-2 bg-purple-500 hover:bg-purple-700 text-white focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
+                        disabled={!existingProjectName?.trim()} // Trim and check if empty
                       >
                         Create Project
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
+                      {!existingProjectName?.trim() && (
+                        <div className="flex items-center gap-2 mt-1 p-2 bg-red-50 border border-red-200 rounded-md">
+                          {/* Icon for attention */}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-orange-500"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {/* Error message */}
+                          <p className="text-orange-600 text-sm">
+                            Attention: Please enter a valid service name.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -786,151 +824,100 @@ export default function SubWorkspacePage(props: PropsParams) {
           )}
         </TabsContent>
 
-          {/* Project Relationships Tab */}
-          <TabsContent value="erd" className="space-y-4">
-            {springProjects.length > 0 ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Microservices Relationship Diagram</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[600px] border rounded-md">
-                      <ERDDiagram projects={springProjects} />
-                    </div>
-                  </CardContent>
-                </Card>
-            ) : (
-                <div className="flex justify-center items-center h-64">
-                  <p className="text-muted-foreground">
-                    No projects available to show relationships.
-                  </p>
+        {/* Project Relationships Tab */}
+        <TabsContent value="erd" className="space-y-4">
+          {springProjects.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Microservices Relationship Diagram</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[600px] border rounded-md">
+                  <ERDDiagram projects={springProjects} />
                 </div>
-            )}
-          </TabsContent>
-
-          {/* Build History Tab */}
-          <TabsContent value="build-history" className="space-y-4">
-            {Array.isArray(buildNumber) && buildNumber.length > 0 ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Build History</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Project Name</TableHead>
-                          <TableHead>Build #</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {buildNumber.map((build: BuildHistoryItem) => (
-                            <TableRow key={build.buildNumber}>
-                              <TableCell>{params?.name}</TableCell>
-                              <TableCell>{build.buildNumber}</TableCell>
-                              <TableCell>
-                                <Badge
-                                    variant={
-                                      build.status === "SUCCESS"
-                                          ? "default"
-                                          : build.status === "FAILURE"
-                                              ? "destructive"
-                                              : "secondary"
-                                    }
-                                >
-                                  {build.status}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                <Button variant="outline" size="sm">
-                                  <FileText className="h-4 w-4 mr-2" />
-                                  <Link
-                                      href={`/workspace/sub-workspace/${params?.name}/${params?.name}/${build?.buildNumber}`}
-                                  >
-                                    View Log
-                                  </Link>
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-            ) : (
-                <div className="flex justify-center items-center h-64">
-                  <p className="text-muted-foreground">
-                    No build history available.
-                  </p>
-                </div>
-            )}
-          </TabsContent>
-        </Tabs>
-
-        <SpringInitializer
-            isOpen={isSpringInitializerOpen}
-            onClose={() => {
-              setIsSpringInitializerOpen(false);
-              setExistingProjectName("");
-            }}
-            folder={params?.name ?? ""}
-            springProjects={springProjects}
-            refetch={refetch}
-        />
-
-        <AlertDialog
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Are you sure you want to delete this project?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                project &#34;{projectToDelete?.name}&#34; and remove all of its
-                data. To confirm, please enter the project name below.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="my-4">
-              <input
-                  type="text"
-                  value={deleteConfirmationName}
-                  onChange={handleDeleteConfirmationNameChange}
-                  placeholder="Enter project name to confirm"
-                  className="w-full p-2 border rounded"
-              />
-              {deleteConfirmationError && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {deleteConfirmationError}
-                  </p>
-              )}
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="flex justify-center items-center h-64">
+              <p className="text-muted-foreground">
+                No projects available to show relationships.
+              </p>
             </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel
-                  onClick={() => {
-                    setDeleteConfirmationName("");
-                    setDeleteConfirmationError("");
-                  }}
-              >
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction onClick={confirmDeleteProject}>
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-        <GitCommandModal
-            isOpen={isGitCommandModalOpen}
-            onClose={() => setIsGitCommandModalOpen(false)}
-            commands={gitCommands}
-            clear={() => setExistingProjectName(null)}
-        />
-      </div>
+          )}
+        </TabsContent>
+
+        {/* Build History Tab */}
+        <TabsContent value="build-history" className="space-y-4">
+          {Array.isArray(buildNumber) && buildNumber.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Build History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Project Name</TableHead>
+                      <TableHead>Build #</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {buildNumber.map((build: BuildHistoryItem) => (
+                      <TableRow key={build.buildNumber}>
+                        <TableCell>{params?.name}</TableCell>
+                        <TableCell>{build.buildNumber}</TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              build.status === "SUCCESS"
+                                ? "default"
+                                : build.status === "FAILURE"
+                                  ? "destructive"
+                                  : "secondary"
+                            }
+                          >
+                            {build.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="outline" size="sm">
+                            <FileText className="h-4 w-4 mr-2" />
+                            <Link
+                              href={`/workspace/sub-workspace/${params?.name}/${params?.name}/${build?.buildNumber}`}
+                            >
+                              View Log
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="flex justify-center items-center h-64">
+              <p className="text-muted-foreground">
+                No build history available.
+              </p>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      <SpringInitializer
+        isOpen={isSpringInitializerOpen}
+        onClose={() => {
+          setIsSpringInitializerOpen(false);
+          setExistingProjectName("");
+        }}
+        folder={params?.name ?? ""}
+        springProjects={springProjects}
+        refetch={refetch}
+      />
+
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
@@ -1003,4 +990,3 @@ export default function SubWorkspacePage(props: PropsParams) {
     </div>
   );
 }
-
