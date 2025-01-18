@@ -37,7 +37,8 @@ import {
     Globe,
     ExternalLink,
     Folder,
-    Loader2
+    Zap,
+    PowerOff,
 } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -50,8 +51,10 @@ import {
 } from "@/redux/api/projectApi";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import Loading from "@/components/Loading";
+// import Loading from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
+import Lottie from "lottie-react";
+import LoadingMissile from "@/public/LoadingMissile.json";
 
 const CreateProjectContent = lazy(
     () => import("@/components/profiledashboard/workspace/CreateProjectContent")
@@ -505,8 +508,13 @@ export default function Service() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-                    <Loading />
+                    {/* Replace Loader2 with Lottie animation */}
+                    <Lottie
+                        animationData={LoadingMissile} // Pass the JSON animation
+                        loop={true} // Make the animation loop
+                        style={{ width: 64, height: 64 }} // Set the size of the animation
+                    />
+                    {/* <Loading /> */}
                 </div>
             </div>
         );
@@ -618,9 +626,8 @@ export default function Service() {
                         <Button
                             key={type}
                             variant={selectedType === type ? "default" : "outline"}
-                            className={`bg-white dark:bg-gray-700 text-purple-500 dark:text-purple-400 capitalize hover:text-purple-700 dark:hover:text-purple-300 hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-purple-500 border border-gray-300 dark:border-gray-600 transition-all ease-in-out ${
-                                selectedType === type ? "ring-2 ring-purple-500 glow" : ""
-                            }`}
+                            className={`bg-white dark:bg-gray-700 text-purple-500 dark:text-purple-400 capitalize hover:text-purple-700 dark:hover:text-purple-300 hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-purple-500 border border-gray-300 dark:border-gray-600 transition-all ease-in-out ${selectedType === type ? "ring-2 ring-purple-500 glow" : ""
+                                }`}
                             onClick={() => setSelectedType(type)}
                         >
                             <div className="flex items-center">
@@ -700,12 +707,16 @@ export default function Service() {
                                             <div className="flex items-center gap-2">
                                                 <Badge
                                                     variant="outline"
-                                                    className={`text-sm font-medium px-3 py-1 rounded-full ${service.status
-                                                        ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
-                                                        : "bg-red-100 text-red-700 border-red-200"
+                                                    className={`text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1 ${service.status
+                                                            ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
+                                                            : "bg-red-100 text-red-700 border-red-200"
                                                         }`}
                                                 >
-                                                    {service.status ? "Running" : "Stopping"}
+                                                    {service.status ? (
+                                                        <Zap className="w-4 h-4 text-green-700" />
+                                                    ) : (
+                                                    <PowerOff className="w-4 h-4 text-red-700" />
+    )}
                                                 </Badge>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -769,9 +780,10 @@ export default function Service() {
                                                 </span>
                                             ) : null}
 
+                                            {/* Subworkspace Card  */}
                                             {service?.type === "subworkspace" ? (
                                                 <span className="text-gray-500 dark:text-gray-400">
-                                                    This is a sub-workspace where you can manage your microservices.
+                                                    sub-workspace where you can manage your <span className="text-green-500 font-semibold">microservices</span>.
                                                 </span>
                                             ) : service.type === "database" ? (
                                                 <div className="space-y-2">

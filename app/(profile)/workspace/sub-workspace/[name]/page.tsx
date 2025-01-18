@@ -432,7 +432,7 @@ export default function SubWorkspacePage(props: PropsParams) {
               onOpenChange={setIsDeployDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button className="bg-purple-500 hover:bg-purple-700">
+                <Button className="bg-purple-500 hover:bg-purple-700 dark:text-white">
                   <Plus className="mr-2 h-4 w-4" />
                   Deploy/Build
                 </Button>
@@ -525,7 +525,7 @@ export default function SubWorkspacePage(props: PropsParams) {
             >
               <DialogTrigger asChild>
                 <Button
-                  className="bg-purple-500 hover:bg-purple-700"
+                  className="bg-purple-500 hover:bg-purple-700 dark:text-white"
                   onClick={() => setIsCreateProjectDialogOpen(true)}
                 >
                   <Plus className="mr-2 h-4 w-4" />
@@ -829,7 +829,7 @@ export default function SubWorkspacePage(props: PropsParams) {
           {springProjects.length > 0 ? (
             <Card>
               <CardHeader>
-                <CardTitle>Microservices Relationship Diagram</CardTitle>
+                <CardTitle className="text-purple-500 font-semibold text-xl">Microservices Relationship Diagram</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[600px] border rounded-md">

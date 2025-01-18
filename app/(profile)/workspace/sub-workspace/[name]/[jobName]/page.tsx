@@ -1,11 +1,11 @@
-'use client'
-import {useEffect, useState} from "react";
-import { Activity, AlertCircle, CheckCircle, Clock, Code, GitBranch, Package, Rocket, XCircle } from 'lucide-react';
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import {Badge} from "@/components/ui/badge";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Activity, AlertCircle, CheckCircle, Clock, Code, GitBranch, Loader2, Package, Rocket, XCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import {
     useDeploySpringServiceMutation,
     useGetBuildNumberInFolderQuery,
@@ -14,38 +14,45 @@ import {
 } from "@/redux/api/projectApi";
 
 import Link from "next/link";
-import {ConfigureProjectModal} from "@/components/profiledashboard/workspace/service/ConfigureProjectModal";
-import {SpringProjectResponse} from "@/app/(profile)/workspace/sub-workspace/[name]/page";
+import { ConfigureProjectModal } from "@/components/profiledashboard/workspace/service/ConfigureProjectModal";
+import { SpringProjectResponse } from "@/app/(profile)/workspace/sub-workspace/[name]/page";
 import Breadcrumbs from "@/components/Breadcrumb2";
+import { useToast } from "@/hooks/use-toast";
 
 export type PropsParams = {
     params: Promise<{ jobName: string }>;
 };
-
 
 type BuildHistory = {
     status: string;
     buildNumber?: number;
 };
 
-const ProjectDetailPage = (props: PropsParams) =>{
+interface ErrorResponse {
+    status?: string;
+    originalStatus?: number;
+    data?: {
+        message?: string;
+    };
+}
+
+const ProjectDetailPage = (props: PropsParams) => {
     const [params, setParams] = useState<{ jobName: string } | null>(null);
     const [deploySpringService] = useDeploySpringServiceMutation();
+    const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState(false); // Add loading state
+    const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null); // For polling
 
-    const jobName = params?.jobName + '-pipeline'
+    const jobName = params?.jobName + '-pipeline';
 
-    console.log(jobName)
+    const { data: projects, refetch: getdata } = useGetProjectByNameQuery({
+        name: params?.jobName || ''
+    });
 
-
-
-    const {data:projects,refetch:getdata} = useGetProjectByNameQuery({
-        name:params?.jobName || ''
-    })
-
-    const {data:buildNumber,refetch} = useGetBuildNumberInFolderQuery({
-        folder: projects?.namespace ?? '' ,
-        name : jobName ?? ''
-    }) as { data: BuildHistory[] | undefined,refetch: () => void };
+    const { data: buildNumber, refetch: refetchBuildNumber } = useGetBuildNumberInFolderQuery({
+        folder: projects?.namespace ?? '',
+        name: jobName ?? ''
+    }) as { data: BuildHistory[] | undefined, refetch: () => void };
 
     const { data } = useGetProjectsQuery({
         subWorkspace: projects?.namespace ?? '',
@@ -53,13 +60,7 @@ const ProjectDetailPage = (props: PropsParams) =>{
         size: 10,
     }) as unknown as { data: SpringProjectResponse };
 
-
     const service = data?.results || [];
-
-    console.log(service);
-
-
-
 
     useEffect(() => {
         props.params.then(setParams);
@@ -71,27 +72,68 @@ const ProjectDetailPage = (props: PropsParams) =>{
         }
     }, [params]);
 
+    // Start polling when the component mounts
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refetchBuildNumber(); // Refetch build number data
+        }, 5000); // Poll every 5 seconds
+
+        setPollingInterval(interval);
+
+        // Cleanup interval on component unmount
+        return () => {
+            if (pollingInterval) clearInterval(pollingInterval);
+        };
+    }, [params, projects?.namespace, jobName]); // Dependencies to restart polling if these change
+
     const handleBuildService = async () => {
-
+        setIsLoading(true); // Set loading to true when deployment starts
         try {
-
             const res = await deploySpringService({
-                folder: projects?.namespace ?? '' ,
-                name : jobName ?? ''
-            })
+                folder: projects?.namespace ?? "",
+                name: jobName ?? "",
+            }).unwrap(); // Use unwrap() to handle potential parsing errors
 
-            console.log(res)
+            // Show success toast
+            toast({
+                title: "Success",
+                description: "Service deployed successfully.",
+                variant: "success",
+                duration: 3000,
+            });
 
-        }catch (error) {
-            console.log(error);
-        }finally {
-            refetch();
+            console.log("Deployment result:", res);
+        } catch (err) {
+            const error = err as ErrorResponse;
+
+            console.log("Failed to deploy service:", error);
+
+            // Handle parsing error or other errors
+            if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
+                // Show success toast for parsing error with 200 status
+                toast({
+                    title: "Success",
+                    description:
+                        error?.data?.message || "Service deployed successfully",
+                    variant: "success",
+                    duration: 3000,
+                });
+            } else {
+                // Show error toast for other errors
+                toast({
+                    title: "Error",
+                    description:
+                        error?.data?.message || "Failed to deploy the service. Please try again.",
+                    variant: "error",
+                    duration: 5000,
+                });
+            }
+        } finally {
+            setIsLoading(false); // Set loading to false when deployment finishes
+            refetchBuildNumber();
             getdata();
         }
-
-    }
-
-
+    };
 
     const getStatusIcon = (status: string) => {
         switch (status.toLowerCase()) {
@@ -106,21 +148,10 @@ const ProjectDetailPage = (props: PropsParams) =>{
         }
     };
 
-    console.log(buildNumber)
-
-
     if (!projects) return null;
 
-    return(
+    return (
         <div className="container mx-auto py-8 px-2">
-            {/* <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
-                <Link href={'/workspace'}>Workspace</Link>
-                <ChevronRight className="h-4 w-4"/>
-                <Link href={`/workspace/sub-workspace/${projects.namespace}`}>{projects.namespace}</Link>
-                <ChevronRight className="h-4 w-4"/>
-                <span className="font-medium text-foreground">{projects.name}</span>
-            </div> */}
-
             <Breadcrumbs />
 
             <div className="grid gap-6 md:grid-cols-3 mt-6">
@@ -131,26 +162,26 @@ const ProjectDetailPage = (props: PropsParams) =>{
                     <CardContent>
                         <div className="grid gap-4">
                             <div className="flex items-center">
-                                <Code className="h-5 w-5 mr-2 text-blue-500"/>
+                                <Code className="h-5 w-5 mr-2 text-blue-500" />
                                 <span className="text-sm font-medium">Namespace:</span>
                                 <span className="ml-2 text-sm bg-gray-100 px-2 py-1 rounded dark:text-black">{projects.namespace}</span>
                             </div>
                             <div className="flex items-center">
-                                <GitBranch className="h-5 w-5 mr-2 text-green-500"/>
+                                <GitBranch className="h-5 w-5 mr-2 text-green-500" />
                                 <span className="text-sm font-medium">Branch:</span>
                                 <span className="ml-2 text-sm bg-gray-100 px-2 py-1 rounded dark:text-black">{projects.branch}</span>
                             </div>
                             <div className="flex items-center">
-                                <Package className="h-5 w-5 mr-2 text-purple-500"/>
+                                <Package className="h-5 w-5 mr-2 text-purple-500" />
                                 <span className="text-sm font-medium">Git:</span>
                                 <a href={projects.git} target="_blank" rel="noopener noreferrer"
-                                   className="ml-2 text-sm text-blue-500 hover:underline truncate">{projects.git}</a>
+                                    className="ml-2 text-sm text-blue-500 hover:underline truncate">{projects.git}</a>
                             </div>
                             <div className="flex items-center">
-                                <Package className="h-5 w-5 mr-2 text-purple-500"/>
+                                <Package className="h-5 w-5 mr-2 text-purple-500" />
                                 <span className="text-sm font-medium">Domain:</span>
                                 <a href={`https://${projects.name}.cloudinator.cloud`} target="_blank" rel="noopener noreferrer"
-                                   className="ml-2 text-sm text-blue-500 hover:underline truncate">{projects.name}.cloudinator.cloud</a>
+                                    className="ml-2 text-sm text-blue-500 hover:underline truncate">{projects.name}.cloudinator.cloud</a>
                             </div>
                         </div>
                     </CardContent>
@@ -163,39 +194,48 @@ const ProjectDetailPage = (props: PropsParams) =>{
                     <CardContent className="flex flex-col gap-4">
                         <ConfigureProjectModal services={service} folder={projects.namespace} name={projects.name} />
                         <Link href={`/workspace/sub-workspace/${projects.namespace}/${params?.jobName}/${buildNumber && buildNumber[0]?.buildNumber ? buildNumber[0].buildNumber : ''}`}>
-                            <Button className="w-full bg-green-500 hover:bg-green-600">
-                                <Activity className="mr-2 h-4 w-4"/> View Logs
+                            <Button className="w-full flex items-center gap-2 bg-green-500 hover:bg-green-700 text-white focus:ring-2 focus:ring-green-700 focus:ring-offset-2">
+                                <Activity className="mr-2 h-4 w-4" /> View Logs
                             </Button>
                         </Link>
 
-                        <Button onClick={()=>handleBuildService()} className="w-full bg-purple-500 hover:bg-purple-600">
-                            <Rocket className="mr-2 h-4 w-4"/> Deploy now
+                        <Button
+                            onClick={() => handleBuildService()}
+                            className="flex items-center gap-2 bg-purple-500 hover:bg-purple-700 text-white focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
+                            disabled={isLoading} // Disable the button while loading
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Deploying...
+                                </>
+                            ) : (
+                                <>
+                                    <Rocket className="mr-2 h-4 w-4" /> Deploy now
+                                </>
+                            )}
                         </Button>
                     </CardContent>
                 </Card>
             </div>
 
-            <Tabs defaultValue="dependencies" className="mt-8">
-                <TabsList className="grid w-full grid-cols-2 rounded-xl bg-muted p-1">
-                    <TabsTrigger value="build-history" className="w-full text-purple-500 bg-white bg-opacity-20 py-2 px-4 data-[state=active]:bg-purple-500 data-[state=active]:text-white">Build History</TabsTrigger>
-                </TabsList>
-                <TabsContent value="build-history">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-2xl font-semibold">Build History</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Project Name</TableHead>
-                                        <TableHead>Build Number</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Report</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {Array.isArray(buildNumber) && buildNumber.map((build: BuildHistory) => (
+            <div className="mt-8">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-semibold text-purple-500 font-bold">Build History</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Project Name</TableHead>
+                                    <TableHead>Build Number</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Report</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {Array.isArray(buildNumber) && buildNumber.length > 0 ? (
+                                    buildNumber.map((build: BuildHistory) => (
                                         <TableRow key={build.buildNumber}>
                                             <TableCell>{params?.jobName}</TableCell>
                                             <TableCell>{build.buildNumber}</TableCell>
@@ -212,23 +252,31 @@ const ProjectDetailPage = (props: PropsParams) =>{
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center">
-                                                    <Clock className="h-4 w-4 mr-2 text-muted-foreground"/>
+                                                    <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
                                                     <Link href={`/workspace/sub-workspace/${projects.namespace}/${params?.jobName}/${build?.buildNumber}`}>
                                                         view log
                                                     </Link>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="text-center py-8">
+                                            <div className="flex flex-col items-center h-[400px] justify-center space-y-2">
+                                                <Package className="h-8 w-8 text-gray-400" />
+                                                <span className="text-gray-500">No build history available yet.</span>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
-    )
-}
+    );
+};
 
 export default ProjectDetailPage;
-

@@ -121,7 +121,7 @@ export function ConfigureProjectModal({ services, folder, name }: ConfigureProje
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="w-full bg-blue-500 hover:bg-blue-600" onClick={() => setOpen(true)}>
+                <Button className="w-full flex items-center gap-2 bg-blue-500 hover:bg-blue-700 text-white focus:ring-2 focus:ring-blue-700 focus:ring-offset-2" onClick={() => setOpen(true)}>
                     <Settings className="mr-2 h-4 w-4"/> Configure Project
                 </Button>
             </DialogTrigger>
