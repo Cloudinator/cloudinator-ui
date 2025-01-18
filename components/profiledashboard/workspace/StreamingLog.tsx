@@ -10,7 +10,6 @@ import {
   Info,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 
 type StreamingLogProps = {
@@ -30,6 +29,13 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterLevel, setFilterLevel] = useState("all");
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log = () => {};
+    }
+  }, []);
+
+  // Connect to the EventSource to stream logs
   const connectToEventSource = () => {
     const url = `https://stream.psa-khmer.world/api/v1/jenkins/stream-log/${name}/${buildNumber}`;
     console.log(`Connecting to: ${url}`);
@@ -86,6 +92,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
     };
   };
 
+  // Connect to the EventSource when the component mounts
   useEffect(() => {
     connectToEventSource();
 
@@ -95,23 +102,33 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
       }
+
+      // Clear logs from state and DOM
+      setLogs([]);
+      if (logContainerRef.current) {
+        logContainerRef.current.innerHTML = "";
+      }
     };
   }, [name, buildNumber]);
 
+  // Auto-scroll to the bottom of the log container
   useEffect(() => {
     if (autoScroll && logContainerRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [logs, autoScroll]);
 
+  // Toggle auto-scroll
   const toggleAutoScroll = () => setAutoScroll(!autoScroll);
 
+  // Determine the log level (error, warn, info)
   const getLogLevel = (log: string) => {
     if (log.includes("ERROR")) return "error";
     if (log.includes("WARN")) return "warn";
     return "info";
   };
 
+  // Get the appropriate icon for the log level
   const getLogIcon = (log: string) => {
     const level = getLogLevel(log);
     switch (level) {
@@ -124,6 +141,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
     }
   };
 
+  // Calculate log statistics (error, warning, info counts)
   const logStats = useMemo(() => {
     const errorCount = logs.filter((log) =>
       log.toLowerCase().includes("error"),
@@ -137,6 +155,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
     return { errorCount, warningCount, infoCount };
   }, [logs]);
 
+  // Get the appropriate CSS class for the log level
   const getLogClass = (log: string) => {
     if (log.toLowerCase().includes("error"))
       return "text-red-500 dark:text-red-400";
@@ -149,6 +168,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      {/* Header Section */}
       <div
         className={`mb-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-all duration-500 ${
           isDeploying
@@ -180,6 +200,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
         </div>
       </div>
 
+      {/* Log Statistics Section */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex items-center justify-between">
           <div className="flex items-center">
@@ -217,6 +238,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
         </div>
       </div>
 
+      {/* Log Container Section */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-2">
@@ -246,14 +268,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
           )}
         </div>
 
-        {/* {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )} */}
-
+        {/* Log Container */}
         <div
           ref={logContainerRef}
           className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-auto h-[600px] font-mono text-sm border-2 border-gray-200 dark:border-gray-800 shadow-[0_0_15px_5px_rgba(59,130,246,0.1)] dark:shadow-[0_0_15px_5px_rgba(59,130,246,0.2)] relative"
@@ -280,7 +295,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
             </select>
           </div>
 
-          {/* Log lines with smoother typewriter animation */}
+          {/* Log Lines */}
           {logs
             .filter((log) => {
               const matchesSearch = log
@@ -312,84 +327,6 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
           {logs.length > 0 && (
             <div className="inline-block h-4 w-1 bg-blue-500 dark:bg-blue-400 animate-blink ml-2" />
           )}
-
-          {/* Custom scrollbar styling */}
-          <style jsx>{`
-            @keyframes fade-in {
-              from {
-                opacity: 0;
-              }
-              to {
-                opacity: 1;
-              }
-            }
-            .animate-typing {
-              animation:
-                typing 1s linear forwards,
-                fade-in 0.5s ease-in-out;
-            }
-
-            .animate-typing {
-              animation: typing 1s linear forwards; /* Smoother typewriter effect */
-              white-space: nowrap;
-              overflow: hidden;
-            }
-
-            @keyframes typing {
-              from {
-                width: 0;
-              }
-              to {
-                width: 100%;
-              }
-            }
-
-            /* Blinking cursor animation */
-            @keyframes blink {
-              0%,
-              50% {
-                opacity: 1;
-              }
-              51%,
-              100% {
-                opacity: 0;
-              }
-            }
-            .animate-blink {
-              animation: blink 1s infinite;
-            }
-
-            /* Custom scrollbar */
-            ::-webkit-scrollbar {
-              width: 8px;
-            }
-
-            ::-webkit-scrollbar-track {
-              background: rgba(209, 213, 219, 0.1); /* Light mode track */
-              border-radius: 4px;
-            }
-
-            .dark ::-webkit-scrollbar-track {
-              background: rgba(75, 85, 99, 0.1); /* Dark mode track */
-            }
-
-            ::-webkit-scrollbar-thumb {
-              background: rgba(59, 130, 246, 0.4); /* Light mode thumb */
-              border-radius: 4px;
-            }
-
-            .dark ::-webkit-scrollbar-thumb {
-              background: rgba(59, 130, 246, 0.6); /* Dark mode thumb */
-            }
-
-            ::-webkit-scrollbar-thumb:hover {
-              background: rgba(59, 130, 246, 0.6); /* Light mode hover */
-            }
-
-            .dark ::-webkit-scrollbar-thumb:hover {
-              background: rgba(59, 130, 246, 0.8); /* Dark mode hover */
-            }
-          `}</style>
         </div>
       </div>
     </div>

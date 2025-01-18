@@ -162,6 +162,7 @@ export default function Service() {
     );
     const [deleteServiceDeployment] = useDeleteServiceDeploymentMutation();
     const [deleteSubWorkspace] = useDeleteSubWorkSpaceMutation();
+    const [deleteConfirmationError, setDeleteConfirmationError] = useState("");
 
     const { toast } = useToast();
 
@@ -890,7 +891,16 @@ export default function Service() {
                         value={deleteConfirmationName}
                         onChange={(e) => setDeleteConfirmationName(e.target.value)}
                         placeholder={`Type ${serviceToDelete ? "service" : subWorkspaceToDelete ? "subworkspace" : "database"} name here`}
+                        onPaste={(e) => {
+                            e.preventDefault(); // Prevent pasting
+                            setDeleteConfirmationError(
+                                "To ensure accuracy, please type the project name manually.",
+                            );
+                        }}
                     />
+                    {deleteConfirmationError && (
+                        <p className="text-red-500 text-sm mt-2">{deleteConfirmationError}</p>
+                    )}
                     <div className="flex justify-end space-x-2 mt-4">
                         <Button
                             variant="outline"
