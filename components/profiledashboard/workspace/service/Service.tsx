@@ -766,7 +766,7 @@ export default function Service() {
                                                 </div>
                                             ) : service.subdomain ? (
                                                 <a
-                                                    href={`https://${service.subdomain}.cloudinator.cloud`}
+                                                    href={`https://${service.subdomain}.soben.me`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="flex items-center text-green-600 hover:underline"
@@ -774,7 +774,7 @@ export default function Service() {
                                                 >
                                                     <Globe className="w-4 h-4 mr-2 flex-shrink-0"/>
                                                     <span
-                                                        className="truncate">{`https://${service.subdomain}.cloudinator.cloud`}</span>
+                                                        className="truncate">{`https://${service.subdomain}.soben.me`}</span>
                                                     <ExternalLink className="w-3 h-3 ml-1 flex-shrink-0"/>
                                                 </a>
                                             ) : (

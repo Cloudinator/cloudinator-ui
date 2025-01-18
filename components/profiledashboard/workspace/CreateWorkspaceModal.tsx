@@ -44,7 +44,7 @@ export function CreateWorkspaceModal() {
         setIsCreating(true)
         const formattedWorkspaceName = workspaceName.trim().replace(/\s+/g, '-')
         try {
-            await createWorkspace({ name: formattedWorkspaceName })
+            const results = await createWorkspace({ name: formattedWorkspaceName }).unwrap();
 
             toast({
                 title: "Success",
@@ -52,6 +52,8 @@ export function CreateWorkspaceModal() {
                 variant: "success",
                 duration: 3000,
             })
+
+            console.log(results)
 
             setWorkspaceName("")
             setOpen(false)
@@ -77,7 +79,7 @@ export function CreateWorkspaceModal() {
             <DialogTrigger asChild>
                 <Button
                     className="bg-purple-500 text-primary-foreground hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={data && data.length > 0}
+                    disabled={data && data.length > 2}
                 >
                     <Zap className="mr-2 h-4 w-4" />
                     Create Workspace
