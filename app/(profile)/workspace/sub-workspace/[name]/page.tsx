@@ -401,250 +401,269 @@ export default function SubWorkspacePage(props: PropsParams) {
       <Breadcrumbs />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-        <div>
+        {/* <div>
           <h1 className="text-3xl font-bold tracking-tight text-purple-500">
             Spring Microservices
           </h1>
           <p className="text-lg text-muted-foreground">
             Manage Spring microservice projects and their relationships
           </p>
-        </div>
-        <div className="flex space-x-2">
-          <Dialog
-            open={isDeployDialogOpen}
-            onOpenChange={setIsDeployDialogOpen}
-          >
-            <DialogTrigger asChild>
-              <Button className="bg-purple-500 hover:bg-purple-700">
-                <Plus className="mr-2 h-4 w-4" />
-                Deploy/Build
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle className="text-2xl text-purple-500">
-                  Select Services
-                </DialogTitle>
-                <DialogDescription>
-                  Choose the services you want to use
-                </DialogDescription>
-              </DialogHeader>
-              <div className="mt-4">
-                <div className="p-4 border rounded-lg space-y-4">
-                  <div className="text-sm text-muted-foreground">
-                    Selected services:
+        </div> */}
+
+        <div className="flex justify-between items-center w-full bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg shadow-gray-200/20 dark:shadow-purple-500/10">
+          {/* Workspace Title */}
+          <div className="flex items-center gap-4">
+            <div>
+              <Plus className="w-8 h-8 text-purple-500" />
+            </div>
+            <div>
+              <h1 className="text-purple-500 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 font-bold text-4xl">
+                Spring Microservices
+              </h1>
+              
+            </div>
+            <p className="text-lg text-muted-foreground">Manage Spring Microservice projects and their relationships</p>
+          </div>
+
+
+          <div className="flex space-x-2">
+            <Dialog
+              open={isDeployDialogOpen}
+              onOpenChange={setIsDeployDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button className="bg-purple-500 hover:bg-purple-700">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Deploy/Build
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl text-purple-500">
+                    Select Services
+                  </DialogTitle>
+                  <DialogDescription>
+                    Choose the services you want to use
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="mt-4">
+                  <div className="p-4 border rounded-lg space-y-4">
+                    <div className="text-sm text-muted-foreground">
+                      Selected services:
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProjects.map((projectName) => {
+                        const project = springProjects.find(
+                          (p) => p.name === projectName,
+                        );
+                        return project ? (
+                          <Badge
+                            key={project.name}
+                            variant="secondary"
+                            className="bg-purple-100 text-purple-700 hover:bg-purple-200"
+                          >
+                            {project.name}
+                          </Badge>
+                        ) : null;
+                      })}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProjects.map((projectName) => {
-                      const project = springProjects.find(
-                        (p) => p.name === projectName,
-                      );
-                      return project ? (
-                        <Badge
-                          key={project.name}
-                          variant="secondary"
-                          className="bg-purple-100 text-purple-700 hover:bg-purple-200"
-                        >
-                          {project.name}
-                        </Badge>
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-                <Collapsible className="mt-4">
-                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border p-4 text-left text-sm font-medium hover:bg-gray-100">
-                    {selectedProjects.length} services selected
-                    <ChevronDown className="h-4 w-4" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    <div className="rounded-lg border p-4 space-y-3">
-                      {springProjects.map((project) => (
-                        <div
-                          key={project.name}
-                          className="flex items-center space-x-2"
-                        >
-                          <Checkbox
-                            id={project.name}
-                            checked={selectedProjects.includes(project.name)}
-                            onCheckedChange={(checked) => {
-                              setSelectedProjects(
-                                checked
-                                  ? [...selectedProjects, project.name]
-                                  : selectedProjects.filter(
+                  <Collapsible className="mt-4">
+                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border p-4 text-left text-sm font-medium hover:bg-gray-100">
+                      {selectedProjects.length} services selected
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-2">
+                      <div className="rounded-lg border p-4 space-y-3">
+                        {springProjects.map((project) => (
+                          <div
+                            key={project.name}
+                            className="flex items-center space-x-2"
+                          >
+                            <Checkbox
+                              id={project.name}
+                              checked={selectedProjects.includes(project.name)}
+                              onCheckedChange={(checked) => {
+                                setSelectedProjects(
+                                  checked
+                                    ? [...selectedProjects, project.name]
+                                    : selectedProjects.filter(
                                       (name) => name !== project.name,
                                     ),
-                              );
-                            }}
-                            className="border-purple-500 text-purple-500"
-                          />
-                          <label
-                            htmlFor={project.name}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {project.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </div>
-              <DialogFooter className="mt-6 space-x-2">
-                <Button onClick={handleBuildProject} variant="outline">
-                  Build
-                </Button>
-                <Button
-                  onClick={handleDeployProject}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  Deploy
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          <Dialog
-            open={isCreateProjectDialogOpen}
-            onOpenChange={setIsCreateProjectDialogOpen}
-          >
-            <DialogTrigger asChild>
-              <Button
-                className="bg-purple-500 hover:bg-purple-700"
-                onClick={() => setIsCreateProjectDialogOpen(true)}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Spring Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[700px]">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-center text-purple-500">
-                  Create Your Spring Project
-                </DialogTitle>
-                <DialogDescription className="text-center">
-                  Choose your preferred method to kickstart your Spring project
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col space-y-6 mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card
-                    className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
-                    onClick={() => handleCreateProject("new")}
-                  >
-                    <CardHeader className="flex flex-col items-center">
-                      <Sparkles className="h-12 w-12 text-purple-500 mb-2" />
-                      <CardTitle className="text-purple-500">
-                        Create New Project
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-center text-sm text-muted-foreground">
-                        Start fresh with a new Spring project using our
-                        initializer
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card
-                    className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
-                    onClick={() => handleCreateProject("existing")}
-                  >
-                    <CardHeader className="flex flex-col items-center">
-                      <Code className="h-12 w-12 text-purple-500 mb-2" />
-                      <CardTitle className="text-purple-500">
-                        Use Existing Code
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-center text-sm text-muted-foreground">
-                        Import your existing Spring project code
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-                {existingProjectName !== null && (
-                  <div className="space-y-4 p-6 bg-muted rounded-lg">
-                    <Label
-                      htmlFor="existing-project-name"
-                      className="text-lg font-semibold"
-                    >
-                      Project Name
-                    </Label>
-                    <Input
-                      id="existing-project-name"
-                      value={existingProjectName}
-                      onChange={(e) => setExistingProjectName(e.target.value)}
-                      placeholder="Enter your project name"
-                      className="w-full"
-                    />
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="service-select"
-                        className="text-lg font-semibold"
-                      >
-                        Select Services
-                      </Label>
-                      <div className="flex space-x-2 flex-wrap">
-                        {springProjects.map((project) => (
-                          <Button
-                            key={project.uuid}
-                            variant={
-                              selectedServices.includes(project.name)
-                                ? "secondary"
-                                : "outline"
-                            }
-                            className="mb-2"
-                            onClick={() => {
-                              setSelectedServices((prevSelected) =>
-                                prevSelected.includes(project.name)
-                                  ? prevSelected.filter(
-                                      (item) => item !== project.name,
-                                    )
-                                  : [...prevSelected, project.name],
-                              );
-                            }}
-                          >
-                            {project.name}
-                          </Button>
+                                );
+                              }}
+                              className="border-purple-500 text-purple-500"
+                            />
+                            <label
+                              htmlFor={project.name}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {project.name}
+                            </label>
+                          </div>
                         ))}
                       </div>
-                    </div>
-                    <div className="mt-4">
-                      <Label className="text-lg font-semibold mb-2 block">
-                        Selected Services (Drag to reorder)
-                      </Label>
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                      >
-                        <SortableContext
-                          items={selectedServices}
-                          strategy={verticalListSortingStrategy}
-                        >
-                          <AnimatePresence>
-                            {selectedServices.map((service) => (
-                              <SortableItem key={service} id={service} />
-                            ))}
-                          </AnimatePresence>
-                        </SortableContext>
-                      </DndContext>
-                    </div>
-                    <Button
-                      onClick={() =>
-                        handleCreateExistingProject(existingProjectName)
-                      }
-                      className="w-full bg-purple-500 hover:bg-purple-700"
-                      disabled={!existingProjectName} // Disable if existingProjectName is empty
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+                <DialogFooter className="mt-6 space-x-2">
+                  <Button onClick={handleBuildProject} variant="outline">
+                    Build
+                  </Button>
+                  <Button
+                    onClick={handleDeployProject}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    Deploy
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Dialog
+              open={isCreateProjectDialogOpen}
+              onOpenChange={setIsCreateProjectDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  className="bg-purple-500 hover:bg-purple-700"
+                  onClick={() => setIsCreateProjectDialogOpen(true)}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Spring Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[700px]">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold text-center text-purple-500">
+                    Create Your Spring Project
+                  </DialogTitle>
+                  <DialogDescription className="text-center">
+                    Choose your preferred method to kickstart your Spring project
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col space-y-6 mt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card
+                      className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
+                      onClick={() => handleCreateProject("new")}
                     >
-                      Create Project
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                      <CardHeader className="flex flex-col items-center">
+                        <Sparkles className="h-12 w-12 text-purple-500 mb-2" />
+                        <CardTitle className="text-purple-500">
+                          Create New Project
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-center text-sm text-muted-foreground">
+                          Start fresh with a new Spring project using our
+                          initializer
+                        </p>
+                      </CardContent>
+                    </Card>
+                    <Card
+                      className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
+                      onClick={() => handleCreateProject("existing")}
+                    >
+                      <CardHeader className="flex flex-col items-center">
+                        <Code className="h-12 w-12 text-purple-500 mb-2" />
+                        <CardTitle className="text-purple-500">
+                          Use Existing Code
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-center text-sm text-muted-foreground">
+                          Import your existing Spring project code
+                        </p>
+                      </CardContent>
+                    </Card>
                   </div>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
+                  {existingProjectName !== null && (
+                    <div className="space-y-4 p-6 bg-muted rounded-lg">
+                      <Label
+                        htmlFor="existing-project-name"
+                        className="text-lg font-semibold"
+                      >
+                        Project Name
+                      </Label>
+                      <Input
+                        id="existing-project-name"
+                        value={existingProjectName}
+                        onChange={(e) => setExistingProjectName(e.target.value)}
+                        placeholder="Enter your project name"
+                        className="w-full"
+                      />
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="service-select"
+                          className="text-lg font-semibold"
+                        >
+                          Select Services
+                        </Label>
+                        <div className="flex space-x-2 flex-wrap">
+                          {springProjects.map((project) => (
+                            <Button
+                              key={project.uuid}
+                              variant={
+                                selectedServices.includes(project.name)
+                                  ? "secondary"
+                                  : "outline"
+                              }
+                              className="mb-2"
+                              onClick={() => {
+                                setSelectedServices((prevSelected) =>
+                                  prevSelected.includes(project.name)
+                                    ? prevSelected.filter(
+                                      (item) => item !== project.name,
+                                    )
+                                    : [...prevSelected, project.name],
+                                );
+                              }}
+                            >
+                              {project.name}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <Label className="text-lg font-semibold mb-2 block">
+                          Selected Services (Drag to reorder)
+                        </Label>
+                        <DndContext
+                          sensors={sensors}
+                          collisionDetection={closestCenter}
+                          onDragEnd={handleDragEnd}
+                        >
+                          <SortableContext
+                            items={selectedServices}
+                            strategy={verticalListSortingStrategy}
+                          >
+                            <AnimatePresence>
+                              {selectedServices.map((service) => (
+                                <SortableItem key={service} id={service} />
+                              ))}
+                            </AnimatePresence>
+                          </SortableContext>
+                        </DndContext>
+                      </div>
+                      <Button
+                        onClick={() =>
+                          handleCreateExistingProject(existingProjectName)
+                        }
+                        className="w-full bg-purple-500 hover:bg-purple-700"
+                        disabled={!existingProjectName} // Disable if existingProjectName is empty
+                      >
+                        Create Project
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
+
 
       <Tabs defaultValue="spring-projects" className="space-y-4 w-full">
         <TabsList className="w-full flex">
@@ -908,13 +927,11 @@ export default function SubWorkspacePage(props: PropsParams) {
                 );
               }}
               placeholder="Enter project name to confirm"
-              className={`w-full p-3 border ${
-                deleteConfirmationError ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 ${
-                deleteConfirmationError
+              className={`w-full p-3 border ${deleteConfirmationError ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 ${deleteConfirmationError
                   ? "focus:ring-red-500"
                   : "focus:ring-blue-500"
-              } transition-colors`}
+                } transition-colors`}
             />
             {deleteConfirmationError && (
               <p className="text-red-500 text-sm mt-2">
@@ -935,11 +952,10 @@ export default function SubWorkspacePage(props: PropsParams) {
             <AlertDialogAction
               onClick={confirmDeleteProject}
               disabled={deleteConfirmationName !== projectToDelete?.name} // Disable if input doesn't match
-              className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 ${
-                deleteConfirmationName === projectToDelete?.name
-                  ? "bg-red-600 hover:bg-red-700 focus:ring-red-500"
-                  : "bg-red-300 cursor-not-allowed" // Disabled state styling
-              }`}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 ${deleteConfirmationName === projectToDelete?.name
+                ? "bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                : "bg-red-300 cursor-not-allowed" // Disabled state styling
+                }`}
             >
               Delete
             </AlertDialogAction>
