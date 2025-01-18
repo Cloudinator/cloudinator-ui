@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Button } from "@/components/ui/button"
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -18,9 +18,9 @@ import { useCreateWorkspaceMutation, useGetWorkspacesQuery } from "@/redux/api/p
 import { useToast } from "@/hooks/use-toast"
 
 interface ErrorResponse {
-    data?: {
-        message?: string;
-    };
+  data?: {
+    message?: string;
+  };
 }
 
 export function CreateWorkspaceModal() {
@@ -34,11 +34,11 @@ export function CreateWorkspaceModal() {
 
     const [createWorkspace] = useCreateWorkspaceMutation()
 
-    useEffect(() => {
-        if (open && inputRef.current) {
-            inputRef.current.focus()
-        }
-    }, [open])
+  useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [open]);
 
     const handleCreateWorkspace = async () => {
         setIsCreating(true)
@@ -79,7 +79,7 @@ export function CreateWorkspaceModal() {
             <DialogTrigger asChild>
                 <Button
                     className="bg-purple-500 text-primary-foreground hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={data && data.length > 2}
+                    disabled={data && data.length > 0}
                 >
                     <Zap className="mr-2 h-4 w-4" />
                     Create Workspace
