@@ -44,7 +44,7 @@ export function CreateWorkspaceModal() {
         setIsCreating(true)
         const formattedWorkspaceName = workspaceName.trim().replace(/\s+/g, '-')
         try {
-            await createWorkspace({ name: formattedWorkspaceName })
+            const results = await createWorkspace({ name: formattedWorkspaceName }).unwrap();
 
             toast({
                 title: "Success",
@@ -52,6 +52,8 @@ export function CreateWorkspaceModal() {
                 variant: "success",
                 duration: 3000,
             })
+
+            console.log(results)
 
             setWorkspaceName("")
             setOpen(false)
