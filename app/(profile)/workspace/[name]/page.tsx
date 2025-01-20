@@ -15,6 +15,7 @@ import {
   Code,
   Loader2,
   AlertCircle,
+  Terminal,
 } from "lucide-react";
 import {
   BuildNumber,
@@ -198,12 +199,12 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         prevBuilds.map((build) =>
           build.buildNumber === newBuild.buildNumber
             ? {
-                ...build,
-                status:
-                  typeof result.status === "string"
-                    ? result.status
-                    : "BUILDING",
-              }
+              ...build,
+              status:
+                typeof result.status === "string"
+                  ? result.status
+                  : "BUILDING",
+            }
             : build,
         ),
       );
@@ -398,11 +399,10 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             </h1>
             <Badge
               variant="outline"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${
-                projects.status
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${projects.status
                   ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
                   : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
-              }`}
+                }`}
             >
               {projects.status ? (
                 <motion.div
@@ -566,9 +566,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                         Service Status
                       </dt>
                       <dd
-                        className={`${
-                          projects.status ? "text-green-500" : "text-red-500"
-                        } font-medium text-lg flex items-center gap-2 dark:text-white`}
+                        className={`${projects.status ? "text-green-500" : "text-red-500"
+                          } font-medium text-lg flex items-center gap-2 dark:text-white`}
                       >
                         {projects.status ? (
                           <>
@@ -632,7 +631,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                 </CardHeader>
                 <CardContent className="p-6 dark:text-white relative group">
                   {buildNumber.length > 0 &&
-                  buildNumber[0].status === "SUCCESS" ? (
+                    buildNumber[0].status === "SUCCESS" ? (
                     // Show the Website Preview if the build is successful
                     <Link
                       href={url}
@@ -656,7 +655,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                     // Fallback UI for non-successful builds
                     <div className="flex flex-col items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-lg">
                       {buildNumber.length > 0 &&
-                      buildNumber[0].status === "BUILDING" ? (
+                        buildNumber[0].status === "BUILDING" ? (
                         // Build in progress
                         <>
                           <Loader2 className="w-8 h-8 animate-spin text-blue-500 dark:text-blue-300" />
@@ -693,66 +692,86 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             <Card className="w-full dark:bg-gray-800">
               <CardHeader>
                 <CardTitle className="text-purple-500 dark:text-white">
-                  Build History ({buildNumber.length})
+                  Build History
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-4">
-                  {buildNumber.map((build: BuildNumber) => (
-                    <li
-                      key={build.buildNumber}
-                      className="flex items-center justify-between p-4 rounded-lg dark:bg-gray-700"
-                    >
-                      <div className="flex items-center gap-4">
-                        <Badge
-                          variant={
-                            build.status === "SUCCESS"
-                              ? "outline"
-                              : build.status === "BUILDING"
-                                ? "secondary"
-                                : "destructive"
-                          }
-                          style={
-                            build.status === "SUCCESS"
-                              ? { backgroundColor: "green", color: "white" }
-                              : build.status === "BUILDING"
-                                ? { backgroundColor: "#F59E0B", color: "white" }
-                                : { backgroundColor: "#DC2626", color: "white" }
-                          }
-                        >
-                          {build.status}
-                        </Badge>
-                        <span className="text-sm text-gray-500 dark:text-gray-300">
-                          {projectName}
-                        </span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="flex items-center gap-2 text-purple-500 hover:text-purple-700 dark:text-white dark:hover:text-white dark:bg-gray-700 dark:hover:bg-gray-600"
+                {buildNumber.length === 0 ? (
+                  // Empty state for Build History
+                  <div className="flex flex-col items-center justify-center p-8 h-[500px]">
+                    <Code className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 text-center">
+                      No builds available.
+                    </p>
+                  </div>
+                ) : (
+                  // Build History List
+                  <ul className="space-y-4">
+                    {buildNumber.map((build: BuildNumber) => (
+                      <li
+                        key={build.buildNumber}
+                        className="flex items-center justify-between p-4 rounded-lg dark:bg-gray-700"
                       >
-                        <Code className="w-4 h-4" />
-                        <Link
-                          href={`/workspace/${projectName}/${build.buildNumber}`}
+                        <div className="flex items-center gap-4">
+                          <Badge
+                            variant={
+                              build.status === "SUCCESS"
+                                ? "outline"
+                                : build.status === "BUILDING"
+                                  ? "secondary"
+                                  : "destructive"
+                            }
+                            style={
+                              build.status === "SUCCESS"
+                                ? { backgroundColor: "green", color: "white" }
+                                : build.status === "BUILDING"
+                                  ? { backgroundColor: "#F59E0B", color: "white" }
+                                  : { backgroundColor: "#DC2626", color: "white" }
+                            }
+                          >
+                            {build.status}
+                          </Badge>
+                          <span className="text-sm text-gray-500 dark:text-gray-300">
+                            {projectName}
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex items-center gap-2 text-purple-500 hover:text-purple-700 dark:text-white dark:hover:text-white dark:bg-gray-700 dark:hover:bg-gray-600"
                         >
-                          View Details
-                        </Link>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
+                          <Code className="w-4 h-4" />
+                          <Link
+                            href={`/workspace/${projectName}/${build.buildNumber}`}
+                          >
+                            View Details
+                          </Link>
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
           <TabsContent value="logs" className="w-full">
             <Card className="w-full">
-              {/* <CardHeader>
-                <CardTitle className="text-purple-500 text-3xl">
+              <CardHeader>
+                <CardTitle className="text-purple-500 dark:text-white">
                   Build Logs
                 </CardTitle>
-              </CardHeader> */}
+              </CardHeader>
               <CardContent>
-                {buildNumber.length > 0 && (
+                {buildNumber.length === 0 ? (
+                  // Empty state for Build Logs
+                  <div className="flex flex-col items-center justify-center p-8 h-[500px]">
+                    <Terminal className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 text-center">
+                      No build logs available.
+                    </p>
+                  </div>
+                ) : (
+                  // Build Logs Component
                   <StreamingLog
                     name={projectName}
                     buildNumber={buildNumber[0].buildNumber}

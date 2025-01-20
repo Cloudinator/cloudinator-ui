@@ -70,14 +70,14 @@ const NavBarHomePage = () => {
           asChild
           className="bg-purple-600 hover:bg-purple-700 text-white"
         >
-          <Link href={"/identity/register"}>SIGN UP</Link>
+          <Link href={"https://oauth2.cloudinator.istad.co/register"}>SIGN UP</Link>
         </Button>
         <Button
           asChild
           variant="outline"
           className="border-purple-600 text-purple-600 hover:bg-purple-100 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-900"
         >
-          <Link href={"/oauth2/authorization/devops"}>SIGN IN</Link>
+          <Link href={"https://oauth2.cloudinator.istad.co/login"}>SIGN IN</Link>
         </Button>
       </>
     );

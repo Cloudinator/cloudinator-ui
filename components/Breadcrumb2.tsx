@@ -8,7 +8,9 @@ export default function Breadcrumbs() {
   const pathname = usePathname();
   const pathSegments = pathname
     .split("/")
-    .filter((segment) => segment !== "" && segment !== "sub-workspace"); // Filter out 'sub-workspace'
+    .filter(
+      (segment) => segment !== "" && segment !== "sub-workspace" && segment !== "database"
+    ); // Filter out 'sub-workspace' and 'database'
 
   // Function to format segment names (e.g., replace hyphens with spaces, capitalize)
   const formatSegmentName = (segment: string) => {

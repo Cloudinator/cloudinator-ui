@@ -39,6 +39,8 @@ import {
     Folder,
     Zap,
     PowerOff,
+    Eye,
+    EyeOff,
 } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -157,6 +159,7 @@ export default function Service() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredServices, setFilteredServices] = useState<(ServiceType | SubWorkspaceType | DatabaseType)[]>([]);
+    const [showPassword, setShowPassword] = useState(false);
     const [selectedType, setSelectedType] = useState<ServiceType["type"] | "all">(
         "all"
     );
@@ -676,7 +679,9 @@ export default function Service() {
                                     href={
                                         service.type === "subworkspace"
                                             ? `/workspace/sub-workspace/${service.name}`
-                                            : `/workspace/${service.name}`
+                                            : service.type === "database"
+                                                ? `/workspace/database/${service.name}` // New route for database services
+                                                : `/workspace/${service.name}`
                                     }
                                     passHref
                                     legacyBehavior
@@ -708,15 +713,15 @@ export default function Service() {
                                                 <Badge
                                                     variant="outline"
                                                     className={`text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1 ${service.status
-                                                            ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
-                                                            : "bg-red-100 text-red-700 border-red-200"
+                                                        ? "bg-green-100 text-green-700 border-green-200 animate-pulse"
+                                                        : "bg-red-100 text-red-700 border-red-200"
                                                         }`}
                                                 >
                                                     {service.status ? (
                                                         <Zap className="w-4 h-4 text-green-700" />
                                                     ) : (
-                                                    <PowerOff className="w-4 h-4 text-red-700" />
-    )}
+                                                        <PowerOff className="w-4 h-4 text-red-700" />
+                                                    )}
                                                 </Badge>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -787,15 +792,41 @@ export default function Service() {
                                                 </span>
                                             ) : service.type === "database" ? (
                                                 <div className="space-y-2">
+                                                    {/* Database Type */}
                                                     <div className="flex items-center space-x-2">
                                                         <Database className="w-4 h-4 text-purple-500" />
-                                                        <span className="truncate">Database Type : {service.dbType} </span>
+                                                        <span className="truncate">Database Type: {service.dbType}</span>
                                                     </div>
+
+                                                    {/* Username and Password */}
                                                     <div className="flex items-center space-x-2">
                                                         <User2 className="w-4 h-4 text-purple-500" />
                                                         <span className="truncate">User: {service.name}</span>
-                                                        <span className="truncate">Password: {service.password}</span>
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className="truncate">
+                                                                Password:{" "}
+                                                                {showPassword ? (
+                                                                    service.password
+                                                                ) : (
+                                                                    <span className="text-gray-500">••••••••</span>
+                                                                )}
+                                                            </span>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => setShowPassword(!showPassword)}
+                                                                className="text-purple-500 hover:text-purple-700"
+                                                            >
+                                                                {showPassword ? (
+                                                                    <EyeOff className="w-4 h-4" />
+                                                                ) : (
+                                                                    <Eye className="w-4 h-4" />
+                                                                )}
+                                                            </Button>
+                                                        </div>
                                                     </div>
+
+                                                    {/* Port and Domain */}
                                                     <div className="flex items-center space-x-2">
                                                         <Server className="w-4 h-4 text-purple-500" />
                                                         <span className="truncate">Port: {service.port}</span>

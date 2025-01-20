@@ -12,6 +12,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 // import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 
 type StreamingLogProps = {
   name: string;
@@ -19,6 +20,7 @@ type StreamingLogProps = {
 };
 
 export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
+  const {toast} = useToast();
   const [logs, setLogs] = useState<string[]>([]);
   const [isDeploying, setIsDeploying] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,11 +57,26 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
       console.log("Received message:", event.data);
       const newLogs = event.data.split("\n");
 
-      // Check if the build is successful
+      // Check for deployment success
       if (newLogs.some((log: string) => log.includes("Finished: SUCCESS"))) {
         setIsDeploying(false);
-        setProgress(100);
-        eventSourceRef.current?.close(); // Close the connection on success
+        toast({
+          title: "Deployment Successful",
+          description: "Your deployment has completed successfully.",
+          variant: "success",
+        });
+        eventSourceRef.current?.close();
+      }
+
+      // Check for deployment failure
+      if (newLogs.some((log: string) => log.includes("Finished: FAILURE"))) {
+        setIsDeploying(false);
+        toast({
+          title: "Deployment Failed",
+          description: "There was an error during deployment.",
+          variant: "error",
+        });
+        eventSourceRef.current?.close();
       }
 
       setLogs((prevLogs) => [...prevLogs, ...newLogs]);
@@ -395,3 +412,4 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
     </div>
   );
 };
+
