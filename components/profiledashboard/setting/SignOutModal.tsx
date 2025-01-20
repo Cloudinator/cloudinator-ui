@@ -9,18 +9,28 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import Link from "next/link";
 
 interface SignOutModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-
 const SignOutModal: React.FC<SignOutModalProps> = ({
-                                                       isOpen,
-                                                       onClose
-                                                   }) => {
+    isOpen,
+    onClose
+}) => {
+
+    const handleLogout = () => {
+        // Clear local storage or cookies if needed
+        localStorage.removeItem('access_token'); // Example: Remove access token
+        localStorage.removeItem('refresh_token'); // Example: Remove refresh token
+
+        // Redirect to the identity provider's logout endpoint
+        window.location.href = 'https://oauth2.cloudinator.istad.co/logout';
+
+        // Optionally, you can redirect to a specific page after logout
+        // router.push('/login'); // Uncomment if you want to redirect after logout
+    };
 
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -35,8 +45,9 @@ const SignOutModal: React.FC<SignOutModalProps> = ({
                     <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                         className="bg-red-500 hover:bg-red-700"
+                        onClick={handleLogout}
                     >
-                        <Link href={'https://oauth2.cloudinator.istad.co/logout'}>Sign Out</Link>
+                        Sign Out
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

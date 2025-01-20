@@ -157,7 +157,7 @@ const TutorialPopup: React.FC = () => {
                                 <h2 className="text-2xl font-bold mb-2 text-purple-500">{tutorialSteps[currentStep].title}</h2>
                                 <p className="mb-4 dark:text-gray-400">{getPersonalizedContent(tutorialSteps[currentStep])}</p>
                                 {tutorialSteps[currentStep].title === "Documentation" && (
-                                    <Link href="https://cloudinator-doc-vercel.vercel.app/">
+                                    <Link href="https://doc.cloudinator.cloud" passHref>
                                         <span className="text-purple-500 underline">Go to Documentation</span>
                                     </Link>
                                 )}

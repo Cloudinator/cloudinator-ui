@@ -435,8 +435,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             <Button
               onClick={() => setIsRollbackModalOpen(true)}
               variant="outline"
-              className="flex items-center gap-2 bg-white border-purple-200 border text-purple-500 hover:bg-purple-100 hover:text-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
-              disabled={successfulBuilds.length === 0}
+              className={`flex items-center gap-2 bg-white border-purple-200 border text-purple-500 hover:bg-purple-100 hover:text-purple-700 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2 ${isDeploymentRunning ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={successfulBuilds.length === 0 || isDeploymentRunning} // Disable during deployment
             >
               <RotateCcw className="w-4 h-4" />
               Rollback
@@ -445,8 +445,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
               <Button
                 onClick={() => setIsStopDialogOpen(true)}
                 variant="destructive"
-                className="flex items-center gap-2 focus:ring-2 focus:ring-red-700 focus:ring-offset-2"
-                disabled={isStopping}
+                className={`flex items-center gap-2 focus:ring-2 focus:ring-red-700 focus:ring-offset-2 ${isDeploymentRunning ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isStopping || isDeploymentRunning} // Disable during deployment
               >
                 {isStopping ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -458,8 +458,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             ) : (
               <Button
                 onClick={() => setIsRestartDialogOpen(true)}
-                className="flex items-center gap-2 bg-orange-500 hover:bg-orange focus:ring-2 focus:ring-orange-700 focus:ring-offset-2"
-                disabled={isStarting}
+                className={`flex items-center gap-2 bg-orange-500 hover:bg-orange focus:ring-2 focus:ring-orange-700 focus:ring-offset-2 ${isDeploymentRunning ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isStarting || isDeploymentRunning} // Disable during deployment
               >
                 {isStarting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -471,7 +471,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             )}
             <Button
               variant="secondary"
-              className="flex text-purple-500 items-center gap-2 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
+              className={`flex text-purple-500 items-center gap-2 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2 ${isDeploymentRunning ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={isDeploymentRunning} // Disable during deployment
             >
               <ExternalLink className="w-4 h-4" />
               <Link href={url} target="_blank" rel="noopener noreferrer">

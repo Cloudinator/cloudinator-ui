@@ -15,6 +15,9 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     if (typeof window !== "undefined") {
       const savedState = localStorage.getItem("sidebar-collapsed");
+
+
+      
       return savedState ? JSON.parse(savedState) : false;
     }
     return false;

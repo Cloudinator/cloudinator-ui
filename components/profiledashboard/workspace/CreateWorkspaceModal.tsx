@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Zap, Loader2 } from 'lucide-react';
 import { useCreateWorkspaceMutation, useGetWorkspacesQuery } from "@/redux/api/projectApi";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 interface ErrorResponse {
     status?: string;
@@ -43,48 +44,58 @@ export function CreateWorkspaceModal() {
     }, [open]);
 
     const handleCreateWorkspace = async () => {
+        // Early return if workspace name is empty
+        if (!workspaceName.trim()) {
+            return;
+        }
+    
         setIsCreating(true);
         const formattedWorkspaceName = workspaceName.trim().replace(/\s+/g, '-');
-
+    
         try {
+            // Attempt to create the workspace
             const results = await createWorkspace({ name: formattedWorkspaceName }).unwrap();
-
+    
+            // Show success toast
             toast({
                 title: "Success",
                 description: `Workspace "${formattedWorkspaceName}" created successfully!`,
-                variant: "success",
+                variant: "default", // shadcn uses "default" for success
                 duration: 3000,
             });
-
+    
             console.log(results);
-
-            setWorkspaceName("");
-            setOpen(false);
         } catch (err) {
             const error = err as ErrorResponse;
-
+    
             console.error("Error creating workspace:", error);
-
-            // Handle parsing errors or other API errors
+    
+            // Handle specific parsing error case
             if (error?.status === "PARSING_ERROR" || error?.originalStatus === 200) {
                 toast({
                     title: "Success",
                     description: `Workspace "${formattedWorkspaceName}" created successfully!`,
-                    variant: "success",
+                    variant: "success", // shadcn uses "default" for success
                     duration: 3000,
                 });
-
-                setWorkspaceName("");
-                setOpen(false);
             } else {
+                // Show error toast for other errors
                 toast({
                     title: "Error",
                     description: error?.data?.message || "Failed to create workspace. Please try again.",
-                    variant: "error",
+                    variant: "error", // shadcn uses "destructive" for errors
                     duration: 5000,
+                    action: (
+                        <ToastAction altText="Try again" onClick={() => handleCreateWorkspace()}>
+                            Try again
+                        </ToastAction>
+                    ), // Optional: Add a retry action
                 });
             }
         } finally {
+            // Reset state
+            setWorkspaceName("");
+            setOpen(false);
             setIsCreating(false);
         }
     };
@@ -142,11 +153,16 @@ export function CreateWorkspaceModal() {
                         disabled={!workspaceName.trim() || isCreating}
                     >
                         {isCreating ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Creating...
+                            </>
                         ) : (
-                            <Zap className="mr-2 h-4 w-4" />
+                            <>
+                                <Zap className="mr-2 h-4 w-4" />
+                                Create Workspace
+                            </>
                         )}
-                        {isCreating ? "Creating..." : "Create Workspace"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

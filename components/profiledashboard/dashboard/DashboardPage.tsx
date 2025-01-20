@@ -143,27 +143,25 @@ export default function DashboardPage() {
           </Card>
         </Link>
         {/* Total Projects Card */}
-        <Link href="/workspace" passHref>
-          <Card className="from-purple-500/90 via-indigo-500/90 to-gray-800/90 dark:from-purple-600/90 dark:via-indigo-600/90 dark:to-gray-900/90 border border-purple-500/20 dark:border-purple-600/20 rounded-xl shadow-lg shadow-purple-500/10 dark:shadow-purple-500/20 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-md font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
-                Totals Projects
-              </CardTitle>
-              <div className="p-2 rounded-full bg-purple-800/10 border border-purple-700/30">
-                <GitBranch className="h-5 w-5 text-purple-500" />
+        <Card className="from-purple-500/90 via-indigo-500/90 to-gray-800/90 dark:from-purple-600/90 dark:via-indigo-600/90 dark:to-gray-900/90 border border-purple-500/20 dark:border-purple-600/20 rounded-xl shadow-lg shadow-purple-500/10 dark:shadow-purple-500/20 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02] h-full">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-lg font-semibold text-purple-500 bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-100 dark:to-pink-100">
+              Totals Projects
+            </CardTitle>
+            <div className="p-2 rounded-full bg-purple-800/10 border border-purple-700/30">
+              <GitBranch className="h-5 w-5 text-purple-500" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoadingCountSubWorkspace || isLoadingCountServices ? (
+              <Skeleton className="h-8 w-3/4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50 rounded-lg" />
+            ) : (
+              <div className="text-4xl font-bold text-purple-500 dark:text-white bg-clip-text bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-25 dark:to-pink-25">
+                {projects}
               </div>
-            </CardHeader>
-            <CardContent>
-              {isLoadingCountSubWorkspace || isLoadingCountServices ? (
-                <Skeleton className="h-8 w-3/4 bg-gradient-to-r from-purple-800/50 to-indigo-800/50 rounded-lg" />
-              ) : (
-                <div className="text-3xl font-bold text-purple-500 dark:text-white bg-clip-text bg-gradient-to-r from-purple-100 to-pink-100">
-                  {projects}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </Link>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Success Rate Card */}
         <Card className="from-purple-500/90 via-indigo-500/90 to-gray-800/90 dark:from-purple-600/90 dark:via-indigo-600/90 dark:to-gray-900/90 border border-purple-500/20 dark:border-purple-600/20 rounded-xl shadow-lg shadow-purple-500/10 dark:shadow-purple-500/20 hover:shadow-purple-500/20 transition-all duration-300 hover:scale-[1.02]">

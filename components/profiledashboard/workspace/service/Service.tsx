@@ -801,7 +801,7 @@ export default function Service() {
                                                     <div className="flex items-center space-x-2">
                                                         <User2 className="w-4 h-4 text-purple-500" />
                                                         <span className="truncate">User: {service.name}</span>
-                                                        
+
                                                     </div>
 
                                                     {/* Port and Domain */}
@@ -899,6 +899,14 @@ export default function Service() {
                     <Input
                         value={deleteConfirmationName}
                         onChange={(e) => setDeleteConfirmationName(e.target.value)}
+                        onPaste={(e) => {
+                            e.preventDefault(); // Prevent paste action
+                            toast({
+                                title: "Secure your deletion",
+                                description: "Please type the name manually to confirm deletion.",
+                                variant: "error",
+                            });
+                        }}
                         placeholder={`Type ${serviceToDelete ? "service" : subWorkspaceToDelete ? "subworkspace" : "database"} name here`}
                     />
                     <div className="flex justify-end space-x-2 mt-4">

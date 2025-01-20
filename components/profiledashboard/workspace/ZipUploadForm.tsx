@@ -9,11 +9,20 @@ import { useUploadZipMutation } from "@/redux/api/file"
 import { useDeployZipServiceMutation } from "@/redux/api/projectApi"
 import { Upload, File, CheckCircle, AlertCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useToast } from '@/hooks/use-toast'
 
 interface ZipUploadFormProps {
     onClose: () => void
     selectedWorkspace: string
     data1: () => void
+}
+
+interface ErrorResponse {
+    status?: string;
+    originalStatus?: number;
+    data?: {
+        message?: string;
+    };
 }
 
 export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFormProps) {
@@ -23,6 +32,7 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
     const [deployZipService] = useDeployZipServiceMutation()
     const [isLoading, setIsLoading] = useState(false)
     const [step, setStep] = useState(1)
+    const { toast } = useToast()
 
     const sanitizeInput = (value: string) => {
         return value.replace(/\s+/g, '-').toLowerCase() // Converts spaces to hyphens and makes it lowercase
@@ -49,7 +59,20 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
         event.preventDefault()
 
         if (!file) {
-            alert('Please select a file.')
+            toast({
+                title: 'Error',
+                description: 'Please select a file.',
+                variant: 'error',
+            })
+            return
+        }
+
+        if (!projectName) {
+            toast({
+                title: 'Error',
+                description: 'Please enter a project name.',
+                variant: 'error',
+            })
             return
         }
 
@@ -73,10 +96,35 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
 
             console.log('Upload successful:', uploadResponse)
             console.log('Project created:', deployResponse)
+
+            toast({
+                title: 'Success',
+                description: 'Project created and deployed successfully.',
+                variant: 'success',
+            })
+
+            setStep(3) // Move to the success step
+            data1() // Refresh data
         } catch (err) {
+            const error = err as ErrorResponse
             console.log('Error during project creation and deployment:', err)
-            setStep(3)
-            data1()
+
+            if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
+                toast({
+                    title: 'Success',
+                    description: error?.data?.message || 'Project created and deployed successfully.',
+                    variant: 'success',
+                })
+                setStep(3) // Move to the success step
+                data1() // Refresh data
+            } else {
+                toast({
+                    title: 'Error',
+                    description: error?.data?.message || 'Error during project creation and deployment.',
+                    variant: 'error',
+                })
+                setStep(4) // Move to the error step
+            }
         } finally {
             setIsLoading(false)
         }
@@ -93,7 +141,7 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                         className="space-y-4"
                     >
                         <div>
-                            <Label htmlFor="projectName" className={"text-purple-500"}>Project Name</Label>
+                            <Label htmlFor="projectName" className="text-purple-500">Project Name</Label>
                             <Input
                                 id="projectName"
                                 value={projectName}
@@ -110,23 +158,23 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                             <input {...getInputProps()} />
                             {file ? (
                                 <div className="flex items-center justify-center space-x-2">
-                                    <File className="w-6 h-6 text-primary" />
-                                    <span>{file.name}</span>
+                                    <File className="w-6 h-6 text-purple-500" />
+                                    <span className="text-purple-500">{file.name}</span>
                                 </div>
                             ) : (
                                 <div>
                                     <Upload className="w-12 h-12 mx-auto text-purple-500" />
-                                    <p className={"text-purple-500"}>Drag & drop a ZIP file here, or click to select one</p>
+                                    <p className="text-purple-500">Drag & drop a ZIP file here, or click to select one</p>
                                 </div>
                             )}
                         </div>
                         <Button
                             type="submit"
                             disabled={isLoading || !file || !projectName}
-                            className="w-full c"
+                            className="w-full flex items-center gap-2 bg-purple-500 hover:bg-purple-600 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
                             onClick={handleSubmit}
                         >
-                            Create and Deploy Project
+                            {isLoading ? 'Processing...' : 'Create and Deploy Project'}
                         </Button>
                     </motion.div>
                 )
@@ -136,10 +184,9 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="space-y-4"
+                        className="space-y-4 text-center"
                     >
-                        <h3 className="text-lg font-semibold">Uploading and Deploying...</h3>
-                        <p className="text-sm text-gray-500">Please wait while we process your project.</p>
+                        <h3 className="text-lg font-semibold text-purple-500">Uploading and Deploying...</h3>
                     </motion.div>
                 )
             case 3:
@@ -151,9 +198,9 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                         className="space-y-4 text-center"
                     >
                         <CheckCircle className="w-16 h-16 mx-auto text-green-500" />
-                        <h3 className="text-xl font-semibold">Success!</h3>
-                        <p>Your project has been created and deployed successfully.</p>
-                        <Button onClick={onClose}>Close</Button>
+                        <h3 className="text-xl font-semibold text-green-500">Success!</h3>
+                        <p>Your project has been created successfully.</p>
+                        <Button className="bg-purple-500 hover:bg-purple-700 w-[120px]" onClick={onClose}>Close</Button>
                     </motion.div>
                 )
             case 4:
@@ -165,9 +212,9 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                         className="space-y-4 text-center"
                     >
                         <AlertCircle className="w-16 h-16 mx-auto text-red-500" />
-                        <h3 className="text-xl font-semibold">Error</h3>
+                        <h3 className="text-xl font-semibold text-red-500">Error</h3>
                         <p>An error occurred while creating and deploying the project.</p>
-                        <Button onClick={() => setStep(1)}>Try Again</Button>
+                        <Button className="bg-purple-500 hover:bg-purple-700 w-[120px]" onClick={() => setStep(1)}>Try Again</Button>
                     </motion.div>
                 )
         }
