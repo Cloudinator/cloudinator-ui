@@ -39,8 +39,6 @@ import {
     Folder,
     Zap,
     PowerOff,
-    Eye,
-    EyeOff,
 } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -76,6 +74,7 @@ type ServiceType = {
     username: string;
     dbType: string;
     dbVersion: string;
+    buildStatus?: string;
 };
 
 export type ServiceDeploymentResponse = {
@@ -159,7 +158,6 @@ export default function Service() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredServices, setFilteredServices] = useState<(ServiceType | SubWorkspaceType | DatabaseType)[]>([]);
-    const [showPassword, setShowPassword] = useState(false);
     const [selectedType, setSelectedType] = useState<ServiceType["type"] | "all">(
         "all"
     );
@@ -170,6 +168,7 @@ export default function Service() {
 
     const { data: workspacesData } = useGetWorkspacesQuery();
     const workspaces = workspacesData || [];
+
 
     const [selectedWorkspace, setSelectedWorkspace] = useState(() => {
         if (typeof window !== "undefined") {
@@ -439,7 +438,7 @@ export default function Service() {
                 toast({
                     title: "Success",
                     description: `Database "${databaseToDelete.dbName}" has been deleted successfully.`,
-                    variant: "default",
+                    variant: "success",
                     duration: 3000,
                 });
 
@@ -453,7 +452,7 @@ export default function Service() {
                     description:
                         error?.data?.message ||
                         "Failed to delete database. Please try again.",
-                    variant: "destructive",
+                    variant: "error",
                     duration: 5000,
                 });
             } finally {
@@ -779,7 +778,7 @@ export default function Service() {
                                                     <GitBranch className="w-4 h-4 mr-2 flex-shrink-0 text-purple-500" />
                                                     <span className="truncate">{service.gitUrl}</span>
                                                 </a>
-                                            ) : service.type !== "subworkspace" ? (
+                                            ) : service.type !== "subworkspace" && service.type !== "database" ? (
                                                 <span className="text-gray-500 dark:text-gray-400">
                                                     Git URL not available
                                                 </span>
@@ -802,36 +801,15 @@ export default function Service() {
                                                     <div className="flex items-center space-x-2">
                                                         <User2 className="w-4 h-4 text-purple-500" />
                                                         <span className="truncate">User: {service.name}</span>
-                                                        <div className="flex items-center space-x-2">
-                                                            <span className="truncate">
-                                                                Password:{" "}
-                                                                {showPassword ? (
-                                                                    service.password
-                                                                ) : (
-                                                                    <span className="text-gray-500">••••••••</span>
-                                                                )}
-                                                            </span>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={() => setShowPassword(!showPassword)}
-                                                                className="text-purple-500 hover:text-purple-700"
-                                                            >
-                                                                {showPassword ? (
-                                                                    <EyeOff className="w-4 h-4" />
-                                                                ) : (
-                                                                    <Eye className="w-4 h-4" />
-                                                                )}
-                                                            </Button>
-                                                        </div>
+                                                        
                                                     </div>
 
                                                     {/* Port and Domain */}
-                                                    <div className="flex items-center space-x-2">
+                                                    {/* <div className="flex items-center space-x-2">
                                                         <Server className="w-4 h-4 text-purple-500" />
                                                         <span className="truncate">Port: {service.port}</span>
-                                                        <span className="truncate">Domain: {service.subdomain}</span>
-                                                    </div>
+                                                        <span className="truncate">Host: {service.subdomain}</span>
+                                                    </div> */}
                                                 </div>
                                             ) : service.subdomain ? (
                                                 <a
@@ -890,8 +868,9 @@ export default function Service() {
                                                         {service?.type === "subworkspace"
                                                             ? "Sub Workspace"
                                                             : service.type === "database"
-                                                                ? `${service.type} Database`
-                                                                : service.branch}
+                                                                ? `${service.type}`
+                                                                : service.branch
+                                                        }
                                                     </span>
                                                 </span>
                                             </div>

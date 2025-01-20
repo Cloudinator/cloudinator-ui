@@ -400,8 +400,8 @@ export default function ProjectDetailPage({ params }: PropsParams) {
             <Badge
               variant="outline"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${projects.status
-                  ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
-                  : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
+                ? "text-green-500 border-green-500 bg-green-50 hover:bg-green-100"
+                : "text-red-500 border-red-500 bg-red-50 hover:bg-red-100"
                 }`}
             >
               {projects.status ? (
@@ -474,9 +474,9 @@ export default function ProjectDetailPage({ params }: PropsParams) {
               className="flex text-purple-500 items-center gap-2 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
             >
               <ExternalLink className="w-4 h-4" />
-              <a href={url} target="_blank" rel="noopener noreferrer">
+              <Link href={url} target="_blank" rel="noopener noreferrer">
                 Visit Site
-              </a>
+              </Link>
             </Button>
           </div>
         </div>
@@ -504,79 +504,71 @@ export default function ProjectDetailPage({ params }: PropsParams) {
           </TabsList>
           <TabsContent value="overview" className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800">
-                <CardHeader className="border-b border-purple-100 dark:border-gray-700">
-                  <CardTitle className="text-xl text-purple-500 font-bold flex items-center gap-2 dark:text-white">
-                    <Code className="w-5 h-5" />
+              <Card className="w-full bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700 rounded-xl">
+                <CardHeader className="border-b border-purple-500/20">
+                  <CardTitle className="text-xl font-bold flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+                    <Code className="w-5 h-5 text-purple-500 dark:text-purple-400" />
                     Project Details
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 dark:text-white">
+                <CardContent className="p-6">
                   <dl className="space-y-4">
                     {/* Build Status */}
-                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                      <dt className="font-semibold text-gray-600 dark:text-gray-400 text-sm uppercase tracking-wide">
                         Build Status
                       </dt>
-                      <dd className="font-medium text-lg flex items-center gap-2 dark:text-white">
+                      <dd className="font-medium text-lg flex items-center gap-2">
                         {buildNumber.length > 0 ? (
                           buildNumber[0].status === "BUILDING" ? (
                             <>
-                              <Loader2 className="w-4 h-4 animate-spin text-blue-500 dark:text-blue-300" />
-                              <span className="text-blue-500 dark:text-blue-300">
+                              <Loader2 className="w-4 h-4 animate-spin text-blue-500 dark:text-blue-400" />
+                              <span className="text-blue-500 dark:text-blue-400">
                                 Building... ({elapsedTime}s)
                               </span>
                             </>
                           ) : buildNumber[0].status === "FAILED" ? (
                             <>
-                              <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-300" />
-                              <span className="text-red-500 dark:text-red-300">
-                                Build Failed
-                              </span>
+                              <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400" />
+                              <span className="text-red-500 dark:text-red-400">Build Failed</span>
                             </>
                           ) : buildNumber[0].status === "SUCCESS" ? (
                             <>
-                              <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-300" />
-                              <span className="text-green-500 dark:text-green-300">
-                                Build Successful
-                              </span>
+                              <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-400" />
+                              <span className="text-green-500 dark:text-green-400">Build Successful</span>
                             </>
                           ) : (
                             <>
-                              <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
-                              <span className="text-gray-500 dark:text-gray-300">
-                                Build Status Unknown
-                              </span>
+                              <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                              <span className="text-gray-500 dark:text-gray-400">Build Status Unknown</span>
                             </>
                           )
                         ) : (
                           <>
-                            <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-300" />
-                            <span className="text-gray-500 dark:text-gray-300">
-                              No Builds Available
-                            </span>
+                            <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                            <span className="text-gray-500 dark:text-gray-400">No Builds Available</span>
                           </>
                         )}
                       </dd>
                     </div>
 
                     {/* Service Status */}
-                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                      <dt className="font-semibold text-gray-600 dark:text-gray-400 text-sm uppercase tracking-wide">
                         Service Status
                       </dt>
                       <dd
-                        className={`${projects.status ? "text-green-500" : "text-red-500"
-                          } font-medium text-lg flex items-center gap-2 dark:text-white`}
+                        className={`${projects.status ? "text-green-500 dark:text-green-400" : "text-red-500 dark:text-red-400"
+                          } font-medium text-lg flex items-center gap-2`}
                       >
                         {projects.status ? (
                           <>
-                            <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-300 animate-pulse" />
+                            <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 animate-pulse" />
                             Running
                           </>
                         ) : (
                           <>
-                            <div className="w-2 h-2 rounded-full bg-red-500 dark:bg-red-300" />
+                            <div className="w-2 h-2 rounded-full bg-red-500 dark:bg-red-400" />
                             Stopped
                           </>
                         )}
@@ -584,101 +576,82 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                     </div>
 
                     {/* URL */}
-                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                      <dt className="font-semibold text-gray-600 dark:text-gray-400 text-sm uppercase tracking-wide">
                         URL
                       </dt>
                       <dd>
-                        <a
+                        <Link
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 hover:underline flex items-center gap-2"
+                          className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline flex items-center gap-2"
                         >
                           <ExternalLink className="w-4 h-4" />
                           {url}
-                        </a>
+                        </Link>
                       </dd>
                     </div>
 
                     {/* Repository */}
-                    <div className="flex flex-col gap-1 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <dt className="font-semibold text-gray-600 text-sm uppercase tracking-wide dark:text-gray-300">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                      <dt className="font-semibold text-gray-600 dark:text-gray-400 text-sm uppercase tracking-wide">
                         Repository
                       </dt>
                       <dd>
-                        <a
+                        <Link
                           href={projects.gitUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-400 hover:underline flex items-center gap-2"
+                          className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline flex items-center gap-2"
                         >
                           <Github className="w-4 h-4" />
                           {projects.gitUrl.split("/").slice(-2).join("/")}
-                        </a>
+                        </Link>
                       </dd>
                     </div>
                   </dl>
                 </CardContent>
               </Card>
               {/* Project Preview Card */}
-              <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800">
-                <CardHeader className="border-b border-purple-100 dark:border-gray-700">
-                  <CardTitle className="text-xl text-purple-500 font-bold flex items-center gap-2 dark:text-white">
-                    <ExternalLink className="w-5 h-5" />
+              <Card className="w-full bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700 rounded-xl">
+                <CardHeader className="border-b border-purple-500/20">
+                  <CardTitle className="text-xl font-bold flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
+                    <ExternalLink className="w-5 h-5 text-purple-500 dark:text-purple-400" />
                     Project Preview
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 dark:text-white relative group">
-                  {buildNumber.length > 0 &&
-                    buildNumber[0].status === "SUCCESS" ? (
+                <CardContent className="p-6 relative group">
+                  {buildNumber.length > 0 && buildNumber[0].status === "SUCCESS" ? (
                     // Show the Website Preview if the build is successful
-                    <Link
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block relative"
-                    >
-                      {/* Blurred Preview */}
-                      <div className="blur-sm group-hover:blur-none transition-all duration-300">
-                        <WebsitePreview url={url} />
-                      </div>
-
-                      {/* Hover Text Overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <p className="text-white text-lg font-semibold">
-                          Click to Visit Site
-                        </p>
-                      </div>
-                    </Link>
+                    <div className="group-hover:blur-none transition-all duration-300">
+                      <WebsitePreview url={url} />
+                    </div>
                   ) : (
                     // Fallback UI for non-successful builds
-                    <div className="flex flex-col items-center justify-center h-64 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                      {buildNumber.length > 0 &&
-                        buildNumber[0].status === "BUILDING" ? (
+                    <div className="flex flex-col items-center justify-center h-64 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                      {buildNumber.length > 0 && buildNumber[0].status === "BUILDING" ? (
                         // Build in progress
                         <>
-                          <Loader2 className="w-8 h-8 animate-spin text-blue-500 dark:text-blue-300" />
-                          <p className="mt-4 text-gray-600 dark:text-gray-300 text-center">
+                          <Loader2 className="w-8 h-8 animate-spin text-blue-500 dark:text-blue-400" />
+                          <p className="mt-4 text-gray-600 dark:text-gray-400 text-center">
                             Build in progress... Please wait.
                           </p>
                         </>
-                      ) : buildNumber.length > 0 &&
-                        buildNumber[0].status === "FAILED" ? (
+                      ) : buildNumber.length > 0 && buildNumber[0].status === "FAILED" ? (
                         // Build failed
                         <>
-                          <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-300" />
-                          <p className="mt-4 text-gray-600 dark:text-gray-300 text-center">
+                          <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400" />
+                          <p className="mt-4 text-gray-600 dark:text-gray-400 text-center">
                             Build failed. Please check the logs and try again.
                           </p>
                         </>
                       ) : (
                         // No builds available
                         <>
-                          <AlertCircle className="w-8 h-8 text-gray-500 dark:text-gray-300" />
-                          <p className="mt-4 text-gray-600 dark:text-gray-300 text-center">
-                            No builds available. Start a new build to see the
-                            preview.
+                          <AlertCircle className="w-8 h-8 text-gray-500 dark:text-gray-400" />
+                          <p className="mt-4 text-gray-600 dark:text-gray-400 text-center">
+                            No builds available. Start a new build to see the preview.
                           </p>
                         </>
                       )}

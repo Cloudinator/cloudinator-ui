@@ -60,6 +60,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
       // Check for deployment success
       if (newLogs.some((log: string) => log.includes("Finished: SUCCESS"))) {
         setIsDeploying(false);
+        setProgress(100);
         toast({
           title: "Deployment Successful",
           description: "Your deployment has completed successfully.",

@@ -11,38 +11,41 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Zap, Loader2 } from 'lucide-react'
-import { useCreateWorkspaceMutation, useGetWorkspacesQuery } from "@/redux/api/projectApi"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Zap, Loader2 } from 'lucide-react';
+import { useCreateWorkspaceMutation, useGetWorkspacesQuery } from "@/redux/api/projectApi";
+import { useToast } from "@/hooks/use-toast";
 
 interface ErrorResponse {
-  data?: {
-    message?: string;
-  };
+    status?: string;
+    originalStatus?: number;
+    data?: {
+        message?: string;
+    };
 }
 
 export function CreateWorkspaceModal() {
-    const { toast } = useToast()
-    const [open, setOpen] = useState(false)
-    const [workspaceName, setWorkspaceName] = useState("")
-    const [isCreating, setIsCreating] = useState(false)
-    const inputRef = useRef<HTMLInputElement>(null)
+    const { toast } = useToast();
+    const [open, setOpen] = useState(false);
+    const [workspaceName, setWorkspaceName] = useState("");
+    const [isCreating, setIsCreating] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    const { data } = useGetWorkspacesQuery()
+    const { data } = useGetWorkspacesQuery();
 
-    const [createWorkspace] = useCreateWorkspaceMutation()
+    const [createWorkspace] = useCreateWorkspaceMutation();
 
-  useEffect(() => {
-    if (open && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [open]);
+    useEffect(() => {
+        if (open && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [open]);
 
     const handleCreateWorkspace = async () => {
-        setIsCreating(true)
-        const formattedWorkspaceName = workspaceName.trim().replace(/\s+/g, '-')
+        setIsCreating(true);
+        const formattedWorkspaceName = workspaceName.trim().replace(/\s+/g, '-');
+
         try {
             const results = await createWorkspace({ name: formattedWorkspaceName }).unwrap();
 
@@ -51,28 +54,42 @@ export function CreateWorkspaceModal() {
                 description: `Workspace "${formattedWorkspaceName}" created successfully!`,
                 variant: "success",
                 duration: 3000,
-            })
+            });
 
-            console.log(results)
+            console.log(results);
 
-            setWorkspaceName("")
-            setOpen(false)
+            setWorkspaceName("");
+            setOpen(false);
         } catch (err) {
-            const error = err as ErrorResponse
-            console.error(error)
+            const error = err as ErrorResponse;
 
-            toast({
-                title: "Error",
-                description: error?.data?.message || "Failed to create workspace. Please try again.",
-                variant: "error",
-                duration: 5000,
-            })
+            console.error("Error creating workspace:", error);
+
+            // Handle parsing errors or other API errors
+            if (error?.status === "PARSING_ERROR" || error?.originalStatus === 200) {
+                toast({
+                    title: "Success",
+                    description: `Workspace "${formattedWorkspaceName}" created successfully!`,
+                    variant: "success",
+                    duration: 3000,
+                });
+
+                setWorkspaceName("");
+                setOpen(false);
+            } else {
+                toast({
+                    title: "Error",
+                    description: error?.data?.message || "Failed to create workspace. Please try again.",
+                    variant: "error",
+                    duration: 5000,
+                });
+            }
         } finally {
-            setIsCreating(false)
+            setIsCreating(false);
         }
-    }
+    };
 
-    if (!data) return null
+    if (!data) return null;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -134,5 +151,5 @@ export function CreateWorkspaceModal() {
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    )
+    );
 }
