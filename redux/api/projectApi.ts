@@ -294,10 +294,6 @@ export const projectsApi = projectApi.injectEndpoints({
             query: ({ workspaceName, size, page }) => `api/v1/database/${workspaceName}?size=${size}&page=${page}`,
           }),
 
-
-
-
-
     }),
 })
 
