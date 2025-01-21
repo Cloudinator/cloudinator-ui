@@ -174,7 +174,7 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                             className="w-full flex items-center gap-2 bg-purple-500 hover:bg-purple-600 focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
                             onClick={handleSubmit}
                         >
-                            {isLoading ? 'Processing...' : 'Create and Deploy Project'}
+                            {isLoading ? 'Processing...' : 'Create Project'}
                         </Button>
                     </motion.div>
                 )
@@ -186,7 +186,7 @@ export function ZipUploadForm({ onClose, selectedWorkspace, data1 }: ZipUploadFo
                         exit={{ opacity: 0 }}
                         className="space-y-4 text-center"
                     >
-                        <h3 className="text-lg font-semibold text-purple-500">Uploading and Deploying...</h3>
+                        <h3 className="text-lg font-semibold text-purple-500">Uploading...</h3>
                     </motion.div>
                 )
             case 3:

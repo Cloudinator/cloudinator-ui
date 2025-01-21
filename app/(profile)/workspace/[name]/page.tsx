@@ -70,6 +70,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   const [buildStartTime, setBuildStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const { toast } = useToast();
+  const [isRefetching, setIsRefetching] = useState(false);
 
   const [buildService] = useBuildServiceMutation();
   const [stopServiceDeployment] = useStopServiceDeploymentMutation();
@@ -162,6 +163,15 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     };
   }, [projectName, refetchBuilds, refetchProjects]);
 
+  // Start the timer when the build status changes to "BUILDING"
+  useEffect(() => {
+    if (buildNumber.length > 0 && buildNumber[0].status === "BUILDING") {
+      setBuildStartTime(Date.now()); // Set the start time
+      setElapsedTime(0); // Reset elapsed time
+    }
+  }, [buildNumber]);
+
+  // Calculate elapsed time in seconds
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
@@ -172,7 +182,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
     }
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (interval) clearInterval(interval); // Cleanup the interval
     };
   }, [buildStartTime]);
 
@@ -181,6 +191,35 @@ export default function ProjectDetailPage({ params }: PropsParams) {
       handleError(buildsError);
     }
   }, [buildsError]);
+
+  useEffect(() => {
+    if (buildNumber.length > 0 && buildNumber[0].status === "BUILDING") {
+      // Start the refetch process after 6 seconds
+      setIsRefetching(true);
+      const timer = setTimeout(() => {
+        refetchProjects();
+        refetchBuilds();
+        setIsRefetching(false);
+      }, 6000); // 6000 milliseconds = 6 seconds
+
+      // Cleanup the timer
+      return () => clearTimeout(timer);
+    }
+  }, [buildNumber, refetchProjects, refetchBuilds]);
+
+  // Refetch when the build status changes to "SUCCESS" or "FAILED"
+  useEffect(() => {
+    if (
+      buildNumber.length > 0 &&
+      (buildNumber[0].status === "SUCCESS" || buildNumber[0].status === "FAILED")
+    ) {
+      console.log("Refetching data...");
+      refetchProjects().then(() => console.log("Projects refetched"));
+      refetchBuilds().then(() => console.log("Builds refetched"));
+      setBuildStartTime(null); // Reset the start time
+      setElapsedTime(0); // Reset elapsed time
+    }
+  }, [buildNumber, refetchProjects, refetchBuilds]);
 
   const handleBuildService = async () => {
     setIsDeploying(true); // Start loading
@@ -215,6 +254,13 @@ export default function ProjectDetailPage({ params }: PropsParams) {
         variant: "success",
         duration: 3000,
       });
+
+      // Wait for 6 seconds before refetching data
+      setTimeout(() => {
+        refetchProjects(); // Refetch project data
+        refetchBuilds(); // Refetch build data
+      }, 6000); // 6000 milliseconds = 6 seconds
+
     } catch (err) {
       const error = err as ErrorResponse;
 
@@ -634,10 +680,23 @@ export default function ProjectDetailPage({ params }: PropsParams) {
                       {buildNumber.length > 0 && buildNumber[0].status === "BUILDING" ? (
                         // Build in progress
                         <>
-                          <Loader2 className="w-8 h-8 animate-spin text-blue-500 dark:text-blue-400" />
-                          <p className="mt-4 text-gray-600 dark:text-gray-400 text-center">
-                            Build in progress... Please wait.
-                          </p>
+                          {isRefetching ? (
+                            // Show a loading spinner while waiting for refetch
+                            <>
+                              <Loader2 className="w-8 h-8 animate-spin text-blue-500 dark:text-blue-400" />
+                              <p className="mt-4 text-gray-600 dark:text-gray-400 text-center">
+                                Refreshing build status... Please wait.
+                              </p>
+                            </>
+                          ) : (
+                            // Show the default building message
+                            <>
+                              <Loader2 className="w-8 h-8 animate-spin text-blue-500 dark:text-blue-400" />
+                              <p className="mt-4 text-gray-600 dark:text-gray-400 text-center">
+                                Build in progress... Please wait.
+                              </p>
+                            </>
+                          )}
                         </>
                       ) : buildNumber.length > 0 && buildNumber[0].status === "FAILED" ? (
                         // Build failed
