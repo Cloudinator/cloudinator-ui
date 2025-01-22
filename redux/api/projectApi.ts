@@ -1,4 +1,4 @@
-import {createServiceApi} from "@/redux/api/baseApi";
+import { createServiceApi } from "@/redux/api/baseApi";
 
 type Workspace = {
     uuid: string,
@@ -58,13 +58,21 @@ type Database = {
     password: string,
     dbType: string,
     dbVersion: string,
-    workspaceName: string,
+    workspaceName: string | null,
     gitUrl: string,
     branch: string,
-    status:boolean,
+    status: boolean,
     subdomain: string,
     name: string,
+    port: string,
 }
+
+type DatabaseResponse = {
+    results: Database[];
+    total: number;
+    page: number;
+    size: number;
+};
 
 const projectApi = createServiceApi('project')
 
@@ -83,8 +91,8 @@ export const projectsApi = projectApi.injectEndpoints({
         }),
 
 
-        getServiceDeployment: builder.query<Service[], { workspaceName: string,size: number,page:number }>({
-            query: ({ workspaceName,size,page }) => `api/v1/deploy-service/${workspaceName}?size=${size}&page=${page}`,
+        getServiceDeployment: builder.query<Service[], { workspaceName: string, size: number, page: number }>({
+            query: ({ workspaceName, size, page }) => `api/v1/deploy-service/${workspaceName}?size=${size}&page=${page}`,
         }),
 
         getServiceByName: builder.query<Service, { name: string }>({
@@ -95,19 +103,19 @@ export const projectsApi = projectApi.injectEndpoints({
             query: ({ name }) => `api/v1/deploy-service/get-build-numbers/${name}`,
         }),
 
-        createServiceDeployment: builder.mutation<Service, { name: string, gitUrl: string, branch:string,subdomain:string,workspaceName:string,token:string,type:string}>({
-            query: ({ name,gitUrl,branch,subdomain,workspaceName,token,type }) => ({
+        createServiceDeployment: builder.mutation<Service, { name: string, gitUrl: string, branch: string, subdomain: string, workspaceName: string, token: string, type: string }>({
+            query: ({ name, gitUrl, branch, subdomain, workspaceName, token, type }) => ({
                 url: 'api/v1/deploy-service/create-service',
                 method: 'POST',
-                body: { name,gitUrl,branch,subdomain,workspaceName,token,type },
+                body: { name, gitUrl, branch, subdomain, workspaceName, token, type },
             }),
         }),
 
-        deployZipService : builder.mutation<Service, { name: string, gitUrl: string, workspaceName:string,token:string,type:string,branch:string}>({
-            query: ({ name,gitUrl,workspaceName,token,type,branch }) => ({
+        deployZipService: builder.mutation<Service, { name: string, gitUrl: string, workspaceName: string, token: string, type: string, branch: string }>({
+            query: ({ name, gitUrl, workspaceName, token, type, branch }) => ({
                 url: 'api/v1/deploy-service/deploy-zip-service',
                 method: 'POST',
-                body: { name,gitUrl,workspaceName,token,type,branch },
+                body: { name, gitUrl, workspaceName, token, type, branch },
             }),
         }),
 
@@ -118,8 +126,8 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
-        deleteServiceDeployment: builder.mutation<void, {name:string}>({
-            query: ({name}) => ({
+        deleteServiceDeployment: builder.mutation<void, { name: string }>({
+            query: ({ name }) => ({
                 url: `api/v1/deploy-service/delete-service/${name}`,
                 method: 'DELETE',
             }),
@@ -132,15 +140,15 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
-        buildService: builder.mutation<Service,{name:string}>({
-            query: ({name}) => ({
+        buildService: builder.mutation<Service, { name: string }>({
+            query: ({ name }) => ({
                 url: `api/v1/deploy-service/run-service/${name}`,
                 method: 'POST',
             }),
         }),
 
-        getBuildingLogs: builder.query<Service, { jobName: string,buildNumber:number }>({
-            query: ({ jobName,buildNumber }) => `api/v1/deploy-service/stream-logs/${jobName}/${buildNumber}`,
+        getBuildingLogs: builder.query<Service, { jobName: string, buildNumber: number }>({
+            query: ({ jobName, buildNumber }) => `api/v1/deploy-service/stream-logs/${jobName}/${buildNumber}`,
         }),
 
         updateWorkspace: builder.mutation<Workspace, { uuid: string, name: string }>({
@@ -166,22 +174,22 @@ export const projectsApi = projectApi.injectEndpoints({
             }),
         }),
 
-        getSubWorkspaces: builder.query<Service[], { workspaceName: string,size: number,page:number }>({
-            query: ({ workspaceName,size,page }) => `api/v1/sub-workspace/${workspaceName}?size=${size}&page=${page}`,
+        getSubWorkspaces: builder.query<Service[], { workspaceName: string, size: number, page: number }>({
+            query: ({ workspaceName, size, page }) => `api/v1/sub-workspace/${workspaceName}?size=${size}&page=${page}`,
         }),
 
-        deleteSubWorkSpace:builder.mutation<void, {name:string}>({
-            query: ({name}) => ({
+        deleteSubWorkSpace: builder.mutation<void, { name: string }>({
+            query: ({ name }) => ({
                 url: `api/v1/sub-workspace/delete/${name}`,
                 method: 'DELETE',
             }),
         }),
 
-        createProject: builder.mutation<SpringProject, { name: string, group: string, folder: string, dependencies: string[],servicesNames:string[] }>({
-            query: ({ name, group, folder, dependencies,servicesNames }) => ({
+        createProject: builder.mutation<SpringProject, { name: string, group: string, folder: string, dependencies: string[], servicesNames: string[] }>({
+            query: ({ name, group, folder, dependencies, servicesNames }) => ({
                 url: '/api/v1/spring/create-service',
                 method: 'POST',
-                body: { name, group, folder,servicesNames, dependencies },
+                body: { name, group, folder, servicesNames, dependencies },
             }),
         }),
 
@@ -193,12 +201,12 @@ export const projectsApi = projectApi.injectEndpoints({
             query: ({ name }) => `api/v1/spring/project/${name}`,
         }),
 
-        getProjects: builder.query<Service[], { subWorkspace: string,size: number,page:number }>({
-            query: ({ subWorkspace,size,page }) => `api/v1/spring/${subWorkspace}?size=${size}&page=${page}`,
+        getProjects: builder.query<Service[], { subWorkspace: string, size: number, page: number }>({
+            query: ({ subWorkspace, size, page }) => `api/v1/spring/${subWorkspace}?size=${size}&page=${page}`,
         }),
 
-        getBuildNumberInFolder : builder.query<BuildNumber, { folder: string,name:string }>({
-            query: ({ folder,name }) => `api/v1/spring/get-build-numbers/${folder}/${name}`,
+        getBuildNumberInFolder: builder.query<BuildNumber, { folder: string, name: string }>({
+            query: ({ folder, name }) => `api/v1/spring/get-build-numbers/${folder}/${name}`,
         }),
 
         buildSpringService: builder.mutation<void, { folder: string, name: string, serviceName: string[] }>({
@@ -227,31 +235,31 @@ export const projectsApi = projectApi.injectEndpoints({
             query: () => 'api/v1/gitlab/projects',
         }),
 
-        createGitlabService: builder.mutation<Repository,{name:string,branch:string,workspaceName:string,token:string}>({
-            query: ({name,branch,workspaceName,token}) => ({
+        createGitlabService: builder.mutation<Repository, { name: string, branch: string, workspaceName: string, token: string }>({
+            query: ({ name, branch, workspaceName, token }) => ({
                 url: 'api/v1/deploy-service/deploy-gitlab-service',
                 method: 'POST',
-                body: {name,branch,workspaceName,token},
+                body: { name, branch, workspaceName, token },
             }),
         }),
 
-        createExistingProject: builder.mutation<SpringProject,{name: string, folder: string, servicesNames:string[]}>({
-            query: ({ name, folder,servicesNames }) => ({
+        createExistingProject: builder.mutation<SpringProject, { name: string, folder: string, servicesNames: string[] }>({
+            query: ({ name, folder, servicesNames }) => ({
                 url: '/api/v1/spring/create-existing-service',
                 method: 'POST',
-                body: { name, folder,servicesNames },
+                body: { name, folder, servicesNames },
             }),
         }),
 
-        updateExistingService: builder.mutation<SpringProject,{name: string, folder: string, servicesNames:string[]}>({
-            query: ({ name, folder,servicesNames }) => ({
+        updateExistingService: builder.mutation<SpringProject, { name: string, folder: string, servicesNames: string[] }>({
+            query: ({ name, folder, servicesNames }) => ({
                 url: '/api/v1/spring/update-service',
                 method: 'PUT',
-                body: { name, folder,servicesNames },
+                body: { name, folder, servicesNames },
             }),
         }),
 
-        deploySpringService: builder.mutation<SpringProject,{name:string,folder:string}>({
+        deploySpringService: builder.mutation<SpringProject, { name: string, folder: string }>({
             query: ({ name, folder }) => ({
                 url: `/api/v1/spring/build-service/${folder}/${name}`,
                 method: 'POST'
@@ -262,37 +270,33 @@ export const projectsApi = projectApi.injectEndpoints({
             query: () => 'api/v1/workspace/count-workspaces',
         }),
 
-        countSubworkspaces: builder.query<SubWorkspace, {name:string}>({
-            query: ({name}) => `api/v1/sub-workspace/count-sub/${name}`,
+        countSubworkspaces: builder.query<SubWorkspace, { name: string }>({
+            query: ({ name }) => `api/v1/sub-workspace/count-sub/${name}`,
         }),
 
-        countService: builder.query<SubWorkspace, {name:string}>({
-            query: ({name}) => `api/v1/deploy-service/count-deploy-service/${name}`,
+        countService: builder.query<SubWorkspace, { name: string }>({
+            query: ({ name }) => `api/v1/deploy-service/count-deploy-service/${name}`,
         }),
 
         getBuildAnalytic: builder.query<BuildAnalytic, void>({
             query: () => 'api/v1/deploy-service/get-build-analytics',
         }),
 
-        createDatabase: builder.mutation<void, { dbName: string, dbUser: string, dbPassword: string,dbType:string,dbVersion:string, workspaceName: string }>({
-            query: ({ dbName, dbUser, dbPassword,dbType,dbVersion, workspaceName }) => ({
+        createDatabase: builder.mutation<void, { dbName: string, dbUser: string, dbPassword: string, dbType: string, dbVersion: string, workspaceName: string }>({
+            query: ({ dbName, dbUser, dbPassword, dbType, dbVersion, workspaceName }) => ({
                 url: 'api/v1/database/deploy-database',
                 method: 'POST',
-                body: { dbName, dbUser, dbPassword,dbType,dbVersion, workspaceName },
+                body: { dbName, dbUser, dbPassword, dbType, dbVersion, workspaceName },
             }),
         }),
 
-        getDatabaseServices: builder.query<Database[], { workspaceName: string,size: number,page:number }>({
-            query: ({ workspaceName,size,page }) => `api/v1/database/${workspaceName}?size=${size}&page=${page}`,
-        }),
-
-
-
-
+        getDatabaseServices: builder.query<DatabaseResponse, { workspaceName: string; size: number; page: number }>({
+            query: ({ workspaceName, size, page }) => `api/v1/database/${workspaceName}?size=${size}&page=${page}`,
+          }),
 
     }),
 })
 
 
-export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation,useGetTestMutation,useGetMetadataQuery,useDeleteSpringProjectMutation,useGetRepositoryQuery,useCreateGitlabServiceMutation,useCreateExistingProjectMutation,useUpdateExistingServiceMutation,useDeploySpringServiceMutation,useCountWorkspaceQuery,
-useCountSubworkspacesQuery,useCountServiceQuery,useGetBuildAnalyticQuery,useCreateDatabaseMutation,useGetDatabaseServicesQuery} = projectsApi
+export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation, useCreateServiceDeploymentMutation, useGetServiceDeploymentQuery, useGetServiceByNameQuery, useGetBuildInfoByNameQuery, useGetBuildingLogsQuery, useBuildServiceMutation, useCreateSubWorkspaceMutation, useGetSubWorkspacesQuery, useCreateProjectMutation, useGetProjectsQuery, useGetBuildNumberInFolderQuery, useBuildSpringServiceMutation, useGetProjectByNameQuery, useStopServiceDeploymentMutation, useStartServiceDeploymentMutation, useDeployZipServiceMutation, useDeleteServiceDeploymentMutation, useDeleteSubWorkSpaceMutation, useGetTestMutation, useGetMetadataQuery, useDeleteSpringProjectMutation, useGetRepositoryQuery, useCreateGitlabServiceMutation, useCreateExistingProjectMutation, useUpdateExistingServiceMutation, useDeploySpringServiceMutation, useCountWorkspaceQuery,
+    useCountSubworkspacesQuery, useCountServiceQuery, useGetBuildAnalyticQuery, useCreateDatabaseMutation, useGetDatabaseServicesQuery } = projectsApi

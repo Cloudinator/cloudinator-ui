@@ -12,6 +12,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 // import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
+import { ConfettiFireworks } from "./ConfettiFireworks";
 
 type StreamingLogProps = {
   name: string;
@@ -19,6 +21,7 @@ type StreamingLogProps = {
 };
 
 export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
+  const { toast } = useToast();
   const [logs, setLogs] = useState<string[]>([]);
   const [isDeploying, setIsDeploying] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +32,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterLevel, setFilterLevel] = useState("all");
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const connectToEventSource = () => {
     const url = `https://stream.psa-khmer.world/api/v1/jenkins/stream-log/${name}/${buildNumber}`;
@@ -55,11 +59,32 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
       console.log("Received message:", event.data);
       const newLogs = event.data.split("\n");
 
-      // Check if the build is successful
+      // Check for deployment success
       if (newLogs.some((log: string) => log.includes("Finished: SUCCESS"))) {
         setIsDeploying(false);
         setProgress(100);
-        eventSourceRef.current?.close(); // Close the connection on success
+
+        toast({
+          title: "Deployment Successful",
+          description: "Your deployment has completed successfully.",
+          variant: "success",
+        });
+
+        // Trigger confetti animation
+        setShowConfetti(true); // Use state to control the confetti animation
+
+        eventSourceRef.current?.close();
+      }
+
+      // Check for deployment failure
+      if (newLogs.some((log: string) => log.includes("Finished: FAILURE"))) {
+        setIsDeploying(false);
+        toast({
+          title: "Deployment Failed",
+          description: "There was an error during deployment.",
+          variant: "error",
+        });
+        eventSourceRef.current?.close();
       }
 
       setLogs((prevLogs) => [...prevLogs, ...newLogs]);
@@ -106,12 +131,29 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
 
   const toggleAutoScroll = () => setAutoScroll(!autoScroll);
 
+  // Function to categorize logs into errors, warnings, and info
+  const logStats = useMemo(() => {
+    const errorCount = logs.filter((log) =>
+      /error/i.test(log), // Case-insensitive match for "error"
+    ).length;
+    const warningCount = logs.filter((log) =>
+      /warn/i.test(log), // Case-insensitive match for "warn"
+    ).length;
+    const infoCount = logs.filter((log) =>
+      /info/i.test(log), // Case-insensitive match for "info"
+    ).length;
+    return { errorCount, warningCount, infoCount };
+  }, [logs]);
+
+  // Function to get the log level (error, warn, info)
   const getLogLevel = (log: string) => {
-    if (log.includes("ERROR")) return "error";
-    if (log.includes("WARN")) return "warn";
-    return "info";
+    if (/error/i.test(log)) return "error";
+    if (/warn/i.test(log)) return "warn";
+    if (/info/i.test(log)) return "info";
+    return "unknown";
   };
 
+  // Function to get the log icon based on the log level
   const getLogIcon = (log: string) => {
     const level = getLogLevel(log);
     switch (level) {
@@ -119,42 +161,35 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
         return <span>❌</span>;
       case "warn":
         return <span>⚠️</span>;
-      default:
+      case "info":
         return <span>ℹ️</span>;
+      default:
+        return <span>🔍</span>; // Default icon for unknown log levels
     }
   };
 
-  const logStats = useMemo(() => {
-    const errorCount = logs.filter((log) =>
-      log.toLowerCase().includes("error"),
-    ).length;
-    const warningCount = logs.filter((log) =>
-      log.toLowerCase().includes("warning"),
-    ).length;
-    const infoCount = logs.filter((log) =>
-      log.toLowerCase().includes("info"),
-    ).length;
-    return { errorCount, warningCount, infoCount };
-  }, [logs]);
-
+  // Function to get the CSS class for a log based on its level
   const getLogClass = (log: string) => {
-    if (log.toLowerCase().includes("error"))
-      return "text-red-500 dark:text-red-400";
-    if (log.toLowerCase().includes("warning"))
-      return "text-yellow-500 dark:text-yellow-400";
-    if (log.toLowerCase().includes("info"))
-      return "text-blue-500 dark:text-blue-400";
-    return "text-gray-700 dark:text-gray-300";
+    const level = getLogLevel(log);
+    switch (level) {
+      case "error":
+        return "text-red-500 dark:text-red-400";
+      case "warn":
+        return "text-yellow-500 dark:text-yellow-400";
+      case "info":
+        return "text-blue-500 dark:text-blue-400";
+      default:
+        return "text-gray-700 dark:text-gray-300";
+    }
   };
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div
-        className={`mb-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-all duration-500 ${
-          isDeploying
-            ? "border-2 border-purple-500 animate-glow" // Glowing border when deploying
-            : "border border-gray-200 dark:border-gray-700" // Default border when not deploying
-        }`}
+        className={`mb-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-all duration-500 ${isDeploying
+          ? "border-2 border-purple-500 animate-glow" // Glowing border when deploying
+          : "border border-gray-200 dark:border-gray-700" // Default border when not deploying
+          }`}
       >
         <h1 className="text-3xl font-bold mb-2 text-gray-800 dark:text-white">
           <span className="text-purple-500 font-semibold">{name}</span> Logs
@@ -180,6 +215,7 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
         </div>
       </div>
 
+      {/* Log Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex items-center justify-between">
           <div className="flex items-center">
@@ -313,6 +349,8 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
             <div className="inline-block h-4 w-1 bg-blue-500 dark:bg-blue-400 animate-blink ml-2" />
           )}
 
+          {showConfetti && <ConfettiFireworks autoTrigger={true} />}
+
           {/* Custom scrollbar styling */}
           <style jsx>{`
             @keyframes fade-in {
@@ -395,3 +433,4 @@ export const StreamingLog = ({ name, buildNumber }: StreamingLogProps) => {
     </div>
   );
 };
+

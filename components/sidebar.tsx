@@ -4,16 +4,36 @@
 import { cn } from "@/lib/utils";
 import { PanelLeftClose, PanelRightClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ModeToggle } from "./ModeToggle";
 import { MainNav } from "./main-nav";
 
 
 export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Retrieve the collapsed state from localStorage or default to false
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedState = localStorage.getItem("sidebar-collapsed");
 
-  const toggleCollapse = () => setIsCollapsed((prev) => !prev);
+
+      
+      return savedState ? JSON.parse(savedState) : false;
+    }
+    return false;
+  });
+
+  // Save the collapsed state to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("sidebar-collapsed", JSON.stringify(isCollapsed));
+    }
+  }, [isCollapsed]);
+
+  // Toggle the collapsed state
+  const toggleCollapse = () => {
+    setIsCollapsed((prev: boolean) => !prev);
+  };
 
   return (
     <main>
