@@ -41,17 +41,16 @@ const ProjectDetailPage = (props: PropsParams) => {
     const [deploySpringService] = useDeploySpringServiceMutation();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false); // Add loading state
-    const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null); // For polling
 
     const jobName = params?.jobName + '-pipeline';
 
     // Fetch project data
-    const { data: projects, error: projectError, refetch: getdata } = useGetProjectByNameQuery({
+    const { data: projects, refetch: getdata } = useGetProjectByNameQuery({
         name: params?.jobName || ''
     });
 
     // Fetch build number data
-    const { data: buildNumber, error: buildError, refetch: refetchBuildNumber } = useGetBuildNumberInFolderQuery({
+    const { data: buildNumber, refetch: refetchBuildNumber } = useGetBuildNumberInFolderQuery({
         folder: projects?.namespace ?? '',
         name: jobName ?? ''
     }) as { data: BuildHistory[] | undefined, error: ErrorResponse, refetch: () => void };
@@ -73,52 +72,6 @@ const ProjectDetailPage = (props: PropsParams) => {
             console.log(params.jobName);
         }
     }, [params]);
-
-    // Start polling when the component mounts
-    useEffect(() => {
-        const interval = setInterval(() => {
-            refetchBuildNumber(); // Refetch build number data
-        }, 5000); // Poll every 5 seconds
-
-        setPollingInterval(interval);
-
-        // Cleanup interval on component unmount
-        return () => {
-            if (pollingInterval) clearInterval(pollingInterval);
-        };
-    }, [params, projects?.namespace, jobName, refetchBuildNumber, pollingInterval]); // Dependencies to restart polling if these change
-
-    // Handle errors dynamically
-    if (projectError || buildError) {
-        const error = (projectError || buildError) as ErrorResponse;
-        const statusCode = error?.originalStatus || 500;
-        const errorMessage = error?.data?.message || "An unexpected error occurred.";
-
-        return (
-            <div className="container mx-auto py-8 px-2">
-                <Breadcrumbs />
-                <div className="flex flex-col items-center justify-center h-[80vh]">
-                    <div className="text-center">
-                        <XCircle className="h-16 w-16 mx-auto text-red-500" />
-                        <h1 className="text-3xl font-bold text-red-500 mt-4">
-                            {statusCode === 404 ? "Page Not Found" : "Something Went Wrong"}
-                        </h1>
-                        <p className="text-gray-500 mt-2">
-                            {statusCode === 404
-                                ? "The page you're looking for doesn't exist."
-                                : errorMessage}
-                        </p>
-                        <Button
-                            onClick={() => window.location.reload()}
-                            className="mt-6 bg-purple-500 hover:bg-purple-700 text-white"
-                        >
-                            Reload Page
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     const handleBuildService = async () => {
         setIsLoading(true); // Set loading to true when deployment starts

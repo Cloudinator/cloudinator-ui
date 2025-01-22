@@ -1,5 +1,6 @@
 "use client";
 
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useEffect, useState } from "react";
 import {
   Plus,
@@ -39,7 +40,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import ERDDiagram from "@/components/profiledashboard/workspace/service/ERDDiagram";
@@ -126,6 +126,12 @@ type BuildHistoryItem = {
   buildNumber: number;
   status: "BUILDING" | "SUCCESS" | "FAILURE";
 };
+
+interface SortableItemProps {
+  id: string; // Unique identifier for the item
+  projectName: string; // The name of the project/service
+  onRemove: (id: string) => void; // Callback to remove the item
+}
 
 export default function SubWorkspacePage(props: PropsParams) {
   const [params, setParams] = useState<{ name: string } | null>(null);
@@ -345,9 +351,23 @@ export default function SubWorkspacePage(props: PropsParams) {
     }
   };
 
-  function SortableItem(props: { id: string }) {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-      useSortable({ id: props.id });
+  // Handle adding/removing projects
+  const toggleProjectSelection = (projectName: string) => {
+    setSelectedProjects((prevSelected) =>
+      prevSelected.includes(projectName)
+        ? prevSelected.filter((name) => name !== projectName) // Remove if already selected
+        : [...prevSelected, projectName] // Add if not selected
+    );
+  };
+
+  function SortableItem({ id, projectName, onRemove }: SortableItemProps) {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+    } = useSortable({ id });
 
     const style = {
       transform: CSS.Transform.toString(transform),
@@ -368,14 +388,12 @@ export default function SubWorkspacePage(props: PropsParams) {
       >
         <span className="flex items-center">
           <GripVertical className="mr-2 h-4 w-4" />
-          {props.id}
+          {projectName}
         </span>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() =>
-            setSelectedServices(selectedServices.filter((s) => s !== props.id))
-          }
+          onClick={() => onRemove(id)} // Trigger the onRemove callback
           className="text-primary-foreground hover:text-primary-foreground/80"
         >
           <X className="h-4 w-4" />
@@ -427,10 +445,7 @@ export default function SubWorkspacePage(props: PropsParams) {
 
 
           <div className="flex space-x-2">
-            <Dialog
-              open={isDeployDialogOpen}
-              onOpenChange={setIsDeployDialogOpen}
-            >
+            <Dialog open={isDeployDialogOpen} onOpenChange={setIsDeployDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-purple-500 hover:bg-purple-700 dark:text-white">
                   <Plus className="mr-2 h-4 w-4" />
@@ -439,34 +454,31 @@ export default function SubWorkspacePage(props: PropsParams) {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle className="text-2xl text-purple-500">
-                    Select Services
-                  </DialogTitle>
-                  <DialogDescription>
-                    Choose the services you want to use
-                  </DialogDescription>
+                  <DialogTitle className="text-2xl text-purple-500">Select Services</DialogTitle>
+                  <DialogDescription>Choose the services you want to use</DialogDescription>
                 </DialogHeader>
                 <div className="mt-4">
                   <div className="p-4 border rounded-lg space-y-4">
-                    <div className="text-sm text-muted-foreground">
-                      Selected services:
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProjects.map((projectName) => {
-                        const project = springProjects.find(
-                          (p) => p.name === projectName,
-                        );
-                        return project ? (
-                          <Badge
-                            key={project.name}
-                            variant="secondary"
-                            className="bg-purple-100 text-purple-700 hover:bg-purple-200"
-                          >
-                            {project.name}
-                          </Badge>
-                        ) : null;
-                      })}
-                    </div>
+                    <div className="text-sm text-muted-foreground">Selected services:</div>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      modifiers={[restrictToVerticalAxis]}
+                    >
+                      <SortableContext items={selectedServices} strategy={verticalListSortingStrategy}>
+                        <AnimatePresence>
+                          {selectedServices.map((service) => (
+                            <SortableItem
+                              key={service}
+                              id={service}
+                              projectName={service}
+                              onRemove={(id) => setSelectedServices((prev) => prev.filter((s) => s !== id))}
+                            />
+                          ))}
+                        </AnimatePresence>
+                      </SortableContext>
+                    </DndContext>
                   </div>
                   <Collapsible className="mt-4">
                     <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border p-4 text-left text-sm font-medium hover:bg-gray-100">
@@ -478,21 +490,14 @@ export default function SubWorkspacePage(props: PropsParams) {
                         {springProjects.map((project) => (
                           <div
                             key={project.name}
-                            className="flex items-center space-x-2"
+                            className="flex items-center space-x-2 cursor-pointer"
+                            onClick={() => toggleProjectSelection(project.name)}
                           >
-                            <Checkbox
-                              id={project.name}
-                              checked={selectedProjects.includes(project.name)}
-                              onCheckedChange={(checked) => {
-                                setSelectedProjects(
-                                  checked
-                                    ? [...selectedProjects, project.name]
-                                    : selectedProjects.filter(
-                                      (name) => name !== project.name,
-                                    ),
-                                );
-                              }}
-                              className="border-purple-500 text-purple-500"
+                            <div
+                              className={`w-4 h-4 border rounded ${selectedProjects.includes(project.name)
+                                ? 'bg-purple-500 border-purple-500'
+                                : 'border-gray-300'
+                                }`}
                             />
                             <label
                               htmlFor={project.name}
@@ -510,10 +515,7 @@ export default function SubWorkspacePage(props: PropsParams) {
                   <Button onClick={handleBuildProject} variant="outline">
                     Build
                   </Button>
-                  <Button
-                    onClick={handleDeployProject}
-                    className="bg-purple-600 hover:bg-purple-700"
-                  >
+                  <Button onClick={handleDeployProject} className="bg-purple-600 hover:bg-purple-700">
                     Deploy
                   </Button>
                 </DialogFooter>
@@ -581,7 +583,7 @@ export default function SubWorkspacePage(props: PropsParams) {
                     <div className="space-y-4 p-6 bg-muted rounded-lg">
                       <Label
                         htmlFor="existing-project-name"
-                        className="text-lg font-semibold"
+                        className="text-lg text-purple-500 font-semibold"
                       >
                         Project Name
                       </Label>
@@ -595,7 +597,7 @@ export default function SubWorkspacePage(props: PropsParams) {
                       <div className="space-y-2">
                         <Label
                           htmlFor="service-select"
-                          className="text-lg font-semibold"
+                          className="text-lg text-purple-500 font-semibold"
                         >
                           Select Services
                         </Label>
@@ -625,21 +627,24 @@ export default function SubWorkspacePage(props: PropsParams) {
                         </div>
                       </div>
                       <div className="mt-4">
-                        <Label className="text-lg font-semibold mb-2 block">
+                        <Label className="text-lg text-purple-500 font-semibold mb-2 block">
                           Selected Services (Drag to reorder)
                         </Label>
                         <DndContext
                           sensors={sensors}
                           collisionDetection={closestCenter}
                           onDragEnd={handleDragEnd}
+                          modifiers={[restrictToVerticalAxis]}
                         >
-                          <SortableContext
-                            items={selectedServices}
-                            strategy={verticalListSortingStrategy}
-                          >
+                          <SortableContext items={selectedServices} strategy={verticalListSortingStrategy}>
                             <AnimatePresence>
                               {selectedServices.map((service) => (
-                                <SortableItem key={service} id={service} />
+                                <SortableItem
+                                  key={service}
+                                  id={service}
+                                  projectName={service}
+                                  onRemove={(id) => setSelectedServices((prev) => prev.filter((s) => s !== id))}
+                                />
                               ))}
                             </AnimatePresence>
                           </SortableContext>
