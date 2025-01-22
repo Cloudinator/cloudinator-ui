@@ -1,7 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ChevronRight, Plus, FileText, ChevronDown, MoreVertical, Sparkles, Code, ArrowRight, GripVertical, X } from 'lucide-react';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { useCallback, useEffect, useState } from "react";
+import {
+  Plus,
+  FileText,
+  ChevronDown,
+  MoreVertical,
+  Sparkles,
+  Code,
+  ArrowRight,
+  GripVertical,
+  FolderOpen,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +39,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import ERDDiagram from "@/components/profiledashboard/workspace/service/ERDDiagram";
@@ -77,11 +87,20 @@ import { CSS } from "@dnd-kit/utilities";
 import { motion, AnimatePresence } from "framer-motion";
 import { GitCommandModal } from "@/components/profiledashboard/workspace/GitCommandModal";
 import { useGetMeQuery } from "@/redux/api/userApi";
-import {useToast} from "@/hooks/use-toast";
+import Breadcrumbs from "@/components/Breadcrumb2";
+import { useToast } from "@/hooks/use-toast";
 
 export type PropsParams = {
   params: Promise<{ name: string }>;
 };
+
+interface ErrorResponse {
+  status?: string;
+  originalStatus?: number;
+  data?: {
+    message?: string;
+  };
+}
 
 type SpringProjectType = {
   uuid: string;
@@ -107,12 +126,10 @@ type BuildHistoryItem = {
   status: "BUILDING" | "SUCCESS" | "FAILURE";
 };
 
-interface ErrorResponse {
-  status?: string | number;
-  originalStatus?: number;
-  data?: {
-    message?: string;
-  };
+interface SortableItemProps {
+  id: string; // Unique identifier for the item
+  projectName: string; // The name of the project/service
+  onRemove: (id: string) => void; // Callback to remove the item
 }
 
 export default function SubWorkspacePage(props: PropsParams) {
@@ -128,18 +145,17 @@ export default function SubWorkspacePage(props: PropsParams) {
       useState<SpringProjectType | null>(null);
   const [deleteConfirmationName, setDeleteConfirmationName] = useState("");
   const [deleteConfirmationError, setDeleteConfirmationError] = useState("");
-  const [existingProjectName, setExistingProjectName] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const [gitName, setGitName] = useState<string | null>(null);
-
+  const [existingProjectName, setExistingProjectName] = useState<string | null>(
+      null,
+  );
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [createExistingProject] = useCreateExistingProjectMutation();
 
   const [deleteSpringProject] = useDeleteSpringProjectMutation();
   const [isGitCommandModalOpen, setIsGitCommandModalOpen] = useState(false);
+  const [defaultValue, setDefaultValue] = useState('spring-projects');
 
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const { data: profile } = useGetMeQuery();
 
@@ -168,10 +184,20 @@ export default function SubWorkspacePage(props: PropsParams) {
     name: params?.name ?? "",
   });
 
-  const handleDeployProject = () => {
-    console.log("Deploying projects:", selectedProjects);
-    setIsDeployDialogOpen(false);
+  // Retrieve the stored tab value from localStorage when the component mounts
+  useEffect(() => {
+    const storedTab = localStorage.getItem('selectedTab');
+    if (storedTab) {
+      setDefaultValue(storedTab);
+    }
+  }, []);
+
+  // Store the selected tab in localStorage when the user changes tabs
+  const handleTabChange = (value: string) => {
+    localStorage.setItem('selectedTab', value);
+    setDefaultValue(value);
   };
+
 
   const handleBuildProject = () => {
     try {
@@ -194,8 +220,21 @@ export default function SubWorkspacePage(props: PropsParams) {
         name: project.name,
       });
 
+      // Show success toast
+      toast({
+        title: "Success",
+        description: "Project deleted successfully.",
+        variant: "success",
+      });
+
       console.log(result);
     } catch (error) {
+      // Show error toast
+      toast({
+        title: "Error",
+        description: "Failed to delete the project.",
+        variant: "error",
+      });
       console.log(error);
     } finally {
       refetch();
@@ -239,53 +278,66 @@ export default function SubWorkspacePage(props: PropsParams) {
   };
 
   const handleCreateExistingProject = async (name: string) => {
-    if (!name || error) {
-      setError("Please enter a valid project name");
-      return;
-    }
-
-    const existingProjectName = name + Math.floor(Math.random() * 1000);
-
-    setGitName(existingProjectName);
-
     try {
       const result = await createExistingProject({
         folder: params?.name ?? "",
-        name: existingProjectName,
+        name: name,
         servicesNames: selectedServices,
-      }).unwrap()
+      }).unwrap();
 
+      // Show success toast
+      toast({
+        title: "Success",
+        description: `Project "${name}" created successfully.`,
+        variant: "success",
+        duration: 3000,
+      });
 
+      console.log("Project created successfully:", result);
 
-      console.log(result);
+      // Reset state and close the dialog
+      setIsCreateProjectDialogOpen(false);
+      setSelectedServices([]);
+
+      // Refetch data
+      refetch();
     } catch (err) {
-
       const error = err as ErrorResponse;
 
-      if (error?.status === 'PARSING_ERROR' && error?.originalStatus === 200) {
+      console.log("Failed to create project:", error);
+
+      // Handle parsing error or other errors
+      if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
+        // Show success toast for parsing error with 200 status
         toast({
           title: "Success",
           description:
               error?.data?.message ||
-              `ProjectName "${name}" created successfully!`,
+              `Project "${name}" created successfully (parsing error).`,
           variant: "success",
           duration: 3000,
         });
+
+        // Reset state and close the dialog
         setIsCreateProjectDialogOpen(false);
         setSelectedServices([]);
-        setIsGitCommandModalOpen(true);
+
+        // Refetch data
         refetch();
-      }else {
+      } else {
+        // Show error toast for other errors
         toast({
           title: "Error",
           description:
-              error?.data?.message || "Failed to create project. Please try again.",
+              error?.data?.message ||
+              "Failed to create the project. Please try again.",
           variant: "error",
           duration: 5000,
         });
-      }
 
-      console.log(error);
+        // Open Git Command Modal for fallback
+        setIsGitCommandModalOpen(true);
+      }
     }
   };
 
@@ -296,38 +348,42 @@ export default function SubWorkspacePage(props: PropsParams) {
       }),
   );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim();
-    setExistingProjectName(value);
-    if (!value) {
-      setError("Project name cannot be empty");
-    } else if (value.length < 3) {
-      setError("Project name must be at least 3 characters long");
-    } else if (value.length > 50) {
-      setError("Project name must not exceed 50 characters");
-    } else if (!/^[a-zA-Z0-9-_]+$/.test(value)) {
-      setError("Project name can only contain letters, numbers, hyphens, and underscores");
-    } else {
-      setError(null);
-    }
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
+    if (active.id !== over?.id) {
       setSelectedServices((items) => {
-        const oldIndex = items.indexOf(active.id.toString());
-        const newIndex = items.indexOf(over.id.toString());
-
+        const oldIndex = items.indexOf(active.id as string);
+        const newIndex = items.indexOf(over?.id as string);
         return arrayMove(items, oldIndex, newIndex);
       });
     }
-  };
+  }, []);
 
-  function SortableItem(props: { id: string }) {
-    const { attributes, listeners, setNodeRef, transform, transition } =
-        useSortable({ id: props.id });
+  // Handle adding/removing projects
+  const toggleProjectSelection = useCallback((projectName: string) => {
+    setSelectedProjects((prev) =>
+        prev.includes(projectName)
+            ? prev.filter((name) => name !== projectName)
+            : [...prev, projectName]
+    );
+
+    setSelectedServices((prev) =>
+        prev.includes(projectName)
+            ? prev.filter((name) => name !== projectName)
+            : [...prev, projectName]
+    );
+  }, []);
+
+
+  function SortableItem({ id, projectName, onRemove }: SortableItemProps) {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+    } = useSortable({ id });
 
     const style = {
       transform: CSS.Transform.toString(transform),
@@ -335,32 +391,25 @@ export default function SubWorkspacePage(props: PropsParams) {
     };
 
     return (
-        <motion.li
+        <div
             ref={setNodeRef}
             style={style}
             {...attributes}
-            {...listeners}
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex justify-between items-center mb-2 cursor-move"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
+            className="flex items-center justify-between p-3 bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
         >
-        <span className="flex items-center">
-          <GripVertical className="mr-2 h-4 w-4" />
-          {props.id}
-        </span>
+          <div className="flex items-center space-x-2">
+            <GripVertical className="h-5 w-5 text-gray-500 cursor-move" {...listeners} />
+            <span className="font-medium text-gray-700">{projectName}</span>
+          </div>
           <Button
               variant="ghost"
               size="sm"
-              onClick={() =>
-                  setSelectedServices(selectedServices.filter((s) => s !== props.id))
-              }
-              className="text-primary-foreground hover:text-primary-foreground/80"
+              onClick={() => onRemove(id)}
+              className="text-red-500 hover:text-red-700"
           >
-            <X className="h-4 w-4" />
+            Remove
           </Button>
-        </motion.li>
+        </div>
     );
   }
 
@@ -370,7 +419,7 @@ export default function SubWorkspacePage(props: PropsParams) {
 
   const gitCommands = [
     "git init --initial-branch=main",
-    `git remote add origin https://git.cloudinator.cloud/group-${profile.username}/${gitName}.git`,
+    `git remote add origin https://git.cloudinator.cloud/group-${profile.username}/${existingProjectName}.git`,
     "git add .",
     'git commit -m "message"',
     "git push --set-upstream origin main",
@@ -378,255 +427,275 @@ export default function SubWorkspacePage(props: PropsParams) {
 
   return (
       <div className="flex-1 space-y-6 p-8">
-        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Link href={"/workspace"}>workspace</Link>
-          <ChevronRight className="h-4 w-4" />
-          <span className="font-medium text-foreground">{params?.name}</span>
-        </div>
+        <Breadcrumbs />
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-purple-500">
-              Spring Microservices
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Manage Spring microservice projects and their relationships
-            </p>
-          </div>
-          <div className="flex space-x-2">
-            <Dialog
-                open={isDeployDialogOpen}
-                onOpenChange={setIsDeployDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <Button className="bg-purple-500 hover:bg-purple-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Deploy/Build
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl text-purple-500">Select Services</DialogTitle>
-                  <DialogDescription>
-                    Choose the services you want to use
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="mt-4">
-                  <div className="p-4 border rounded-lg space-y-4">
-                    <div className="text-sm text-muted-foreground">
-                      Selected services:
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProjects.map((projectName) => {
-                        const project = springProjects.find(
-                            (p) => p.name === projectName,
-                        );
-                        return project ? (
-                            <Badge
-                                key={project.name}
-                                variant="secondary"
-                                className="bg-purple-100 text-purple-700 hover:bg-purple-200"
-                            >
-                              {project.name}
-                            </Badge>
-                        ) : null;
-                      })}
-                    </div>
-                  </div>
-                  <Collapsible className="mt-4">
-                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border p-4 text-left text-sm font-medium hover:bg-gray-100">
-                      {selectedProjects.length} services selected
-                      <ChevronDown className="h-4 w-4" />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-2">
-                      <div className="rounded-lg border p-4 space-y-3">
-                        {springProjects.map((project) => (
-                            <div
-                                key={project.name}
-                                className="flex items-center space-x-2"
-                            >
-                              <Checkbox
-                                  id={project.name}
-                                  checked={selectedProjects.includes(project.name)}
-                                  onCheckedChange={(checked) => {
-                                    setSelectedProjects(
-                                        checked
-                                            ? [...selectedProjects, project.name]
-                                            : selectedProjects.filter(
-                                                (name) => name !== project.name,
-                                            ),
-                                    );
-                                  }}
-                                  className="border-purple-500 text-purple-500"
+          {/* <div>
+          <h1 className="text-3xl font-bold tracking-tight text-purple-500">
+            Spring Microservices
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Manage Spring microservice projects and their relationships
+          </p>
+        </div> */}
+
+          <div className="flex justify-between items-center w-full bg-white dark:bg-gray-900 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg shadow-gray-200/20 dark:shadow-purple-500/10">
+            {/* Workspace Title */}
+            <div className="flex items-center gap-4">
+              <div>
+                <Plus className="w-8 h-8 text-purple-500" />
+              </div>
+              <div>
+                <h1 className="text-purple-500 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 font-bold text-4xl">
+                  Spring Microservices
+                </h1>
+
+              </div>
+              <p className="text-lg text-muted-foreground">Manage Spring Microservice projects and their relationships</p>
+            </div>
+
+
+            <div className="flex space-x-2">
+              <Dialog open={isDeployDialogOpen} onOpenChange={setIsDeployDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-purple-500 hover:bg-purple-700 dark:text-white">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Deploy/Build
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl text-purple-500">Select Services</DialogTitle>
+                    <DialogDescription>Choose the services you want to use</DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    <div className="p-4 border rounded-lg space-y-4">
+                      <div className="text-sm text-muted-foreground">Selected services:</div>
+                      <DndContext
+                          sensors={sensors}
+                          collisionDetection={closestCenter}
+                          onDragEnd={handleDragEnd}
+                          modifiers={[restrictToVerticalAxis]}
+                      >
+                        <SortableContext items={selectedServices} strategy={verticalListSortingStrategy}>
+                          {selectedServices.map((service) => (
+                              <SortableItem
+                                  key={service}
+                                  id={service}
+                                  projectName={service}
+                                  onRemove={(id) => setSelectedServices((prev) => prev.filter((s) => s !== id))}
                               />
-                              <label
-                                  htmlFor={project.name}
-                                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          ))}
+                        </SortableContext>
+                      </DndContext>
+                    </div>
+                    <Collapsible className="mt-4">
+                      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border p-4 text-left text-sm font-medium hover:bg-gray-100">
+                        {selectedProjects.length} services selected
+                        <ChevronDown className="h-4 w-4" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-2">
+                        <div className="rounded-lg border p-4 space-y-3">
+                          {springProjects.map((project) => (
+                              <div
+                                  key={project.name}
+                                  className="flex items-center space-x-2 cursor-pointer"
+                                  onClick={() => toggleProjectSelection(project.name)}
                               >
-                                {project.name}
-                              </label>
-                            </div>
-                        ))}
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                </div>
-                <DialogFooter className="mt-6 space-x-2">
-                  <Button onClick={handleBuildProject} variant="outline">
-                    Build
-                  </Button>
-                  <Button
-                      onClick={handleDeployProject}
-                      className="bg-purple-600 hover:bg-purple-700"
-                  >
-                    Deploy
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            <Dialog
-                open={isCreateProjectDialogOpen}
-                onOpenChange={setIsCreateProjectDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <Button
-                    className="bg-purple-500 hover:bg-purple-700"
-                    onClick={() => setIsCreateProjectDialogOpen(true)}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Spring Project
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[700px]">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold text-center text-purple-500">
-                    Create Your Spring Project
-                  </DialogTitle>
-                  <DialogDescription className="text-center">
-                    Choose your preferred method to kickstart your Spring project
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col space-y-6 mt-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card
-                        className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
-                        onClick={() => handleCreateProject("new")}
-                    >
-                      <CardHeader className="flex flex-col items-center">
-                        <Sparkles className="h-12 w-12 text-purple-500 mb-2" />
-                        <CardTitle className="text-purple-500">Create New Project</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-center text-sm text-muted-foreground">
-                          Start fresh with a new Spring project using our
-                          initializer
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card
-                        className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
-                        onClick={() => handleCreateProject("existing")}
-                    >
-                      <CardHeader className="flex flex-col items-center">
-                        <Code className="h-12 w-12 text-purple-500 mb-2" />
-                        <CardTitle className="text-purple-500">Use Existing Code</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-center text-sm text-muted-foreground">
-                          Import your existing Spring project code
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  {existingProjectName !== null && (
-                      <div className="space-y-4 p-6 bg-muted rounded-lg">
-                        <Label
-                            htmlFor="existing-project-name"
-                            className="text-lg font-semibold"
-                        >
-                          Project Name
-                        </Label>
-                        <Input
-                            id="existing-project-name"
-                            value={existingProjectName}
-                            onChange={handleInputChange}
-                            placeholder="Enter your project name"
-                            className="w-full"
-                            required
-                        />
-                        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-                        <div className="space-y-2">
-                          <Label
-                              htmlFor="service-select"
-                              className="text-lg font-semibold"
-                          >
-                            Select Services
-                          </Label>
-                          <div className="flex space-x-2 flex-wrap">
-                            {springProjects.map((project) => (
-                                <Button
-                                    key={project.uuid}
-                                    variant={
-                                      selectedServices.includes(project.name)
-                                          ? "secondary"
-                                          : "outline"
-                                    }
-                                    className="mb-2"
-                                    onClick={() => {
-                                      setSelectedServices((prevSelected) =>
-                                          prevSelected.includes(project.name)
-                                              ? prevSelected.filter(
-                                                  (item) => item !== project.name,
-                                              )
-                                              : [...prevSelected, project.name],
-                                      );
-                                    }}
+                                <div
+                                    className={`w-4 h-4 border rounded ${selectedProjects.includes(project.name)
+                                        ? 'bg-purple-500 border-purple-500'
+                                        : 'border-gray-300'
+                                    }`}
+                                />
+                                <label
+                                    htmlFor={project.name}
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                 >
                                   {project.name}
-                                </Button>
-                            ))}
-                          </div>
+                                </label>
+                              </div>
+                          ))}
                         </div>
-                        <div className="mt-4">
-                          <Label className="text-lg font-semibold mb-2 block">
-                            Selected Services (Drag to reorder)
-                          </Label>
-                          <DndContext
-                              sensors={sensors}
-                              collisionDetection={closestCenter}
-                              onDragEnd={handleDragEnd}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                  <DialogFooter className="mt-6 space-x-2">
+                    <Button onClick={handleBuildProject} variant="outline">
+                      Build
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Dialog
+                  open={isCreateProjectDialogOpen}
+                  onOpenChange={setIsCreateProjectDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                      className="bg-purple-500 hover:bg-purple-700 dark:text-white"
+                      onClick={() => setIsCreateProjectDialogOpen(true)}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Spring Project
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[700px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-center text-purple-500">
+                      Create Your Spring Project
+                    </DialogTitle>
+                    <DialogDescription className="text-center">
+                      Choose your preferred method to kickstart your Spring project
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col space-y-6 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <Card
+                          className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
+                          onClick={() => handleCreateProject("new")}
+                      >
+                        <CardHeader className="flex flex-col items-center">
+                          <Sparkles className="h-12 w-12 text-purple-500 mb-2" />
+                          <CardTitle className="text-purple-500">
+                            Create New Project
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-center text-sm text-muted-foreground">
+                            Start fresh with a new Spring project using our
+                            initializer
+                          </p>
+                        </CardContent>
+                      </Card>
+                      <Card
+                          className="cursor-pointer transition-all duration-300 hover:border-purple-500 hover:shadow-md"
+                          onClick={() => handleCreateProject("existing")}
+                      >
+                        <CardHeader className="flex flex-col items-center">
+                          <Code className="h-12 w-12 text-purple-500 mb-2" />
+                          <CardTitle className="text-purple-500">
+                            Use Existing Code
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-center text-sm text-muted-foreground">
+                            Import your existing Spring project code
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    {existingProjectName !== null && (
+                        <div className="space-y-4 p-6 bg-muted rounded-lg">
+                          <Label
+                              htmlFor="existing-project-name"
+                              className="text-lg text-purple-500 font-semibold"
                           >
-                            <SortableContext
-                                items={selectedServices}
-                                strategy={verticalListSortingStrategy}
+                            Project Name
+                          </Label>
+                          <Input
+                              id="existing-project-name"
+                              value={existingProjectName}
+                              onChange={(e) => setExistingProjectName(e.target.value)}
+                              placeholder="Enter your project name"
+                              className="w-full"
+                          />
+                          <div className="space-y-2">
+                            <Label
+                                htmlFor="service-select"
+                                className="text-lg text-purple-500 font-semibold"
                             >
-                              <AnimatePresence>
-                                {selectedServices.map((service) => (
-                                    <SortableItem key={service} id={service} />
-                                ))}
-                              </AnimatePresence>
-                            </SortableContext>
-                          </DndContext>
+                              Select Services
+                            </Label>
+                            <div className="flex space-x-2 flex-wrap">
+                              {springProjects.map((project) => (
+                                  <Button
+                                      key={project.uuid}
+                                      variant={
+                                        selectedServices.includes(project.name)
+                                            ? "secondary"
+                                            : "outline"
+                                      }
+                                      className="mb-2"
+                                      onClick={() => {
+                                        setSelectedServices((prevSelected) =>
+                                            prevSelected.includes(project.name)
+                                                ? prevSelected.filter(
+                                                    (item) => item !== project.name,
+                                                )
+                                                : [...prevSelected, project.name],
+                                        );
+                                      }}
+                                  >
+                                    {project.name}
+                                  </Button>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="mt-4">
+                            <Label className="text-lg text-purple-500 font-semibold mb-2 block">
+                              Selected Services (Drag to reorder)
+                            </Label>
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleDragEnd}
+                                modifiers={[restrictToVerticalAxis]}
+                            >
+                              <SortableContext items={selectedServices} strategy={verticalListSortingStrategy}>
+                                <AnimatePresence>
+                                  {selectedServices.map((service) => (
+                                      <SortableItem
+                                          key={service}
+                                          id={service}
+                                          projectName={service}
+                                          onRemove={(id) => setSelectedServices((prev) => prev.filter((s) => s !== id))}
+                                      />
+                                  ))}
+                                </AnimatePresence>
+                              </SortableContext>
+                            </DndContext>
+                          </div>
+                          <Button
+                              onClick={() => handleCreateExistingProject(existingProjectName)}
+                              className="w-full flex items-center gap-2 bg-purple-500 hover:bg-purple-700 text-white focus:ring-2 focus:ring-purple-700 focus:ring-offset-2"
+                              disabled={!existingProjectName?.trim()} // Trim and check if empty
+                          >
+                            Create Project
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                          {!existingProjectName?.trim() && (
+                              <div className="flex items-center gap-2 mt-1 p-2 bg-red-50 border border-red-200 rounded-md">
+                                {/* Icon for attention */}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-5 w-5 text-orange-500"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+                                  <path
+                                      fillRule="evenodd"
+                                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                      clipRule="evenodd"
+                                  />
+                                </svg>
+                                {/* Error message */}
+                                <p className="text-orange-600 text-sm">
+                                  Attention: Please enter a valid service name.
+                                </p>
+                              </div>
+                          )}
                         </div>
-                        <Button
-                            onClick={() =>
-                                handleCreateExistingProject(existingProjectName)
-                            }
-                            className="w-full bg-primary hover:bg-primary/90"
-                            disabled={!existingProjectName || !!error}
-                        >
-                          Create Project
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
 
-        <Tabs defaultValue="spring-projects" className="space-y-4 w-full">
+
+        <Tabs defaultValue={defaultValue} className="mt-6 w-full" onValueChange={handleTabChange}>
           <TabsList className="w-full flex">
             <TabsTrigger
                 value="spring-projects"
@@ -653,65 +722,116 @@ export default function SubWorkspacePage(props: PropsParams) {
             {springProjects.length > 0 ? (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {springProjects.map((project) => (
-                      <Card key={project.uuid}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <CardTitle className="text-sm font-medium">
-                            {project.name}
-                          </CardTitle>
-                          <div className="flex items-center space-x-2">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                  <span className="sr-only">Open menu</span>
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                  <Link
-                                      href={`/workspace/sub-workspace/${params?.name}/${project.name}`}
+                      <motion.div
+                          key={project.uuid} // Ensure key is added to the motion.div
+                          initial={{ opacity: 0, y: 20 }} // Initial animation state
+                          animate={{ opacity: 1, y: 0 }} // Animate to this state
+                          transition={{ duration: 0.3, ease: "easeOut" }} // Smooth transition
+                          whileHover={{ scale: 1.02 }} // Scale up on hover
+                          whileTap={{ scale: 0.98 }} // Scale down on tap
+                      >
+                        <Link
+                            href={`/workspace/sub-workspace/${params?.name}/${project.name}`}
+                        >
+                          <Card className="transition-all duration-300 hover:shadow-lg relative bg-white dark:bg-black/20 backdrop-blur-md dark:backdrop-blur-md border border-gray-200 dark:border-white/20 rounded-xl hover:border-purple-500/50 hover:shadow-purple-500/20 dark:hover:border-purple-500/50 dark:hover:shadow-purple-500/20 cursor-pointer">
+                            {/* Card Header */}
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                              <CardTitle className="text-lg font-medium truncate max-w-[70%] text-purple-500 dark:text-white">
+                                {project.name}
+                              </CardTitle>
+                              <div className="flex items-center space-x-2">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full"
+                                        onClick={(e) => e.stopPropagation()} // Prevent card click when dropdown is clicked
+                                    >
+                                      <span className="sr-only">Open menu</span>
+                                      <MoreVertical className="h-4 w-4 text-gray-900 dark:text-white" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent
+                                      align="end"
+                                      className="w-48 bg-white dark:bg-black/80 backdrop-blur-md dark:backdrop-blur-md border border-gray-200 dark:border-white/20 rounded-lg"
                                   >
-                                    Go to Detail
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onSelect={() => handleDeleteProject(project)}
-                                >
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Branch:</span>
-                              <span>{project.branch}</span>
-                            </div>
-                            <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          Namespace:
-                        </span>
-                              <span>{project.namespace}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Git:</span>
-                              <span className="truncate max-w-[150px]">
-                          {project.git}
-                        </span>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                                    <DropdownMenuItem asChild>
+                                      <Link
+                                          href={`/workspace/sub-workspace/${params?.name}/${project.name}`}
+                                          className="w-full flex items-center text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10"
+                                      >
+                                        <span>Go to Detail</span>
+                                      </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={(e) => {
+                                          e.preventDefault(); // Prevent default behavior
+                                          e.stopPropagation(); // Stop event propagation
+                                          handleDeleteProject(project); // Handle delete action
+                                        }}
+                                        className="text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-500"
+                                    >
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </CardHeader>
+
+                            {/* Card Content */}
+                            <CardContent>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Branch:
+                            </span>
+                                  <span className="font-medium text-gray-900 dark:text-white">
+                              {project.branch}
+                            </span>
+                                </div>
+                                <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Namespace:
+                            </span>
+                                  <span className="font-medium text-gray-900 dark:text-white">
+                              {project.namespace}
+                            </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Git:</span>
+                                  <span className="font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
+                              {project.git}
+                            </span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      </motion.div>
                   ))}
                 </div>
             ) : (
-                <div className="flex justify-center items-center h-64">
-                  <p className="text-muted-foreground">
-                    No Spring Projects available.
-                  </p>
-                </div>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex justify-center items-center h-64"
+                >
+                  <div className="text-center space-y-2">
+                    <FolderOpen className="h-8 w-8 text-muted-foreground mx-auto" />{" "}
+                    {/* Add an icon for empty state */}
+                    <p className="text-muted-foreground">
+                      No Spring Projects available.
+                    </p>
+                    <Button
+                        variant="outline"
+                        onClick={() => setIsCreateProjectDialogOpen(true)}
+                        className="mt-2 bg-purple-500 hover:bg-purple-700 text-white hover:text-white"
+                    >
+                      Create New Project
+                    </Button>
+                  </div>
+                </motion.div>
             )}
           </TabsContent>
 
@@ -720,7 +840,7 @@ export default function SubWorkspacePage(props: PropsParams) {
             {springProjects.length > 0 ? (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Microservices Relationship Diagram</CardTitle>
+                    <CardTitle className="text-purple-500 font-semibold text-xl">Microservices Relationship Diagram</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[600px] border rounded-md">
@@ -763,18 +883,25 @@ export default function SubWorkspacePage(props: PropsParams) {
                                 <Badge
                                     variant={
                                       build.status === "SUCCESS"
-                                          ? "default"
+                                          ? "default" // Green for success
                                           : build.status === "FAILURE"
-                                              ? "destructive"
-                                              : "secondary"
+                                              ? "destructive" // Red for failure
+                                              : "secondary" // Yellow for building
+                                    }
+                                    className={
+                                      build.status === "SUCCESS"
+                                          ? "bg-green-500 hover:bg-green-600 text-white" // Green for success
+                                          : build.status === "FAILURE"
+                                              ? "bg-red-500 hover:bg-red-600 text-white" // Red for failure
+                                              : "bg-yellow-500 hover:bg-yellow-600 text-white" // Yellow for building
                                     }
                                 >
                                   {build.status}
                                 </Badge>
                               </TableCell>
                               <TableCell>
-                                <Button variant="outline" size="sm">
-                                  <FileText className="h-4 w-4 mr-2" />
+                                <Button variant="outline" className="text-purple-500" size="sm">
+                                  <FileText className="h-4 w-4 mr-2 text-purple" />
                                   <Link
                                       href={`/workspace/sub-workspace/${params?.name}/${params?.name}/${build?.buildNumber}`}
                                   >
@@ -813,41 +940,60 @@ export default function SubWorkspacePage(props: PropsParams) {
             open={isDeleteDialogOpen}
             onOpenChange={setIsDeleteDialogOpen}
         >
-          <AlertDialogContent>
+          <AlertDialogContent className="max-w-md">
             <AlertDialogHeader>
-              <AlertDialogTitle>
+              <AlertDialogTitle className="text-xl font-semibold text-purple-500">
                 Are you sure you want to delete this project?
               </AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                project &#34;{projectToDelete?.name}&#34; and remove all of its
-                data. To confirm, please enter the project name below.
+              <AlertDialogDescription className="mt-2 text-gray-600">
+                This will permanently delete the project &quot;
+                <span className="text-purple-500">{projectToDelete?.name}</span>
+                &quot; and remove all of its data. To confirm, please enter the
+                project name below.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <div className="my-4">
+            <div className="my-6">
               <input
                   type="text"
                   value={deleteConfirmationName}
                   onChange={handleDeleteConfirmationNameChange}
+                  onPaste={(e) => {
+                    e.preventDefault(); // Prevent pasting
+                    setDeleteConfirmationError(
+                        "To ensure accuracy, please type the project name manually.",
+                    );
+                  }}
                   placeholder="Enter project name to confirm"
-                  className="w-full p-2 border rounded"
+                  className={`w-full p-3 border ${deleteConfirmationError ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 ${deleteConfirmationError
+                      ? "focus:ring-red-500"
+                      : "focus:ring-blue-500"
+                  } transition-colors`}
               />
               {deleteConfirmationError && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="text-red-500 text-sm mt-2">
                     {deleteConfirmationError}
                   </p>
               )}
             </div>
-            <AlertDialogFooter>
+            <AlertDialogFooter className="flex justify-end space-x-4">
               <AlertDialogCancel
                   onClick={() => {
                     setDeleteConfirmationName("");
                     setDeleteConfirmationError("");
                   }}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction onClick={confirmDeleteProject}>
+              <AlertDialogAction
+                  onClick={confirmDeleteProject}
+                  disabled={deleteConfirmationName !== projectToDelete?.name} // Disable if input doesn't match
+                  className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 ${deleteConfirmationName === projectToDelete?.name
+                      ? "bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                      : "bg-red-300 cursor-not-allowed" // Disabled state styling
+                  }`}
+              >
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -862,4 +1008,3 @@ export default function SubWorkspacePage(props: PropsParams) {
       </div>
   );
 }
-
