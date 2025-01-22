@@ -18,9 +18,11 @@ import { useCreateWorkspaceMutation, useGetWorkspacesQuery } from "@/redux/api/p
 import { useToast } from "@/hooks/use-toast"
 
 interface ErrorResponse {
-  data?: {
-    message?: string;
-  };
+    status?: string | number;
+    originalStatus?: number;
+    data?: {
+        message?: string;
+    };
 }
 
 export function CreateWorkspaceModal() {
@@ -55,20 +57,43 @@ export function CreateWorkspaceModal() {
 
             console.log(results)
 
-            setWorkspaceName("")
-            setOpen(false)
+
         } catch (err) {
             const error = err as ErrorResponse
             console.error(error)
 
-            toast({
-                title: "Error",
-                description: error?.data?.message || "Failed to create workspace. Please try again.",
-                variant: "error",
-                duration: 5000,
-            })
-        } finally {
-            setIsCreating(false)
+            if (error?.status === "PARSING_ERROR" && error?.originalStatus === 200) {
+                toast({
+                    title: "Success",
+                    description:
+                        error?.data?.message ||
+                        `Workspace name "${formattedWorkspaceName}" created successfully!`,
+                    variant: "success",
+                    duration: 3000,
+                });
+                setWorkspaceName("")
+                setOpen(false)
+                setIsCreating(false)
+            } else if (error?.status == 409) {
+                toast({
+                    title: "Error",
+                    description:
+                        error?.data?.message || "Failed to Workspace. Please try again.",
+                    variant: "error",
+                    duration: 5000,
+                });
+            } else {
+                toast({
+                    title: "Error",
+                    description:
+                        error?.data?.message ||
+                        "Failed to Workspace. Please try again.",
+                    variant: "error",
+                    duration: 5000,
+                });
+            }
+
+
         }
     }
 
