@@ -1,7 +1,7 @@
 "use client";
 
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Plus,
   FileText,
@@ -12,7 +12,6 @@ import {
   ArrowRight,
   GripVertical,
   FolderOpen,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -338,27 +337,33 @@ export default function SubWorkspacePage(props: PropsParams) {
     }),
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
+    if (active.id !== over?.id) {
       setSelectedServices((items) => {
-        const oldIndex = items.indexOf(active.id.toString());
-        const newIndex = items.indexOf(over.id.toString());
-
+        const oldIndex = items.indexOf(active.id as string);
+        const newIndex = items.indexOf(over?.id as string);
         return arrayMove(items, oldIndex, newIndex);
       });
     }
-  };
+  }, []);
 
   // Handle adding/removing projects
-  const toggleProjectSelection = (projectName: string) => {
-    setSelectedProjects((prevSelected) =>
-      prevSelected.includes(projectName)
-        ? prevSelected.filter((name) => name !== projectName) // Remove if already selected
-        : [...prevSelected, projectName] // Add if not selected
+  const toggleProjectSelection = useCallback((projectName: string) => {
+    setSelectedProjects((prev) =>
+      prev.includes(projectName)
+        ? prev.filter((name) => name !== projectName)
+        : [...prev, projectName]
     );
-  };
+
+    setSelectedServices((prev) =>
+      prev.includes(projectName)
+        ? prev.filter((name) => name !== projectName)
+        : [...prev, projectName]
+    );
+  }, []);
+
 
   function SortableItem({ id, projectName, onRemove }: SortableItemProps) {
     const {
@@ -375,30 +380,25 @@ export default function SubWorkspacePage(props: PropsParams) {
     };
 
     return (
-      <motion.li
+      <div
         ref={setNodeRef}
         style={style}
         {...attributes}
-        {...listeners}
-        className="bg-primary text-primary-foreground px-4 py-2 rounded-md flex justify-between items-center mb-2 cursor-move"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 10 }}
-        transition={{ duration: 0.2 }}
+        className="flex items-center justify-between p-3 bg-gray-100 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
       >
-        <span className="flex items-center">
-          <GripVertical className="mr-2 h-4 w-4" />
-          {projectName}
-        </span>
+        <div className="flex items-center space-x-2">
+          <GripVertical className="h-5 w-5 text-gray-500 cursor-move" {...listeners} />
+          <span className="font-medium text-gray-700">{projectName}</span>
+        </div>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onRemove(id)} // Trigger the onRemove callback
-          className="text-primary-foreground hover:text-primary-foreground/80"
+          onClick={() => onRemove(id)}
+          className="text-red-500 hover:text-red-700"
         >
-          <X className="h-4 w-4" />
+          Remove
         </Button>
-      </motion.li>
+      </div>
     );
   }
 
@@ -467,16 +467,14 @@ export default function SubWorkspacePage(props: PropsParams) {
                       modifiers={[restrictToVerticalAxis]}
                     >
                       <SortableContext items={selectedServices} strategy={verticalListSortingStrategy}>
-                        <AnimatePresence>
-                          {selectedServices.map((service) => (
-                            <SortableItem
-                              key={service}
-                              id={service}
-                              projectName={service}
-                              onRemove={(id) => setSelectedServices((prev) => prev.filter((s) => s !== id))}
-                            />
-                          ))}
-                        </AnimatePresence>
+                        {selectedServices.map((service) => (
+                          <SortableItem
+                            key={service}
+                            id={service}
+                            projectName={service}
+                            onRemove={(id) => setSelectedServices((prev) => prev.filter((s) => s !== id))}
+                          />
+                        ))}
                       </SortableContext>
                     </DndContext>
                   </div>
