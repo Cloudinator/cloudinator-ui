@@ -20,7 +20,7 @@ import {
   BuildNumber,
   useBuildServiceMutation,
   useGetBuildInfoByNameQuery,
-  useGetServiceByNameQuery,
+  useGetServiceByNameQuery, useRollbackServiceMutation,
   useStartServiceDeploymentMutation,
   useStopServiceDeploymentMutation,
 } from "@/redux/api/projectApi";
@@ -73,6 +73,7 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   const [buildService] = useBuildServiceMutation();
   const [stopServiceDeployment] = useStopServiceDeploymentMutation();
   const [startServiceDeployment] = useStartServiceDeploymentMutation();
+  const [rollbackService] = useRollbackServiceMutation();
 
   const {
     data: projects,
@@ -330,10 +331,18 @@ export default function ProjectDetailPage({ params }: PropsParams) {
   const handleRollback = async (version: number) => {
     try {
       console.log(`Rolling back to version ${version}`);
-      // Implement your rollback logic here
-      // await rollbackService({ name: projectName, version });
-      // After successful rollback, you may want to refresh the build history
-      // await refetchBuilds();
+
+      console.log("Rollback successful",projects?.name,projects?.gitUrl,projects?.branch,version,projects?.subdomain);
+
+      await rollbackService({
+        namespace: projects?.name || "",
+        repo: projects?.gitUrl || "",
+        branch: projects?.branch || "",
+        tag: String(version) || "",
+        domain: projects?.subdomain || "",
+      })
+
+
     } catch (error) {
       console.error("Failed to rollback:", error);
     }

@@ -287,7 +287,13 @@ export const projectsApi = projectApi.injectEndpoints({
         }),
 
 
-
+        rollbackService: builder.mutation<void , {branch:string,repo:string,domain:string,tag:string,namespace:string}>({
+            query: ({branch,repo,domain,tag,namespace}) => ({
+                url: 'api/v1/deploy-service/rollback-service',
+                method: 'POST',
+                body: {branch,repo,domain,tag,namespace},
+            }),
+        }),
 
 
     }),
@@ -295,4 +301,4 @@ export const projectsApi = projectApi.injectEndpoints({
 
 
 export const { useGetWorkspacesQuery, useCreateWorkspaceMutation, useUpdateWorkspaceMutation, useDeleteWorkspaceMutation,useCreateServiceDeploymentMutation ,useGetServiceDeploymentQuery,useGetServiceByNameQuery,useGetBuildInfoByNameQuery,useGetBuildingLogsQuery,useBuildServiceMutation,useCreateSubWorkspaceMutation,useGetSubWorkspacesQuery,useCreateProjectMutation,useGetProjectsQuery,useGetBuildNumberInFolderQuery,useBuildSpringServiceMutation,useGetProjectByNameQuery,useStopServiceDeploymentMutation,useStartServiceDeploymentMutation,useDeployZipServiceMutation,useDeleteServiceDeploymentMutation,useDeleteSubWorkSpaceMutation,useGetTestMutation,useGetMetadataQuery,useDeleteSpringProjectMutation,useGetRepositoryQuery,useCreateGitlabServiceMutation,useCreateExistingProjectMutation,useUpdateExistingServiceMutation,useDeploySpringServiceMutation,useCountWorkspaceQuery,
-useCountSubworkspacesQuery,useCountServiceQuery,useGetBuildAnalyticQuery,useCreateDatabaseMutation,useGetDatabaseServicesQuery} = projectsApi
+useCountSubworkspacesQuery,useCountServiceQuery,useGetBuildAnalyticQuery,useCreateDatabaseMutation,useGetDatabaseServicesQuery,useRollbackServiceMutation} = projectsApi
