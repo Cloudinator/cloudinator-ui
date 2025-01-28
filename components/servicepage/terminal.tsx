@@ -81,7 +81,7 @@ export default function TerminalPage() {
     }, [activeTab, currentLineIndex, tabs])
 
     return (
-        <section className="bg-gray-50 py-8 md:py-8">
+        <section className="bg-gray-50 py-8 md:py-8 dark:bg-gray-800">
             <div className="container mx-auto px-4">
             
                 <div className="text-center">
