@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
-import logo from "@/public/cloudinator-v2.1.png";
+import logo from "/cloudinator-v2.1.png";
 
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ModeToggle";
