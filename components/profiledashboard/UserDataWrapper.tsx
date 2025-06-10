@@ -19,7 +19,7 @@ export default function UserDataWrapper({
   useEffect(() => {
     if (!isLoading && isError) {
       // Assuming isError indicates an expired token
-      router.push("/expired-token");
+      // router.push("/expired-token");
     }
   }, [data, isLoading, isError, router]);
 

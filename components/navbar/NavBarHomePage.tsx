@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
-import logo from "cloudinator-v2.1.png";
-
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ModeToggle";
 import { useAuth } from "@/contexts/AuthContext";
@@ -94,7 +92,7 @@ const NavBarHomePage = () => {
           <div className="flex justify-between items-center ">
             <Link href="/" aria-label="Home">
               <Image
-                src={logo}
+                src="/cloudinator-v2.1.png"
                 alt="Cloudinator"
                 width={100}
                 height={100}
